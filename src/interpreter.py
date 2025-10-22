@@ -243,6 +243,16 @@ class Interpreter:
         # Pop return address
         return_line, return_stmt = self.runtime.pop_gosub()
 
+        # Validate that the return address still exists
+        if return_line not in self.runtime.line_table:
+            raise RuntimeError(f"RETURN error: line {return_line} no longer exists")
+
+        line_node = self.runtime.line_table[return_line]
+        # return_stmt can be == len(statements), meaning "past the end, go to next line"
+        # but it can't be > len(statements)
+        if return_stmt > len(line_node.statements):
+            raise RuntimeError(f"RETURN error: statement {return_stmt} in line {return_line} no longer exists")
+
         # Jump back to the line and statement after GOSUB
         self.runtime.next_line = return_line
         self.runtime.next_stmt_index = return_stmt
@@ -291,11 +301,24 @@ class Interpreter:
 
         # Check if loop should continue
         if (step > 0 and new_value <= loop_info['end']) or (step < 0 and new_value >= loop_info['end']):
+            # Validate that the FOR return address still exists
+            return_line = loop_info['return_line']
+            return_stmt = loop_info['return_stmt']
+
+            if return_line not in self.runtime.line_table:
+                raise RuntimeError(f"NEXT error: FOR loop line {return_line} no longer exists")
+
+            line_node = self.runtime.line_table[return_line]
+            # return_stmt can be == len(statements), meaning the FOR is the last statement
+            # but it can't be > len(statements)
+            if return_stmt > len(line_node.statements):
+                raise RuntimeError(f"NEXT error: FOR statement in line {return_line} no longer exists")
+
             # Continue loop - update variable and jump to statement AFTER the FOR
             self.runtime.set_variable(var_name.rstrip('$%!#'), var_name[-1] if var_name[-1] in '$%!#' else None, new_value)
-            self.runtime.next_line = loop_info['return_line']
+            self.runtime.next_line = return_line
             # Resume at the statement AFTER the FOR statement
-            self.runtime.next_stmt_index = loop_info['return_stmt'] + 1
+            self.runtime.next_stmt_index = return_stmt + 1
         else:
             # Loop finished
             self.runtime.pop_for_loop(var_name)

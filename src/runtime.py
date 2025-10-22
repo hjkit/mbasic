@@ -17,8 +17,19 @@ from ast_nodes import DataStatementNode, DefFnStatementNode
 class Runtime:
     """Runtime state for BASIC program execution"""
 
-    def __init__(self, ast):
-        self.ast = ast
+    def __init__(self, ast_or_line_table):
+        """Initialize runtime.
+
+        Args:
+            ast_or_line_table: Either a ProgramNode AST (old style) or a dict {line_num: LineNode} (new style)
+        """
+        # Support both old-style (full AST) and new-style (line table dict)
+        if isinstance(ast_or_line_table, dict):
+            self.ast = None
+            self.line_table_dict = ast_or_line_table
+        else:
+            self.ast = ast_or_line_table
+            self.line_table_dict = None
 
         # Variable storage
         self.variables = {}           # name -> value
@@ -71,12 +82,22 @@ class Runtime:
         Call this once before execution starts.
         """
         # Build line number table
-        for line in self.ast.lines:
-            self.line_table[line.line_number] = line
-            self.line_order.append(line.line_number)
+        if self.line_table_dict:
+            # New style: line_table already provided, just populate line_order
+            self.line_table = self.line_table_dict
+            self.line_order = sorted(self.line_table.keys())
+            lines_to_process = self.line_table.values()
+        else:
+            # Old style: build from AST
+            for line in self.ast.lines:
+                self.line_table[line.line_number] = line
+                self.line_order.append(line.line_number)
+            lines_to_process = self.ast.lines
+            # Sort line numbers for sequential execution
+            self.line_order.sort()
 
         # Extract DATA values and DEF FN definitions
-        for line in self.ast.lines:
+        for line in lines_to_process:
             for stmt in line.statements:
                 if isinstance(stmt, DataStatementNode):
                     # Flatten nested lists from DATA statement
@@ -87,9 +108,6 @@ class Runtime:
                             self.data_items.append(value)
                 elif isinstance(stmt, DefFnStatementNode):
                     self.user_functions[stmt.name] = stmt
-
-        # Sort line numbers for sequential execution
-        self.line_order.sort()
 
         return self
 

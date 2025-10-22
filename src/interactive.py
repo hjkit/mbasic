@@ -21,12 +21,27 @@ class InteractiveMode:
     """MBASIC 5.21 interactive command mode"""
 
     def __init__(self):
-        self.lines = {}  # line_number -> line_text
+        self.lines = {}  # line_number -> line_text (for SAVE/LIST)
+        self.line_asts = {}  # line_number -> LineNode (parsed AST)
         self.current_file = None
         self.runtime = None  # Persistent runtime for immediate mode
         self.interpreter = None  # Persistent interpreter
         self.program_runtime = None  # Runtime for RUN (preserved for CONT)
         self.program_interpreter = None  # Interpreter for RUN (preserved for CONT)
+
+    def parse_single_line(self, line_text):
+        """Parse a single line into a LineNode AST.
+
+        Returns: LineNode or None if parse fails
+        """
+        try:
+            tokens = list(tokenize(line_text))
+            parser = Parser(tokens)
+            line_node = parser.parse_line()
+            return line_node
+        except Exception as e:
+            print(f"?Syntax error: {e}")
+            return None
 
     def clear_execution_state(self):
         """Clear GOSUB/RETURN and FOR/NEXT stacks when program is edited.
@@ -85,13 +100,25 @@ class InteractiveMode:
                 # Delete line
                 if line_num in self.lines:
                     del self.lines[line_num]
-                    # Clear execution state - line deletion invalidates stacks
-                    self.clear_execution_state()
+                    del self.line_asts[line_num]
+                    # Update runtime's line_table if program is running
+                    if self.program_runtime and line_num in self.program_runtime.line_table:
+                        del self.program_runtime.line_table[line_num]
+                        if line_num in self.program_runtime.line_order:
+                            self.program_runtime.line_order.remove(line_num)
             else:
-                # Add/replace line
+                # Add/replace line - store both text and parsed AST
                 self.lines[line_num] = line
-                # Clear execution state - line changes invalidate stacks
-                self.clear_execution_state()
+                line_ast = self.parse_single_line(line)
+                if line_ast:
+                    self.line_asts[line_num] = line_ast
+                    # Update runtime's line_table if program is running
+                    if self.program_runtime:
+                        self.program_runtime.line_table[line_num] = line_ast
+                        if line_num not in self.program_runtime.line_order:
+                            # Insert in sorted position
+                            import bisect
+                            bisect.insort(self.program_runtime.line_order, line_num)
         else:
             # Direct command
             self.execute_command(line)
@@ -127,16 +154,9 @@ class InteractiveMode:
             return
 
         try:
-            # Build program text
-            program_text = self.get_program_text()
-
-            # Parse
-            tokens = list(tokenize(program_text))
-            parser = Parser(tokens)
-            ast = parser.parse()
-
-            # Execute
-            runtime = Runtime(ast)
+            # Execute using line ASTs directly (new style)
+            # Runtime will reference self.line_asts which is mutable
+            runtime = Runtime(self.line_asts)
             interpreter = Interpreter(runtime)
             # Pass reference to interactive mode so statements like LIST can access the line editor
             interpreter.interactive_mode = self
@@ -210,7 +230,10 @@ class InteractiveMode:
     def cmd_new(self):
         """NEW - Clear program"""
         self.lines.clear()
+        self.line_asts.clear()
         self.current_file = None
+        # Clear execution state when program is cleared
+        self.clear_execution_state()
         print("Ready")
 
     def cmd_save(self, filename):
@@ -265,6 +288,7 @@ class InteractiveMode:
 
             # Clear current program
             self.lines.clear()
+            self.line_asts.clear()
 
             # Parse and load lines
             for line in program_text.split('\n'):
@@ -276,6 +300,10 @@ class InteractiveMode:
                 if match:
                     line_num = int(match.group(1))
                     self.lines[line_num] = line
+                    # Parse line into AST
+                    line_ast = self.parse_single_line(line)
+                    if line_ast:
+                        self.line_asts[line_num] = line_ast
 
             self.current_file = filename
             print(f"Loaded from {filename}")
@@ -331,6 +359,16 @@ class InteractiveMode:
                     else:
                         lines_added += 1
                     self.lines[line_num] = line
+                    # Parse line into AST
+                    line_ast = self.parse_single_line(line)
+                    if line_ast:
+                        self.line_asts[line_num] = line_ast
+                        # Update runtime's line_table if program is running
+                        if self.program_runtime:
+                            self.program_runtime.line_table[line_num] = line_ast
+                            if line_num not in self.program_runtime.line_order:
+                                import bisect
+                                bisect.insort(self.program_runtime.line_order, line_num)
 
             print(f"Merged from {filename}")
             print(f"{lines_added} line(s) added, {lines_replaced} line(s) replaced")
@@ -356,10 +394,13 @@ class InteractiveMode:
             to_delete = [n for n in self.lines.keys() if start <= n <= end]
             for line_num in to_delete:
                 del self.lines[line_num]
-
-            # Clear execution state if any lines were deleted
-            if to_delete:
-                self.clear_execution_state()
+                if line_num in self.line_asts:
+                    del self.line_asts[line_num]
+                # Update runtime's line_table if program is running
+                if self.program_runtime and line_num in self.program_runtime.line_table:
+                    del self.program_runtime.line_table[line_num]
+                    if line_num in self.program_runtime.line_order:
+                        self.program_runtime.line_order.remove(line_num)
 
         except Exception as e:
             print(f"?Syntax error")
@@ -384,14 +425,8 @@ class InteractiveMode:
                 increment = int(parts[1])
 
         try:
-            # Parse current program
-            program_text = self.get_program_text()
-            tokens = list(tokenize(program_text))
-            parser = Parser(tokens)
-            ast = parser.parse()
-
             # Build mapping from old line numbers to new line numbers
-            old_lines = sorted(self.lines.keys())
+            old_lines = sorted(self.line_asts.keys())
             line_map = {}
 
             new_num = new_start
@@ -399,38 +434,37 @@ class InteractiveMode:
                 line_map[old_num] = new_num
                 new_num += increment
 
-            # Walk AST and update line number references
-            self._renum_ast(ast, line_map)
+            # Walk each line AST and update line number references
+            for line_node in self.line_asts.values():
+                # Update line number references in statements
+                for stmt in line_node.statements:
+                    self._renum_statement(stmt, line_map)
+                # Update the line's own number
+                old_line_num = line_node.line_number
+                line_node.line_number = line_map[old_line_num]
 
-            # Serialize updated AST back to source
-            self.lines = {}
-            for line_node in ast.lines:
-                line_text = self._serialize_line(line_node)
-                self.lines[line_node.line_number] = line_text
+            # Rebuild line_asts dict with new line numbers
+            new_line_asts = {}
+            new_lines = {}
+            for old_num in old_lines:
+                new_num = line_map[old_num]
+                line_node = self.line_asts[old_num]
+                new_line_asts[new_num] = line_node
+                new_lines[new_num] = self._serialize_line(line_node)
 
-            # Clear execution state - renumbering invalidates all line number references
-            self.clear_execution_state()
+            self.line_asts = new_line_asts
+            self.lines = new_lines
+
+            # Update runtime's line_table if program is running
+            if self.program_runtime:
+                self.program_runtime.line_table = self.line_asts
+                self.program_runtime.line_order = sorted(self.line_asts.keys())
 
             print("Renumbered")
 
         except Exception as e:
             print(f"?Error during renumber: {e}")
 
-    def _renum_ast(self, ast, line_map):
-        """Walk AST and update all line number references
-
-        Args:
-            ast: ProgramNode to update
-            line_map: dict mapping old line numbers to new line numbers
-        """
-        # Update line numbers in each LineNode
-        for line_node in ast.lines:
-            if line_node.line_number in line_map:
-                line_node.line_number = line_map[line_node.line_number]
-
-            # Update references in statements
-            for stmt in line_node.statements:
-                self._renum_statement(stmt, line_map)
 
     def _renum_statement(self, stmt, line_map):
         """Recursively update line number references in a statement
