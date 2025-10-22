@@ -269,7 +269,8 @@ class Lexer:
                     return Token(KEYWORDS[keyword], keyword, start_line, start_column)
 
         # Otherwise it's an identifier
-        return Token(TokenType.IDENTIFIER, ident, start_line, start_column)
+        # Normalize to lowercase (BASIC is case-insensitive)
+        return Token(TokenType.IDENTIFIER, ident.lower(), start_line, start_column)
 
     def read_line_number(self) -> Token:
         """Read a line number at the beginning of a line (0-65529)"""

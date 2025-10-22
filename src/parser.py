@@ -41,11 +41,11 @@ class Parser:
         self.position = 0
 
         # Global type mapping from DEF statements
-        # Maps first letter (A-Z) to type (INTEGER, SINGLE, DOUBLE, STRING)
+        # Maps first letter (a-z) to type (INTEGER, SINGLE, DOUBLE, STRING)
         self.def_type_map: Dict[str, str] = {}
 
-        # Default type is SINGLE for all letters
-        for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+        # Default type is SINGLE for all letters (use lowercase since lexer normalizes to lowercase)
+        for letter in 'abcdefghijklmnopqrstuvwxyz':
             self.def_type_map[letter] = TypeInfo.SINGLE
 
         # Symbol table - maps variable names to their types
@@ -176,15 +176,15 @@ class Parser:
                 self.advance()
                 break
 
-            # Get first letter
+            # Get first letter (already lowercase from lexer)
             token = self.current()
             if token.type != TokenType.IDENTIFIER:
                 raise ParseError(f"Expected letter in DEF statement, got {token.type.name}", token)
 
-            first_letter = token.value[0].upper()
+            first_letter = token.value[0]
             self.advance()
 
-            # Check for range (A-Z)
+            # Check for range (a-z)
             if self.match(TokenType.MINUS):
                 self.advance()
 
@@ -192,7 +192,7 @@ class Parser:
                 if token.type != TokenType.IDENTIFIER:
                     raise ParseError(f"Expected letter in DEF statement range, got {token.type.name}", token)
 
-                last_letter = token.value[0].upper()
+                last_letter = token.value[0]
                 self.advance()
 
                 # Apply type to range
@@ -920,7 +920,8 @@ class Parser:
             return TypeInfo.from_suffix(name[-1])
 
         # Check DEF type mapping
-        first_letter = name[0].upper()
+        # name[0] is already lowercase from lexer normalization
+        first_letter = name[0]
         if first_letter in self.def_type_map:
             return self.def_type_map[first_letter]
 

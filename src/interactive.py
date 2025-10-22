@@ -94,6 +94,8 @@ class InteractiveMode:
             self.cmd_save(args)
         elif command == "LOAD":
             self.cmd_load(args)
+        elif command == "AUTO":
+            self.cmd_auto(args)
         elif command == "SYSTEM" or command == "BYE":
             self.cmd_system()
         elif command == "DELETE":
@@ -292,6 +294,72 @@ class InteractiveMode:
 
         self.lines = new_lines
         print("Renumbered")
+
+    def cmd_auto(self, args):
+        """AUTO [start][,increment] - Automatic line numbering mode
+
+        AUTO - Start at 10, increment by 10
+        AUTO 100 - Start at 100, increment by 10
+        AUTO 100,5 - Start at 100, increment by 5
+        AUTO ,5 - Start at 10, increment by 5
+        """
+        start = 10
+        increment = 10
+
+        if args:
+            parts = args.split(',')
+            # Handle "AUTO start" or "AUTO start,increment"
+            if parts[0].strip():
+                try:
+                    start = int(parts[0].strip())
+                except ValueError:
+                    print("?Syntax error")
+                    return
+            # Handle "AUTO ,increment" or "AUTO start,increment"
+            if len(parts) > 1 and parts[1].strip():
+                try:
+                    increment = int(parts[1].strip())
+                except ValueError:
+                    print("?Syntax error")
+                    return
+
+        # Enter AUTO mode
+        current_line = start
+
+        try:
+            while True:
+                # Check if line already exists
+                if current_line in self.lines:
+                    # Show asterisk for existing line
+                    prompt = f"*{current_line} "
+                else:
+                    # Show line number for new line
+                    prompt = f"{current_line} "
+
+                # Read input
+                try:
+                    line_text = input(prompt)
+                except EOFError:
+                    # Ctrl+D exits AUTO mode
+                    print()
+                    break
+
+                # Check if line is empty (just pressing Enter)
+                if not line_text or not line_text.strip():
+                    # Empty line exits AUTO mode
+                    break
+
+                # Add the line with its number
+                full_line = str(current_line) + " " + line_text.strip()
+                self.lines[current_line] = full_line
+
+                # Move to next line number
+                current_line += increment
+
+        except KeyboardInterrupt:
+            # Ctrl+C exits AUTO mode
+            print()
+            return
 
     def cmd_system(self):
         """SYSTEM - Exit to operating system"""

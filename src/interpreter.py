@@ -309,9 +309,15 @@ class Interpreter:
     def execute_dim(self, stmt):
         """Execute DIM statement"""
         for array_def in stmt.arrays:
-            var_node = array_def  # It's a VariableNode with subscripts
-            dimensions = [int(self.evaluate_expression(sub)) for sub in var_node.subscripts]
-            self.runtime.dimension_array(var_node.name, var_node.type_suffix, dimensions)
+            # array_def is an ArrayDeclNode with name and dimensions
+            dimensions = [int(self.evaluate_expression(dim)) for dim in array_def.dimensions]
+            # Extract type suffix from name if present
+            name = array_def.name
+            type_suffix = None
+            if name and name[-1] in '$%!#':
+                type_suffix = name[-1]
+                name = name[:-1]
+            self.runtime.dimension_array(name, type_suffix, dimensions)
 
     def execute_input(self, stmt):
         """Execute INPUT statement"""

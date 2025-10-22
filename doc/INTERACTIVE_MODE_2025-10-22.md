@@ -127,6 +127,31 @@ BYE
 ```
 Response: `Goodbye`
 
+#### AUTO [start][,increment]
+Automatic line numbering mode:
+```
+AUTO            ' Auto number from 10, increment 10
+AUTO 100        ' Start at 100, increment 10
+AUTO 100,5      ' Start at 100, increment 5
+AUTO ,20        ' Start at 10, increment 20
+```
+
+In AUTO mode:
+- Type statements without line numbers
+- AUTO adds the line number automatically
+- Shows `*number` if line already exists (collision)
+- Press Enter on empty line to exit AUTO mode
+- Ctrl+C or Ctrl+D also exits
+
+Example:
+```
+AUTO
+10 PRINT "Hello"
+20 FOR I = 1 TO 10
+30 PRINT I
+40 ← (press Enter to exit)
+```
+
 ### Immediate Mode
 
 Execute a statement without a line number:
@@ -262,9 +287,10 @@ When running or saving, lines are sorted and concatenated.
 ✓ RENUM - Renumber lines
 ✓ SYSTEM - Exit
 
+✓ AUTO - Auto line numbering mode
+
 ### Not Yet Implemented
 
-⚠ AUTO - Auto line numbering
 ⚠ EDIT - Line editor
 ⚠ LLIST - List to printer
 ⚠ MERGE - Merge program from file

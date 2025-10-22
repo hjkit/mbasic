@@ -43,7 +43,10 @@
       "Bash(for f in qsolist rbsutl31 sleuth sdir)",
       "Bash(chmod:*)",
       "Bash(./test_interactive.sh)",
-      "Bash(timeout 2 python3:*)"
+      "Bash(timeout 2 python3:*)",
+      "Bash(./test_auto.sh:*)",
+      "Bash(./test_auto_simple.sh:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []
