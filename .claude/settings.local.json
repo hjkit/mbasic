@@ -46,7 +46,8 @@
       "Bash(timeout 2 python3:*)",
       "Bash(./test_auto.sh:*)",
       "Bash(./test_auto_simple.sh:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(./test_renum_interactive.sh:*)"
     ],
     "deny": [],
     "ask": []

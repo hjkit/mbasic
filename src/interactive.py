@@ -267,7 +267,7 @@ class InteractiveMode:
             print(f"?Syntax error")
 
     def cmd_renum(self, args):
-        """RENUM [new_start][,increment] - Renumber program lines"""
+        """RENUM [new_start][,increment] - Renumber program lines and update references"""
         new_start = 10
         increment = 10
 
@@ -278,19 +278,82 @@ class InteractiveMode:
             if len(parts) > 1 and parts[1]:
                 increment = int(parts[1])
 
-        # Renumber lines
+        # Build mapping from old line numbers to new line numbers
         old_lines = sorted(self.lines.keys())
-        new_lines = {}
+        line_map = {}
 
         new_num = new_start
         for old_num in old_lines:
-            # Get line text and replace line number
+            line_map[old_num] = new_num
+            new_num += increment
+
+        # Renumber lines and update line references
+        new_lines = {}
+
+        for old_num in old_lines:
             line_text = self.lines[old_num]
             match = re.match(r'^(\d+)(\s.*)', line_text)
-            if match:
-                new_line_text = str(new_num) + match.group(2)
-                new_lines[new_num] = new_line_text
-                new_num += increment
+            if not match:
+                continue
+
+            new_line_num = line_map[old_num]
+            rest_of_line = match.group(2)
+
+            # Update line number references in GOTO, GOSUB, THEN, ELSE, RESTORE, RUN
+            # Patterns to match:
+            # GOTO 100, GOSUB 100, THEN 100, ELSE 100, RESTORE 100, RUN 100
+            # ON x GOTO 10,20,30  ON x GOSUB 10,20,30
+
+            # Replace line numbers after these keywords
+            updated_line = rest_of_line
+
+            # Handle GOTO, GOSUB, THEN, ELSE, RESTORE, RUN followed by a line number
+            for keyword in ['GOTO', 'GOSUB', 'THEN', 'ELSE', 'RESTORE', 'RUN', 'goto', 'gosub', 'then', 'else', 'restore', 'run']:
+                # Pattern: keyword followed by optional spaces and a line number
+                pattern = r'\b' + keyword + r'\s+(\d+)\b'
+
+                def replace_linenum(match_obj):
+                    old_linenum = int(match_obj.group(1))
+                    if old_linenum in line_map:
+                        new_linenum = line_map[old_linenum]
+                        return keyword + ' ' + str(new_linenum)
+                    return match_obj.group(0)
+
+                updated_line = re.sub(pattern, replace_linenum, updated_line, flags=re.IGNORECASE)
+
+            # Handle ON...GOTO and ON...GOSUB with comma-separated line numbers
+            # Pattern: ON expr GOTO/GOSUB num,num,num
+            def replace_on_statement(match_obj):
+                prefix = match_obj.group(1)  # "ON expr GOTO " or "ON expr GOSUB "
+                line_numbers = match_obj.group(2)  # "10,20,30"
+
+                # Split and replace each line number
+                nums = line_numbers.split(',')
+                new_nums = []
+                for num in nums:
+                    num = num.strip()
+                    if num.isdigit():
+                        old_num = int(num)
+                        if old_num in line_map:
+                            new_nums.append(str(line_map[old_num]))
+                        else:
+                            new_nums.append(num)
+                    else:
+                        new_nums.append(num)
+
+                return prefix + ','.join(new_nums)
+
+            # Match ON ... GOTO/GOSUB with line number list
+            updated_line = re.sub(
+                r'\b(ON\s+\S+\s+(?:GOTO|GOSUB)\s+)([\d,\s]+)',
+                replace_on_statement,
+                updated_line,
+                flags=re.IGNORECASE
+            )
+
+            # Create the new line
+            new_line_text = str(new_line_num) + updated_line
+            new_lines[new_line_num] = new_line_text
 
         self.lines = new_lines
         print("Renumbered")
