@@ -28,6 +28,20 @@ class InteractiveMode:
         self.program_runtime = None  # Runtime for RUN (preserved for CONT)
         self.program_interpreter = None  # Interpreter for RUN (preserved for CONT)
 
+    def clear_execution_state(self):
+        """Clear GOSUB/RETURN and FOR/NEXT stacks when program is edited.
+
+        This prevents crashes when line edits invalidate saved return addresses
+        and loop contexts. Called when lines are added, deleted, or renumbered.
+        """
+        if self.program_runtime:
+            self.program_runtime.gosub_stack.clear()
+            self.program_runtime.for_loops.clear()
+            # Also clear STOP state since line edits invalidate the stop position
+            self.program_runtime.stopped = False
+            self.program_runtime.stop_line = None
+            self.program_runtime.stop_stmt_index = None
+
     def start(self):
         """Start interactive mode"""
         print("MBASIC 5.21 Interpreter")
@@ -71,9 +85,13 @@ class InteractiveMode:
                 # Delete line
                 if line_num in self.lines:
                     del self.lines[line_num]
+                    # Clear execution state - line deletion invalidates stacks
+                    self.clear_execution_state()
             else:
                 # Add/replace line
                 self.lines[line_num] = line
+                # Clear execution state - line changes invalidate stacks
+                self.clear_execution_state()
         else:
             # Direct command
             self.execute_command(line)
@@ -339,6 +357,10 @@ class InteractiveMode:
             for line_num in to_delete:
                 del self.lines[line_num]
 
+            # Clear execution state if any lines were deleted
+            if to_delete:
+                self.clear_execution_state()
+
         except Exception as e:
             print(f"?Syntax error")
 
@@ -385,6 +407,9 @@ class InteractiveMode:
             for line_node in ast.lines:
                 line_text = self._serialize_line(line_node)
                 self.lines[line_node.line_number] = line_text
+
+            # Clear execution state - renumbering invalidates all line number references
+            self.clear_execution_state()
 
             print("Renumbered")
 
