@@ -26,7 +26,17 @@
       "Bash(for f in sfamove sfaobdes sfavoc)",
       "Bash(for f in asm2mac backgamm fxparms satelite)",
       "Bash(awk:*)",
-      "Read(///**)"
+      "Read(///**)",
+      "Bash(for f in cpkhex othello qsolist rbsutl31)",
+      "Bash(do echo \"=== $f.bas ===\" awk '/^[0-9]/ {n++; if(n==1 || n==2 || n==3 || n==39 || n==59 || n==83) print}' basic/bas_tests1/$f.bas)",
+      "Bash(for f in backgamm satelite)",
+      "Bash(do echo \"=== $f.bas ===\")",
+      "Bash(for f in battle mooncalc satelite survival uudecode)",
+      "Bash(if grep -q \"^$f.bas\" test_results_parser_fail.txt)",
+      "Bash(then)",
+      "Bash(else)",
+      "Bash(fi)",
+      "Bash(do echo \"=== $f.bas ===\" grep -E \"^\\s*[0-9]+\\s+LOCATE|:\\s*LOCATE\\s+[0-9]\" basic/bas_tests1/$f.bas)"
     ],
     "deny": [],
     "ask": []

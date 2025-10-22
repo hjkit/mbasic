@@ -560,6 +560,7 @@ class DefFnStatementNode:
     expression: 'ExpressionNode'
     line_num: int = 0
     column: int = 0
+    column: int = 0
 
 
 @dataclass

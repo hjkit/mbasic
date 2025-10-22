@@ -297,6 +297,19 @@ class Parser:
             # Check for statement separator
             if self.match(TokenType.COLON):
                 self.advance()
+            elif self.match(TokenType.SEMICOLON):
+                # Allow trailing semicolon (treat as no-op, like some dialects)
+                self.advance()
+                # If there's more after the semicolon, treat it as error
+                # But allow end of line or colon after semicolon
+                if not self.at_end_of_line() and not self.match(TokenType.COLON):
+                    token = self.current()
+                    raise ParseError(f"Expected : or newline after ;, got {token.type.name}", token)
+            elif self.match(TokenType.REM, TokenType.REMARK):
+                # Allow REM without colon after statement (standard MBASIC)
+                # REM consumes rest of line
+                self.parse_remark()
+                break  # REM ends the line
             elif not self.at_end_of_line():
                 # Expected COLON or NEWLINE
                 token = self.current()
@@ -1398,9 +1411,15 @@ class Parser:
             if self.match(TokenType.LINE_NUMBER, TokenType.NUMBER):
                 then_line_number = int(self.advance().value)
 
+                # Allow optional REM after THEN line_number (without colon)
+                # Syntax: IF condition THEN 100 REM comment
+                if self.match(TokenType.REM, TokenType.REMARK):
+                    # REM consumes rest of line, we're done
+                    self.parse_remark()
+                    # Don't check for ELSE since REM consumed the line
                 # Check for ELSE after THEN line_number
                 # Can be either :ELSE or just ELSE (without colon)
-                if self.match(TokenType.COLON):
+                elif self.match(TokenType.COLON):
                     # Peek ahead to see if ELSE follows the colon
                     saved_pos = self.position
                     self.advance()  # Temporarily skip colon

@@ -226,6 +226,7 @@ class Lexer:
             'PRINT#': TokenType.PRINT,
             'LPRINT#': TokenType.LPRINT,
             'INPUT#': TokenType.INPUT,
+            'WRITE#': TokenType.WRITE,
             'FIELD#': TokenType.FIELD,
             'GET#': TokenType.GET,
             'PUT#': TokenType.PUT,
