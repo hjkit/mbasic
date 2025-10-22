@@ -87,6 +87,18 @@ class Interpreter:
         """Execute LET (assignment) statement"""
         value = self.evaluate_expression(stmt.expression)
 
+        # Type coercion based on type suffix
+        if stmt.variable.type_suffix == '%':
+            # Integer - truncate towards zero
+            value = int(value)
+        elif stmt.variable.type_suffix == '$':
+            # String
+            value = str(value)
+        elif stmt.variable.type_suffix in ('!', '#', None):
+            # Single or double precision float (or no suffix) - ensure it's numeric
+            if not isinstance(value, (int, float)):
+                value = float(value) if value else 0
+
         if stmt.variable.subscripts:
             # Array assignment
             subscripts = [int(self.evaluate_expression(sub)) for sub in stmt.variable.subscripts]
@@ -277,6 +289,12 @@ class Interpreter:
 
     def execute_remark(self, stmt):
         """Execute REM statement (do nothing)"""
+        pass
+
+    def execute_deftype(self, stmt):
+        """Execute DEFINT/DEFSNG/DEFDBL/DEFSTR statement (do nothing at runtime)"""
+        # These are compile-time directives handled by the parser
+        # At runtime, they do nothing
         pass
 
     def execute_data(self, stmt):
