@@ -38,6 +38,7 @@ class TokenType(Enum):
     KILL = auto()
     LINE_INPUT = auto()       # LINE INPUT
     LSET = auto()
+    NAME = auto()
     OPEN = auto()
     OUTPUT = auto()          # OUTPUT (used in OPEN FOR OUTPUT)
     PUT = auto()
@@ -219,6 +220,7 @@ KEYWORDS = {
     'KILL': TokenType.KILL,
     'LINE': TokenType.LINE_INPUT,  # Will need special handling for "LINE INPUT"
     'LSET': TokenType.LSET,
+    'NAME': TokenType.NAME,
     'OPEN': TokenType.OPEN,
     'OUTPUT': TokenType.OUTPUT,
     'PUT': TokenType.PUT,

@@ -309,6 +309,39 @@ class KillStatementNode:
 
 
 @dataclass
+class ChainStatementNode:
+    """CHAIN statement - chain to another BASIC program
+
+    Syntax:
+        CHAIN filename$
+
+    Example:
+        CHAIN "MENU"
+        CHAIN FIL$
+    """
+    filename: 'ExpressionNode'  # String expression with filename
+    line_num: int = 0
+    column: int = 0
+
+
+@dataclass
+class NameStatementNode:
+    """NAME statement - rename file
+
+    Syntax:
+        NAME oldfile$ AS newfile$
+
+    Example:
+        NAME "TEMP.DAT" AS "FINAL.DAT"
+        NAME L$ AS L$
+    """
+    old_filename: 'ExpressionNode'  # String expression with old filename
+    new_filename: 'ExpressionNode'  # String expression with new filename
+    line_num: int = 0
+    column: int = 0
+
+
+@dataclass
 class LsetStatementNode:
     """LSET statement - left-justify string in field variable
 
@@ -386,6 +419,34 @@ class RunStatementNode:
         RUN "filename"     - Load and run another program file
     """
     target: Optional['ExpressionNode']  # Filename (string) or line number, None = restart
+    line_num: int = 0
+    column: int = 0
+
+
+@dataclass
+class LoadStatementNode:
+    """LOAD statement - load program from disk
+
+    Syntax:
+        LOAD "filename"    - Load program file
+        LOAD "filename",R  - Load and run program file
+    """
+    filename: 'ExpressionNode'  # String expression with filename
+    run_flag: bool = False      # True if ,R option specified
+    line_num: int = 0
+    column: int = 0
+
+
+@dataclass
+class SaveStatementNode:
+    """SAVE statement - save program to disk
+
+    Syntax:
+        SAVE "filename"    - Save program file
+        SAVE "filename",A  - Save as ASCII text
+    """
+    filename: 'ExpressionNode'  # String expression with filename
+    ascii_flag: bool = False    # True if ,A option specified
     line_num: int = 0
     column: int = 0
 

@@ -376,6 +376,8 @@ class Parser:
             return self.parse_return()
         elif token.type == TokenType.ON:
             return self.parse_on()
+        elif token.type == TokenType.CHAIN:
+            return self.parse_chain()
 
         # Variable declarations
         elif token.type == TokenType.DIM:
@@ -396,6 +398,8 @@ class Parser:
             return self.parse_close()
         elif token.type == TokenType.KILL:
             return self.parse_kill()
+        elif token.type == TokenType.NAME:
+            return self.parse_name()
         elif token.type == TokenType.LSET:
             return self.parse_lset()
         elif token.type == TokenType.RSET:
@@ -418,6 +422,10 @@ class Parser:
             return self.parse_system()
         elif token.type == TokenType.RUN:
             return self.parse_run()
+        elif token.type == TokenType.LOAD:
+            return self.parse_load()
+        elif token.type == TokenType.SAVE:
+            return self.parse_save()
         elif token.type == TokenType.RANDOMIZE:
             return self.parse_randomize()
         elif token.type == TokenType.SWAP:
@@ -790,11 +798,11 @@ class Parser:
             TokenType.ABS, TokenType.ATN, TokenType.COS, TokenType.SIN, TokenType.TAN,
             TokenType.EXP, TokenType.LOG, TokenType.SQR, TokenType.INT, TokenType.FIX,
             TokenType.RND, TokenType.SGN, TokenType.ASC, TokenType.VAL, TokenType.LEN,
-            TokenType.PEEK, TokenType.INP, TokenType.USR,
+            TokenType.PEEK, TokenType.INP, TokenType.USR, TokenType.EOF_FUNC,
             # String functions
             TokenType.LEFT, TokenType.RIGHT, TokenType.MID, TokenType.CHR, TokenType.STR,
             TokenType.INKEY, TokenType.INPUT_FUNC, TokenType.SPACE, TokenType.STRING_FUNC,
-            TokenType.INSTR,
+            TokenType.INSTR, TokenType.HEX, TokenType.OCT,
             # Type conversion
             TokenType.CINT, TokenType.CSNG, TokenType.CDBL,
         }
@@ -1209,6 +1217,23 @@ class Parser:
             column=token.column
         )
 
+    def parse_chain(self) -> ChainStatementNode:
+        """Parse CHAIN statement
+
+        Syntax:
+            CHAIN filename$
+        """
+        token = self.advance()
+
+        # Parse filename expression (must be string)
+        filename = self.parse_expression()
+
+        return ChainStatementNode(
+            filename=filename,
+            line_num=token.line,
+            column=token.column
+        )
+
     def parse_run(self) -> RunStatementNode:
         """Parse RUN statement
 
@@ -1228,6 +1253,72 @@ class Parser:
 
         return RunStatementNode(
             target=target,
+            line_num=token.line,
+            column=token.column
+        )
+
+    def parse_load(self) -> LoadStatementNode:
+        """Parse LOAD statement
+
+        Syntax:
+            LOAD "filename"    - Load program file
+            LOAD "filename",R  - Load and run program file
+        """
+        token = self.advance()
+
+        # Parse filename expression (must be string)
+        filename = self.parse_expression()
+
+        # Check for optional ,R flag
+        run_flag = False
+        if self.match(TokenType.COMMA):
+            self.advance()
+            # Expect R identifier
+            if self.match(TokenType.IDENTIFIER):
+                r_token = self.advance()
+                if r_token.value.upper() == 'R':
+                    run_flag = True
+                else:
+                    raise ParseError(f"Expected R after comma in LOAD, got {r_token.value}", r_token)
+            else:
+                raise ParseError("Expected R after comma in LOAD", self.current())
+
+        return LoadStatementNode(
+            filename=filename,
+            run_flag=run_flag,
+            line_num=token.line,
+            column=token.column
+        )
+
+    def parse_save(self) -> SaveStatementNode:
+        """Parse SAVE statement
+
+        Syntax:
+            SAVE "filename"    - Save program file
+            SAVE "filename",A  - Save as ASCII text
+        """
+        token = self.advance()
+
+        # Parse filename expression (must be string)
+        filename = self.parse_expression()
+
+        # Check for optional ,A flag
+        ascii_flag = False
+        if self.match(TokenType.COMMA):
+            self.advance()
+            # Expect A identifier
+            if self.match(TokenType.IDENTIFIER):
+                a_token = self.advance()
+                if a_token.value.upper() == 'A':
+                    ascii_flag = True
+                else:
+                    raise ParseError(f"Expected A after comma in SAVE, got {a_token.value}", a_token)
+            else:
+                raise ParseError("Expected A after comma in SAVE", self.current())
+
+        return SaveStatementNode(
+            filename=filename,
+            ascii_flag=ascii_flag,
             line_num=token.line,
             column=token.column
         )
@@ -1325,19 +1416,38 @@ class Parser:
                         if stmt:
                             else_statements.append(stmt)
             else:
-                # Parse statements until end of line or colon or ELSE
-                stmt = self.parse_statement()
-                if stmt:
-                    then_statements.append(stmt)
+                # Parse statements until end of line or ELSE
+                # Pattern: IF cond THEN stmt1 :stmt2 :stmt3 ELSE stmt4
+                # or: IF cond THEN stmt1 :stmt2 :ELSE stmt3
+                while not self.at_end_of_line() and not self.match(TokenType.ELSE):
+                    stmt = self.parse_statement()
+                    if stmt:
+                        then_statements.append(stmt)
 
-                # Check for :ELSE pattern (colon before ELSE)
-                # Pattern: IF cond THEN stmt :ELSE stmt
-                if self.match(TokenType.COLON):
-                    # Peek ahead to see if ELSE follows the colon
-                    saved_pos = self.position
-                    self.advance()  # Temporarily skip colon
-                    if self.match(TokenType.ELSE):
-                        # Yes, this is :ELSE syntax
+                    # Check what comes next
+                    if self.match(TokenType.COLON):
+                        # Peek ahead to see if ELSE follows the colon
+                        saved_pos = self.position
+                        self.advance()  # Temporarily skip colon
+                        if self.match(TokenType.ELSE):
+                            # Yes, this is :ELSE syntax
+                            self.advance()  # Skip ELSE
+                            # Check if ELSE is followed by line number or statement
+                            if self.match(TokenType.LINE_NUMBER, TokenType.NUMBER):
+                                else_line_number = int(self.advance().value)
+                            else:
+                                # Parse else statement(s)
+                                else_statements = []
+                                stmt = self.parse_statement()
+                                if stmt:
+                                    else_statements.append(stmt)
+                            break  # Done with THEN clause
+                        else:
+                            # Not :ELSE, just a statement separator - continue loop
+                            self.position = saved_pos
+                            self.advance()  # Skip the colon
+                    elif self.match(TokenType.ELSE):
+                        # ELSE without preceding colon
                         self.advance()  # Skip ELSE
                         # Check if ELSE is followed by line number or statement
                         if self.match(TokenType.LINE_NUMBER, TokenType.NUMBER):
@@ -1348,22 +1458,10 @@ class Parser:
                             stmt = self.parse_statement()
                             if stmt:
                                 else_statements.append(stmt)
+                        break  # Done with THEN clause
                     else:
-                        # Not :ELSE, restore position to before colon
-                        # This allows the colon to be handled as statement separator
-                        self.position = saved_pos
-                # Check for ELSE without colon
-                elif self.match(TokenType.ELSE):
-                    self.advance()  # Skip ELSE
-                    # Check if ELSE is followed by line number or statement
-                    if self.match(TokenType.LINE_NUMBER, TokenType.NUMBER):
-                        else_line_number = int(self.advance().value)
-                    else:
-                        # Parse else statement(s)
-                        else_statements = []
-                        stmt = self.parse_statement()
-                        if stmt:
-                            else_statements.append(stmt)
+                        # No more statements
+                        break
 
         elif self.match(TokenType.GOTO):
             # IF condition GOTO line_number [ELSE ...] (alternate syntax)
@@ -2048,6 +2146,30 @@ class Parser:
             column=token.column
         )
 
+    def parse_name(self) -> NameStatementNode:
+        """Parse NAME statement
+
+        Syntax:
+            NAME oldfile$ AS newfile$
+        """
+        token = self.advance()
+
+        # Parse old filename expression (must be string)
+        old_filename = self.parse_expression()
+
+        # Expect AS keyword
+        self.expect(TokenType.AS)
+
+        # Parse new filename expression (must be string)
+        new_filename = self.parse_expression()
+
+        return NameStatementNode(
+            old_filename=old_filename,
+            new_filename=new_filename,
+            line_num=token.line,
+            column=token.column
+        )
+
     def parse_lset(self) -> LsetStatementNode:
         """Parse LSET statement
 
@@ -2127,15 +2249,10 @@ class Parser:
             # Expect AS
             self.expect(TokenType.AS)
 
-            # Parse variable
-            var_token = self.expect(TokenType.IDENTIFIER)
-            variable = VariableNode(
-                name=var_token.value,
-                type_suffix=self.get_type_suffix(var_token.value),
-                subscripts=None,
-                line_num=var_token.line,
-                column=var_token.column
-            )
+            # Parse variable (may have subscripts for array elements)
+            variable = self.parse_variable_or_function()
+            if not isinstance(variable, VariableNode):
+                raise ParseError("Expected variable after AS in FIELD statement", self.current())
 
             fields.append((width, variable))
 
@@ -2444,28 +2561,23 @@ class Parser:
         )
 
     def parse_swap(self) -> SwapStatementNode:
-        """Parse SWAP statement - Syntax: SWAP var1, var2"""
+        """Parse SWAP statement - Syntax: SWAP var1, var2
+
+        Variables can be simple variables or array elements with subscripts.
+        """
         token = self.advance()
 
-        var1_token = self.expect(TokenType.IDENTIFIER)
-        var1 = VariableNode(
-            name=var1_token.value,
-            type_suffix=self.get_type_suffix(var1_token.value),
-            subscripts=None,
-            line_num=var1_token.line,
-            column=var1_token.column
-        )
+        # Parse first variable (may have subscripts)
+        var1 = self.parse_variable_or_function()
+        if not isinstance(var1, VariableNode):
+            raise ParseError("Expected variable in SWAP statement", token)
 
         self.expect(TokenType.COMMA)
 
-        var2_token = self.expect(TokenType.IDENTIFIER)
-        var2 = VariableNode(
-            name=var2_token.value,
-            type_suffix=self.get_type_suffix(var2_token.value),
-            subscripts=None,
-            line_num=var2_token.line,
-            column=var2_token.column
-        )
+        # Parse second variable (may have subscripts)
+        var2 = self.parse_variable_or_function()
+        if not isinstance(var2, VariableNode):
+            raise ParseError("Expected variable in SWAP statement", self.current())
 
         return SwapStatementNode(
             var1=var1,
