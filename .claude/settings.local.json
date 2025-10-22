@@ -40,7 +40,8 @@
       "Bash(for f in ic-timer lanes othello)",
       "Bash(for f in handplot krakinst)",
       "Bash(for f in qubic rbbmin27 rc5 speech trade)",
-      "Bash(for f in qsolist rbsutl31 sleuth sdir)"
+      "Bash(for f in qsolist rbsutl31 sleuth sdir)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []

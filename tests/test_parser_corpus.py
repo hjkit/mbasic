@@ -54,20 +54,25 @@ def test_file(filepath):
 def main():
     """Run parser tests on all .bas files"""
 
-    # Find all .bas files in bas_tests1 directory
-    test_dir = Path('bas_tests1')
-    if not test_dir.exists():
-        print(f"Error: {test_dir} directory not found")
-        return 1
+    # Find all .bas files in both directories
+    test_dirs = [
+        Path('basic/bas_tests1'),
+        Path('basic/tests_with_results')
+    ]
 
-    bas_files = sorted(test_dir.glob('*.bas'))
+    bas_files = []
+    for test_dir in test_dirs:
+        if test_dir.exists():
+            bas_files.extend(sorted(test_dir.glob('*.bas')))
 
     if not bas_files:
-        print(f"No .bas files found in {test_dir}")
+        print("No .bas files found in test directories")
         return 1
 
     print("=" * 80)
     print(f"Testing Parser on {len(bas_files)} BASIC files")
+    print(f"  bas_tests1:          {len(list(test_dirs[0].glob('*.bas')))} files")
+    print(f"  tests_with_results:  {len(list(test_dirs[1].glob('*.bas')))} files")
     print("=" * 80)
     print()
 
