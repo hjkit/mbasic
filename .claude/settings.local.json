@@ -24,7 +24,9 @@
       "Bash(echo:*)",
       "Bash(for f in dow sleuth scatpad)",
       "Bash(for f in sfamove sfaobdes sfavoc)",
-      "Bash(for f in asm2mac backgamm fxparms satelite)"
+      "Bash(for f in asm2mac backgamm fxparms satelite)",
+      "Bash(awk:*)",
+      "Read(///**)"
     ],
     "deny": [],
     "ask": []
