@@ -460,7 +460,7 @@ class InteractiveMode:
                 stmt.line_number = line_map[stmt.line_number]
 
     def _serialize_line(self, line_node):
-        """Serialize a LineNode back to source text
+        """Serialize a LineNode back to source text, preserving indentation
 
         Args:
             line_node: LineNode to serialize
@@ -469,15 +469,34 @@ class InteractiveMode:
             str: Source text for the line
         """
         # Start with line number
-        parts = [str(line_node.line_number)]
+        line_num_str = str(line_node.line_number)
+        parts = [line_num_str]
 
-        # Serialize each statement
-        for i, stmt in enumerate(line_node.statements):
-            stmt_text = self._serialize_statement(stmt)
-            if i == 0:
-                parts.append(' ' + stmt_text)
+        # Preserve indentation from original source
+        # The column indicates where the first statement started in the original source
+        # We maintain the same column position (absolute indentation) when possible
+        if line_node.statements:
+            first_stmt = line_node.statements[0]
+            if hasattr(first_stmt, 'column') and first_stmt.column > 0:
+                # The original statement was at this column (1-indexed)
+                # We want to put the statement at the same column position
+                current_pos = len(line_num_str) + 1  # +1 for 1-indexed
+                desired_col = first_stmt.column
+
+                # Add spacing to reach the desired column
+                # But ensure at least 1 space after line number
+                spaces_needed = max(1, desired_col - current_pos)
+                parts.append(' ' * spaces_needed)
             else:
-                parts.append(' : ' + stmt_text)
+                parts.append(' ')
+
+            # Serialize each statement
+            for i, stmt in enumerate(line_node.statements):
+                stmt_text = self._serialize_statement(stmt)
+                if i == 0:
+                    parts.append(stmt_text)
+                else:
+                    parts.append(' : ' + stmt_text)
 
         return ''.join(parts)
 
@@ -549,11 +568,11 @@ class InteractiveMode:
 
         elif stmt_type == 'ForStatementNode':
             var = self._serialize_variable(stmt.variable)
-            start = self._serialize_expression(stmt.start_value)
-            end = self._serialize_expression(stmt.end_value)
+            start = self._serialize_expression(stmt.start_expr)
+            end = self._serialize_expression(stmt.end_expr)
             parts = [f"for {var} = {start} to {end}"]
-            if stmt.step_value:
-                step = self._serialize_expression(stmt.step_value)
+            if stmt.step_expr:
+                step = self._serialize_expression(stmt.step_expr)
                 parts.append(f" step {step}")
             return ''.join(parts)
 
