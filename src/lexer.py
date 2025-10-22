@@ -292,6 +292,14 @@ class Lexer:
         while self.current_char() is not None and self.current_char() != '\n':
             self.advance()
 
+    def read_comment(self):
+        """Read comment text until end of line"""
+        comment_text = []
+        while self.current_char() is not None and self.current_char() != '\n':
+            comment_text.append(self.current_char())
+            self.advance()
+        return ''.join(comment_text).strip()
+
     def tokenize(self) -> List[Token]:
         """Tokenize the entire source code"""
         self.tokens = []
@@ -335,9 +343,9 @@ class Lexer:
 
             # Apostrophe comment (like REM)
             if char == "'":
-                self.tokens.append(Token(TokenType.APOSTROPHE, "'", start_line, start_column))
-                self.advance()
-                self.skip_comment()
+                self.advance()  # Skip the apostrophe
+                comment_text = self.read_comment()
+                self.tokens.append(Token(TokenType.APOSTROPHE, comment_text, start_line, start_column))
                 continue
 
             # Numbers (including &H hex, &O octal, and .5 leading decimal)
@@ -357,10 +365,12 @@ class Lexer:
             # Identifiers and keywords
             if char.isalpha():
                 token = self.read_identifier()
-                # Special handling for REM/REMARK - skip rest of line
+                # Special handling for REM/REMARK - read comment text
                 if token.type in (TokenType.REM, TokenType.REMARK):
+                    comment_text = self.read_comment()
+                    # Replace token value with comment text
+                    token = Token(token.type, comment_text, token.line, token.column)
                     self.tokens.append(token)
-                    self.skip_comment()
                 else:
                     self.tokens.append(token)
                 at_line_start = False

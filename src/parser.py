@@ -103,14 +103,15 @@ class Parser:
         return self.position >= len(self.tokens) or self.current().type == TokenType.EOF
 
     def at_end_of_line(self) -> bool:
-        """Check if at end of logical line (NEWLINE or APOSTROPHE or EOF)
+        """Check if at end of logical line (NEWLINE or EOF)
 
-        Note: APOSTROPHE starts a comment, which effectively ends the statement
+        Note: APOSTROPHE is now treated as a statement (comment), not end-of-line,
+        so it can be preserved in the AST.
         """
         token = self.current()
         if token is None:
             return True
-        return token.type in (TokenType.NEWLINE, TokenType.EOF, TokenType.APOSTROPHE)
+        return token.type in (TokenType.NEWLINE, TokenType.EOF)
 
     # ========================================================================
     # Two-Pass Compilation
@@ -949,16 +950,17 @@ class Parser:
     # ========================================================================
 
     def parse_remark(self) -> RemarkStatementNode:
-        """Parse REM or REMARK statement"""
+        """Parse REM, REMARK, or APOSTROPHE comment statement
+
+        The lexer already captured the comment text in the token value.
+        """
         token = self.advance()
 
-        # Read rest of line as comment text
-        text_parts = []
-        while not self.at_end_of_line():
-            text_parts.append(self.advance().value)
+        # Comment text is stored in token.value by the lexer
+        comment_text = token.value if isinstance(token.value, str) else ""
 
         return RemarkStatementNode(
-            text=' '.join(text_parts),
+            text=comment_text,
             line_num=token.line,
             column=token.column
         )
