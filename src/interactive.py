@@ -168,7 +168,11 @@ class InteractiveMode:
             interpreter.run()
 
         except Exception as e:
-            print(f"?{type(e).__name__}: {e}")
+            # Report line number if available
+            if runtime.current_line:
+                print(f"?{type(e).__name__} in {runtime.current_line.line_number}: {e}")
+            else:
+                print(f"?{type(e).__name__}: {e}")
 
     def cmd_cont(self):
         """CONT - Continue execution after STOP or Break"""
@@ -191,7 +195,11 @@ class InteractiveMode:
             self.program_interpreter.run_from_current()
 
         except Exception as e:
-            print(f"?{type(e).__name__}: {e}")
+            # Report line number if available
+            if self.program_runtime.current_line:
+                print(f"?{type(e).__name__} in {self.program_runtime.current_line.line_number}: {e}")
+            else:
+                print(f"?{type(e).__name__}: {e}")
 
     def cmd_list(self, args):
         """LIST [start][-][end] - List program lines"""
@@ -868,7 +876,14 @@ class InteractiveMode:
                 runtime.current_stmt_index = old_index
 
         except Exception as e:
-            print(f"?{type(e).__name__}: {e}")
+            # Report line number if available
+            if runtime.current_line and runtime.current_line.line_number == 0:
+                # Immediate mode - don't show line 0, just show error
+                print(f"?{type(e).__name__}: {e}")
+            elif runtime.current_line:
+                print(f"?{type(e).__name__} in {runtime.current_line.line_number}: {e}")
+            else:
+                print(f"?{type(e).__name__}: {e}")
 
     def get_program_text(self):
         """Get program as text"""

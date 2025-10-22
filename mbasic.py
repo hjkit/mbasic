@@ -45,7 +45,11 @@ def run_file(program_path):
         print(f"Error: File not found: {program_path}", file=sys.stderr)
         sys.exit(1)
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+        # Report line number if available
+        if runtime.current_line:
+            print(f"Error in {runtime.current_line.line_number}: {e}", file=sys.stderr)
+        else:
+            print(f"Error: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()
         sys.exit(1)
