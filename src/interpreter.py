@@ -1046,7 +1046,7 @@ class Interpreter:
             # In non-interactive context, just list files
             import glob
             import os
-            pattern = filespec if filespec else "*.bas"
+            pattern = filespec if filespec else "*"
             files = sorted(glob.glob(pattern))
             if files:
                 for filename in files:

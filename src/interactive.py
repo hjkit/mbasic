@@ -1334,7 +1334,7 @@ class InteractiveMode:
     def cmd_files(self, filespec):
         """FILES [filespec] - Display directory listing
 
-        FILES - List all .bas files in current directory
+        FILES - List all files in current directory
         FILES "*.BAS" - List files matching pattern
         FILES "A:*.*" - List files on drive A (not supported, lists current dir)
         """
@@ -1343,14 +1343,14 @@ class InteractiveMode:
 
         # Default pattern if no argument
         if not filespec:
-            pattern = "*.bas"
+            pattern = "*"
         else:
             # Remove quotes if present
             pattern = filespec.strip().strip('"').strip("'")
 
             # If pattern is empty after stripping, use default
             if not pattern:
-                pattern = "*.bas"
+                pattern = "*"
 
         # In MBASIC, FILES shows disk directory. We'll list matching files in current directory
         # Get matching files
