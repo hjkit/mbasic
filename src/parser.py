@@ -792,6 +792,21 @@ class Parser:
         type_suffix = self.get_type_suffix(name)
         if type_suffix:
             name = name[:-1]  # Remove the suffix character from the name
+        else:
+            # No explicit suffix - check DEF type map
+            first_letter = name[0].lower()
+            if first_letter in self.def_type_map:
+                var_type = self.def_type_map[first_letter]
+                # Determine suffix based on DEF type
+                if var_type == TypeInfo.STRING:
+                    type_suffix = '$'
+                elif var_type == TypeInfo.INTEGER:
+                    type_suffix = '%'
+                elif var_type == TypeInfo.DOUBLE:
+                    type_suffix = '#'
+                elif var_type == TypeInfo.SINGLE:
+                    type_suffix = '!'
+                # Note: We don't modify name here, just set type_suffix
 
         # Check for array subscripts or function arguments
         if self.match(TokenType.LPAREN):
@@ -2076,6 +2091,22 @@ class Parser:
             # Parse array name
             name_token = self.expect(TokenType.IDENTIFIER)
             name = name_token.value
+
+            # Determine type suffix based on explicit suffix or DEF type
+            # If no explicit suffix, check DEF type map and add appropriate suffix
+            if name and name[-1] not in '$%!#':
+                # No explicit suffix - check DEF type map
+                first_letter = name[0].lower()
+                if first_letter in self.def_type_map:
+                    var_type = self.def_type_map[first_letter]
+                    # Append appropriate suffix based on DEF type
+                    if var_type == TypeInfo.STRING:
+                        name = name + '$'
+                    elif var_type == TypeInfo.INTEGER:
+                        name = name + '%'
+                    elif var_type == TypeInfo.DOUBLE:
+                        name = name + '#'
+                    # SINGLE (!) is the default, no need to add suffix
 
             # Expect opening parenthesis
             self.expect(TokenType.LPAREN)
