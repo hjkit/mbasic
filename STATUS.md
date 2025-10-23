@@ -117,47 +117,96 @@ This document provides a comprehensive overview of what is and is not yet implem
 - ✓ WHILE loop stack preservation
 - ✓ Variable preservation across STOP
 
-## ⚠ Partially Implemented
-
-### Built-in Functions (Hardware/System)
-- **PEEK, POKE, INP, OUT, CALL, USR**
-  - **Status:** Parsed, but return placeholder values or do nothing
-  - **Reason:** Requires hardware emulation or system-level access
-  - **Not planned:** These are CP/M-specific and not relevant for modern use
-
 ## ✗ Not Yet Implemented
 
-### 1. Debugging and System Functions (Low Priority)
-**Priority:** Low - Useful but not critical
-
-- ✗ **FRE(n)** - Return free memory available
-- ✗ **VARPTR(var)** - Return memory address of variable
-
-**Status:** Not implemented
-**Impact:** Less memory introspection
-**Workaround:** Not critical for most programs
-
-### 3. Variable and Terminal Operations (Low Priority)
+### 1. Variable Operations (Low Priority)
 **Priority:** Low - Minor convenience features
 
 - ✗ **SWAP var1, var2** - Exchange values of two variables
-- ✗ **NULL n** - Set number of nulls after carriage return
-- ✗ **WIDTH [#filenum,] width** - Set output width
 
-**Status:** Parsed but not executed (SWAP, WIDTH); Not implemented (NULL)
-**Impact:** Minor convenience features
-**Workaround:** Use temp variable for SWAP; not needed for NULL/WIDTH on modern terminals
+**Status:** Parsed but not executed
+**Impact:** Minor convenience feature
+**Workaround:** Use temp variable (e.g., `T=A: A=B: B=T`)
 
-### 4. Printer Support (Not Planned)
-**Priority:** Very Low - Obsolete hardware
+## ❌ Will Not Be Implemented
 
-- ✗ **LPRINT/LPRINT USING** - Print to printer
-- ✗ **LLIST** - List program to printer
-- ✗ **LPOS(n)** - Get printer head position
+These features are obsolete, hardware-specific, or incompatible with modern computing environments. They are parsed for compatibility but will never have functional implementations.
 
-**Status:** Not implemented
-**Impact:** Cannot print to line printer
-**Note:** Not planned - obsolete hardware interface
+### 1. Hardware Access (CP/M-Specific)
+**Reason:** Requires direct hardware/memory access not available in modern operating systems
+
+- **PEEK(addr)** - Read byte from memory address
+  - Status: Returns 0 (placeholder)
+  - Why: Direct memory access is not possible or safe in modern Python/OS environments
+
+- **POKE addr, value** - Write byte to memory address
+  - Status: Parsed but does nothing
+  - Why: Would require hardware emulation; not relevant for modern use
+
+- **INP(port)** - Read from I/O port
+  - Status: Returns 0 (placeholder)
+  - Why: I/O ports don't exist in modern operating systems
+
+- **OUT port, value** - Write to I/O port
+  - Status: Parsed but does nothing
+  - Why: I/O ports are obsolete; no modern equivalent
+
+- **CALL addr** - Call machine language subroutine
+  - Status: Parsed but does nothing
+  - Why: Would require Z80 emulation; not practical or useful
+
+- **USR(n)** - Call user machine code routine
+  - Status: Returns 0 (placeholder)
+  - Why: Cannot execute Z80/8080 machine code from Python
+
+- **VARPTR(var)** - Return memory address of variable
+  - Status: Not implemented
+  - Why: Memory addresses are not meaningful in Python's managed memory environment; variables don't have fixed addresses
+
+- **FRE(n)** - Return free memory available
+  - Status: Not implemented
+  - Why: Modern systems use virtual memory and garbage collection; "free memory" is meaningless in Python
+  - Note: Would return arbitrary values that don't reflect actual system memory
+
+### 2. Printer Support (Obsolete Hardware)
+**Reason:** Line printers are obsolete; modern systems use different printing paradigms
+
+- **LPRINT [USING] ...** - Print to line printer
+  - Status: Not implemented
+  - Why: Line printers don't exist; would need complex OS print spooling
+  - Alternative: Use PRINT to redirect output, then print from file
+
+- **LLIST** - List program to printer
+  - Status: Not implemented
+  - Why: Same as LPRINT; obsolete hardware interface
+
+- **LPOS(n)** - Get line printer head position
+  - Status: Not implemented
+  - Why: No printer head to query on modern systems
+
+### 3. Cassette/Tape Operations (Obsolete Media)
+**Reason:** Cassette tapes are not used for data storage in modern systems
+
+- **CLOAD** - Load program from cassette
+  - Status: Not in MBASIC 5.21 spec (only in earlier versions)
+  - Why: Cassette tapes are obsolete storage media
+
+- **CSAVE** - Save program to cassette
+  - Status: Not in MBASIC 5.21 spec (only in earlier versions)
+  - Why: Cassette tapes are obsolete storage media
+
+### 4. Terminal Control (Obsolete/Unnecessary)
+**Reason:** Modern terminals handle these automatically or differently
+
+- **NULL n** - Set number of nulls after carriage return
+  - Status: Not implemented
+  - Why: Was needed for slow mechanical teletypes; modern terminals don't need this
+
+- **WIDTH [#n,] width** - Set output width
+  - Status: Parsed but not executed
+  - Why: Modern terminals handle line width automatically; not critical for most programs
+
+**Note:** These features are documented here for completeness and to explain why they appear in MBASIC documentation but aren't implemented. Programs that rely heavily on these features cannot be run without modification.
 
 ## Testing Status
 
@@ -204,7 +253,12 @@ Programs that use:
 
 ### What Doesn't Work
 Programs that require:
-- Hardware access (PEEK, POKE, ports)
+- Hardware/memory access (PEEK, POKE, INP, OUT, CALL, USR, VARPTR, FRE)
+- Line printer output (LPRINT, LLIST, LPOS)
+- Cassette tape storage (CLOAD, CSAVE - not in MBASIC 5.21 anyway)
+- Terminal null padding (NULL) or width control (WIDTH)
+
+See the **"❌ Will Not Be Implemented"** section above for detailed explanations of why these features are not supported.
 
 ## Roadmap
 
@@ -235,15 +289,20 @@ Programs that require:
 - ✓ LSET/RSET for field assignment
 - ✓ LOC/LOF functions
 
-### Phase 5 (Future) - Enhancements
+### Phase 5 (Completed) - Formatted Output ✓
+- ✓ TAB(n) and SPC(n) functions
+- ✓ PRINT USING with string formats (!, \ \, &)
+- ✓ PRINT USING with numeric formats (#, +, -, ., ,)
+- ✓ PRINT USING with special formats (**, $$, **$, ^^^^)
+- ✓ PRINT# USING for file output
+- ✓ Format overflow detection (%)
+- ✓ Literal character escaping (_)
+
+### Phase 6 (Future) - Enhancements
 - Documentation improvements
 - Performance optimization
 - Extended error messages
-- Debugging features
-
-### Not Planned
-- Printer support (LPRINT)
-- Direct hardware access (PEEK, POKE, INP, OUT)
+- Additional debugging features
 
 ## Known Limitations
 
