@@ -440,6 +440,56 @@ class Interpreter:
         # Jump to subroutine
         self.runtime.next_line = stmt.line_number
 
+    def execute_ongoto(self, stmt):
+        """Execute ON...GOTO statement - computed GOTO
+
+        Syntax: ON expression GOTO line1, line2, line3, ...
+
+        If expression evaluates to 1, jump to line1
+        If expression evaluates to 2, jump to line2
+        If expression is 0 or > number of lines, continue to next statement
+        """
+        # Evaluate the expression
+        value = self.evaluate_expression(stmt.expression)
+
+        # Convert to integer (round towards zero like MBASIC)
+        index = int(value)
+
+        # Check if index is valid (1-based indexing)
+        if 1 <= index <= len(stmt.line_numbers):
+            # If we're in an error handler and GOTOing out, clear the error state
+            if self.runtime.in_error_handler:
+                self.runtime.in_error_handler = False
+                self.runtime.error_occurred = False
+            self.runtime.next_line = stmt.line_numbers[index - 1]
+        # If index is out of range, just continue to next statement (no jump)
+
+    def execute_ongosub(self, stmt):
+        """Execute ON...GOSUB statement - computed GOSUB
+
+        Syntax: ON expression GOSUB line1, line2, line3, ...
+
+        If expression evaluates to 1, gosub to line1
+        If expression evaluates to 2, gosub to line2
+        If expression is 0 or > number of lines, continue to next statement
+        """
+        # Evaluate the expression
+        value = self.evaluate_expression(stmt.expression)
+
+        # Convert to integer (round towards zero like MBASIC)
+        index = int(value)
+
+        # Check if index is valid (1-based indexing)
+        if 1 <= index <= len(stmt.line_numbers):
+            # Push return address
+            self.runtime.push_gosub(
+                self.runtime.current_line.line_number,
+                self.runtime.current_stmt_index + 1
+            )
+            # Jump to subroutine
+            self.runtime.next_line = stmt.line_numbers[index - 1]
+        # If index is out of range, just continue to next statement (no jump)
+
     def execute_return(self, stmt):
         """Execute RETURN statement"""
         # Pop return address
