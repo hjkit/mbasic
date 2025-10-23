@@ -11,6 +11,15 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+venv/
+env/
+ENV/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
 
 # IDE
 .vscode/

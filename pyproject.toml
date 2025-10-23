@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mbasic-interpreter"
+version = "1.0.0"
+description = "A complete interpreter for MBASIC 5.21 (Microsoft BASIC-80 for CP/M)"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}  # TODO: Update with your information
+]
+keywords = ["basic", "interpreter", "mbasic", "basic-80", "cpm", "retro-computing", "vintage"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Other",
+    "Topic :: Software Development :: Interpreters",
+    "Topic :: System :: Emulators",
+    "Operating System :: OS Independent",
+]
+
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/mb1"  # TODO: Update
+Repository = "https://github.com/yourusername/mb1.git"  # TODO: Update
+Issues = "https://github.com/yourusername/mb1/issues"  # TODO: Update
+Documentation = "https://github.com/yourusername/mb1/blob/main/README.md"  # TODO: Update
+
+[project.scripts]
+mbasic = "mbasic:main"
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.md", "*.txt"]

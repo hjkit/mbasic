@@ -2,6 +2,28 @@
 
 A complete interpreter for MBASIC 5.21 (Microsoft BASIC-80 for CP/M) written in Python.
 
+## Installation
+
+For detailed installation instructions including virtual environment setup, see **[INSTALL.md](INSTALL.md)**.
+
+**Quick install:**
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd mb1
+
+# Create and activate a virtual environment (recommended)
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies (none required, but verifies environment)
+pip install -r requirements.txt
+
+# Run the interpreter
+python3 mbasic.py
+```
+
 ## Features
 
 ✓ **Full MBASIC 5.21 compatibility**
@@ -211,4 +233,6 @@ This is a faithful implementation of MBASIC 5.21 as documented in the official M
 
 ## License
 
-Educational project - see source files for details.
+MIT License - see [LICENSE](LICENSE) file for details.
+
+This project is an independent implementation for educational purposes and is not affiliated with or endorsed by Microsoft Corporation.
