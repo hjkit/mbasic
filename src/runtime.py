@@ -69,9 +69,12 @@ class Runtime:
 
         # Error handling
         self.error_handler = None     # Line number for ON ERROR GOTO
-        self.last_error_code = 0      # ERR - last error code
-        self.last_error_line = 0      # ERL - line number where last error occurred
         self.error_occurred = False
+
+        # ERR and ERL are system variables, not functions
+        # Initialize them in the variable table
+        self.variables['ERR'] = 0
+        self.variables['ERL'] = 0
 
         # Random number seed
         self.rnd_last = 0.5

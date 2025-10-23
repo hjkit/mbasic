@@ -785,6 +785,17 @@ class Parser:
         elif token.type == TokenType.FN:
             return self.parse_fn_call()
 
+        # ERR and ERL are system variables (not functions)
+        elif token.type in (TokenType.ERR, TokenType.ERL):
+            self.advance()
+            return VariableNode(
+                name=token.type.name,  # 'ERR' or 'ERL'
+                type_suffix='',
+                subscripts=[],
+                line_num=token.line,
+                column=token.column
+            )
+
         else:
             raise ParseError(f"Unexpected token in expression: {token.type.name}", token)
 
@@ -856,7 +867,6 @@ class Parser:
             TokenType.EXP, TokenType.LOG, TokenType.SQR, TokenType.INT, TokenType.FIX,
             TokenType.RND, TokenType.SGN, TokenType.ASC, TokenType.VAL, TokenType.LEN,
             TokenType.PEEK, TokenType.INP, TokenType.USR, TokenType.EOF_FUNC,
-            TokenType.ERR, TokenType.ERL,
             # String functions
             TokenType.LEFT, TokenType.RIGHT, TokenType.MID, TokenType.CHR, TokenType.STR,
             TokenType.INKEY, TokenType.INPUT_FUNC, TokenType.SPACE, TokenType.STRING_FUNC,
@@ -864,6 +874,7 @@ class Parser:
             # Type conversion
             TokenType.CINT, TokenType.CSNG, TokenType.CDBL,
         }
+        # Note: ERR and ERL are not functions, they are system variables
         return token_type in builtin_functions
 
     def parse_builtin_function(self) -> FunctionCallNode:
@@ -892,17 +903,7 @@ class Parser:
                 column=func_token.column
             )
 
-        # ERR and ERL can be called without parentheses (return last error info)
-        if func_token.type in (TokenType.ERR, TokenType.ERL) and not self.match(TokenType.LPAREN):
-            # ERR or ERL without arguments
-            return FunctionCallNode(
-                name=func_name,
-                arguments=[],
-                line_num=func_token.line,
-                column=func_token.column
-            )
-
-        # Expect opening parenthesis for other functions or RND/INKEY$/ERR/ERL with args
+        # Expect opening parenthesis for other functions or RND/INKEY$ with args
         self.expect(TokenType.LPAREN)
 
         # Parse arguments

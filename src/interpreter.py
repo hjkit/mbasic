@@ -511,12 +511,12 @@ class Interpreter:
         """
         error_code = int(self.evaluate_expression(stmt.error_code))
 
-        # Set error information
-        self.runtime.last_error_code = error_code
+        # Set error information in variable table
+        self.runtime.variables['ERR'] = error_code
         if self.runtime.current_line:
-            self.runtime.last_error_line = self.runtime.current_line.line_number
+            self.runtime.variables['ERL'] = self.runtime.current_line.line_number
         else:
-            self.runtime.last_error_line = 0
+            self.runtime.variables['ERL'] = 0
 
         # Raise the error
         raise RuntimeError(f"ERROR {error_code}")
@@ -957,14 +957,6 @@ class Interpreter:
 
     def evaluate_functioncall(self, expr):
         """Evaluate function call (built-in or user-defined)"""
-        # Check if it's a built-in function first
-        if expr.name in ('ERR', 'ERL'):
-            # Built-in error functions
-            if expr.name == 'ERR':
-                return self.runtime.last_error_code
-            elif expr.name == 'ERL':
-                return self.runtime.last_error_line
-
         # Get user-defined function definition
         func_def = self.runtime.user_functions.get(expr.name)
         if not func_def:

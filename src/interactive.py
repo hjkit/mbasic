@@ -783,11 +783,18 @@ class InteractiveMode:
             if stmt.else_line_number is not None and stmt.else_line_number in line_map:
                 stmt.else_line_number = line_map[stmt.else_line_number]
 
+            # Check for "IF ERL = line_number" pattern
+            # According to manual: if ERL is on left side of =, right side is a line number
+            if stmt.condition:
+                self._renum_erl_comparison(stmt.condition, line_map)
+
             # Also update statements within THEN/ELSE blocks
-            for then_stmt in stmt.then_statements:
-                self._renum_statement(then_stmt, line_map)
-            for else_stmt in stmt.else_statements:
-                self._renum_statement(else_stmt, line_map)
+            if stmt.then_statements:
+                for then_stmt in stmt.then_statements:
+                    self._renum_statement(then_stmt, line_map)
+            if stmt.else_statements:
+                for else_stmt in stmt.else_statements:
+                    self._renum_statement(else_stmt, line_map)
 
         # RESTORE statement
         elif stmt_type == 'RestoreStatementNode':
@@ -800,6 +807,37 @@ class InteractiveMode:
         elif stmt_type == 'RunStatementNode':
             if hasattr(stmt, 'line_number') and stmt.line_number in line_map:
                 stmt.line_number = line_map[stmt.line_number]
+
+        # ON ERROR GOTO statement
+        elif stmt_type == 'OnErrorStatementNode':
+            if stmt.line_number is not None and stmt.line_number in line_map:
+                stmt.line_number = line_map[stmt.line_number]
+
+    def _renum_erl_comparison(self, expr, line_map):
+        """Handle ERL = line_number patterns in expressions
+
+        According to MBASIC manual: if ERL appears on the left side of =,
+        the number on the right side is treated as a line number reference.
+
+        Also handles: ERL <> line, ERL < line, ERL > line, etc.
+
+        Args:
+            expr: Expression node to check
+            line_map: dict mapping old line numbers to new line numbers
+        """
+        # Check if this is a binary operation (comparison)
+        if type(expr).__name__ != 'BinaryOpNode':
+            return
+
+        # Check if left side is ERL (a VariableNode with name 'ERL')
+        left = expr.left
+        if type(left).__name__ == 'VariableNode' and left.name == 'ERL':
+            # Right side should be renumbered if it's a literal number
+            right = expr.right
+            if type(right).__name__ == 'NumberNode':
+                # Check if this number is a line number in our program
+                if right.value in line_map:
+                    right.value = line_map[right.value]
 
     def _serialize_line(self, line_node):
         """Serialize a LineNode back to source text, preserving indentation
@@ -934,6 +972,16 @@ class InteractiveMode:
             lines = ','.join(str(line) for line in stmt.target_lines)
             return f"on {expr} gosub {lines}"
 
+        elif stmt_type == 'OnErrorStatementNode':
+            if stmt.line_number is not None:
+                return f"on error goto {stmt.line_number}"
+            else:
+                return "on error goto 0"
+
+        elif stmt_type == 'ErrorStatementNode':
+            error_code = self._serialize_expression(stmt.error_code)
+            return f"error {error_code}"
+
         # For other statement types, use a generic approach
         # This is a fallback - ideally all statement types should be handled explicitly
         else:
@@ -950,6 +998,31 @@ class InteractiveMode:
             subs = ','.join(self._serialize_expression(sub) for sub in var.subscripts)
             text += f"({subs})"
         return text
+
+    def _token_to_operator(self, token_type):
+        """Convert a TokenType operator to its string representation"""
+        from tokens import TokenType
+
+        operator_map = {
+            TokenType.PLUS: '+',
+            TokenType.MINUS: '-',
+            TokenType.MULTIPLY: '*',
+            TokenType.DIVIDE: '/',
+            TokenType.POWER: '^',
+            TokenType.EQUAL: '=',
+            TokenType.NOT_EQUAL: '<>',
+            TokenType.LESS_THAN: '<',
+            TokenType.LESS_EQUAL: '<=',
+            TokenType.GREATER_THAN: '>',
+            TokenType.GREATER_EQUAL: '>=',
+            TokenType.AND: 'and',
+            TokenType.OR: 'or',
+            TokenType.NOT: 'not',
+            TokenType.MOD: 'mod',
+            TokenType.BACKSLASH: '\\',
+        }
+
+        return operator_map.get(token_type, str(token_type))
 
     def _serialize_expression(self, expr):
         """Serialize an expression node to source text"""
@@ -969,15 +1042,20 @@ class InteractiveMode:
         elif expr_type == 'BinaryOpNode':
             left = self._serialize_expression(expr.left)
             right = self._serialize_expression(expr.right)
-            return f"{left} {expr.operator} {right}"
+            # Convert TokenType operator to string
+            op_str = self._token_to_operator(expr.operator)
+            return f"{left} {op_str} {right}"
 
         elif expr_type == 'UnaryOpNode':
             operand = self._serialize_expression(expr.operand)
             return f"{expr.operator}{operand}"
 
         elif expr_type == 'FunctionCallNode':
+            # ERR and ERL are special - they're not functions and don't use ()
+            if expr.name in ('ERR', 'ERL') and len(expr.arguments) == 0:
+                return expr.name
             args = ','.join(self._serialize_expression(arg) for arg in expr.arguments)
-            return f"{expr.function_name}({args})"
+            return f"{expr.name}({args})"
 
         else:
             return "?"
