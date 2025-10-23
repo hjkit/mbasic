@@ -18,6 +18,19 @@ from runtime import Runtime
 from interpreter import Interpreter
 import ast_nodes
 
+# Try to import readline for better line editing
+# This enhances input() with:
+# - Backspace/Delete working properly
+# - Arrow keys for navigation
+# - Command history (up/down arrows)
+# - Ctrl+A (start of line), Ctrl+E (end of line)
+# - Emacs keybindings (Ctrl+K, Ctrl+U, etc.)
+try:
+    import readline
+    READLINE_AVAILABLE = True
+except ImportError:
+    READLINE_AVAILABLE = False
+
 
 def print_error(e, runtime=None):
     """Print error with optional traceback in DEBUG mode"""
@@ -73,9 +86,69 @@ class InteractiveMode:
             self.program_runtime.stop_line = None
             self.program_runtime.stop_stmt_index = None
 
+    def _setup_readline(self):
+        """Configure readline for better line editing"""
+        import readline
+        import atexit
+
+        # Set up history file
+        history_file = os.path.expanduser('~/.mbasic_history')
+        try:
+            readline.read_history_file(history_file)
+        except FileNotFoundError:
+            pass  # No history file yet
+
+        # Save history on exit
+        atexit.register(readline.write_history_file, history_file)
+
+        # Set history length
+        readline.set_history_length(1000)
+
+        # Setup tab completion for BASIC keywords
+        readline.set_completer(self._completer)
+        readline.parse_and_bind('tab: complete')
+
+        # Use emacs-style keybindings (default, but be explicit)
+        readline.parse_and_bind('set editing-mode emacs')
+
+    def _completer(self, text, state):
+        """Tab completion for BASIC keywords and commands"""
+        # BASIC keywords and common commands
+        keywords = [
+            'PRINT', 'INPUT', 'LET', 'IF', 'THEN', 'ELSE', 'FOR', 'TO', 'STEP', 'NEXT',
+            'GOTO', 'GOSUB', 'RETURN', 'END', 'STOP', 'CONT', 'RUN', 'LIST', 'NEW',
+            'LOAD', 'SAVE', 'DELETE', 'RENUM', 'AUTO', 'EDIT', 'WHILE', 'WEND',
+            'DIM', 'READ', 'DATA', 'RESTORE', 'ON', 'REM', 'DEF', 'FN',
+            'AND', 'OR', 'NOT', 'MOD',
+            'DEFINT', 'DEFSNG', 'DEFDBL', 'DEFSTR',
+            'MERGE', 'FILES', 'SYSTEM', 'LPRINT'
+        ]
+
+        # Get matches
+        text_upper = text.upper()
+        matches = [kw for kw in keywords if kw.startswith(text_upper)]
+
+        # Return the match at position 'state'
+        if state < len(matches):
+            # Return in lowercase to match user's input case preference
+            if text.islower():
+                return matches[state].lower()
+            elif text.isupper():
+                return matches[state]
+            else:
+                # Mixed case - return uppercase
+                return matches[state]
+        return None
+
     def start(self):
         """Start interactive mode"""
+        # Setup readline if available
+        if READLINE_AVAILABLE:
+            self._setup_readline()
+
         print("MBASIC 5.21 Interpreter")
+        if not READLINE_AVAILABLE:
+            print("(Note: readline not available - line editing limited)")
         print("Ready")
 
         while True:
