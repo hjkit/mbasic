@@ -871,7 +871,7 @@ class Parser:
             TokenType.EXP, TokenType.LOG, TokenType.SQR, TokenType.INT, TokenType.FIX,
             TokenType.RND, TokenType.SGN, TokenType.ASC, TokenType.VAL, TokenType.LEN,
             TokenType.PEEK, TokenType.INP, TokenType.USR, TokenType.EOF_FUNC,
-            TokenType.LOC, TokenType.LOF,
+            TokenType.LOC, TokenType.LOF, TokenType.POS, TokenType.TAB, TokenType.SPC,
             # String functions
             TokenType.LEFT, TokenType.RIGHT, TokenType.MID, TokenType.CHR, TokenType.STR,
             TokenType.INKEY, TokenType.INPUT_FUNC, TokenType.SPACE, TokenType.STRING_FUNC,
@@ -1035,12 +1035,14 @@ class Parser:
             column=token.column
         )
 
-    def parse_print(self) -> PrintStatementNode:
+    def parse_print(self):
         """Parse PRINT or ? statement
 
         Syntax:
             PRINT expr1, expr2          - Print to screen
             PRINT #filenum, expr1       - Print to file
+            PRINT USING format$; expr1  - Formatted print to screen
+            PRINT #filenum, USING format$; expr1 - Formatted print to file
         """
         token = self.advance()
 
@@ -1053,6 +1055,10 @@ class Parser:
             if self.match(TokenType.COMMA):
                 self.advance()
             # Note: Some dialects allow semicolon, but MBASIC uses comma
+
+        # Check for USING keyword
+        if self.match(TokenType.USING):
+            return self.parse_print_using(token, file_number)
 
         expressions: List[ExpressionNode] = []
         separators: List[str] = []
@@ -1090,6 +1096,48 @@ class Parser:
             file_number=file_number,
             line_num=token.line,
             column=token.column
+        )
+
+    def parse_print_using(self, print_token, file_number) -> PrintUsingStatementNode:
+        """Parse PRINT USING statement
+
+        Syntax:
+            PRINT USING format$; expr1; expr2
+            PRINT #filenum, USING format$; expr1
+        """
+        # Advance past USING keyword
+        self.advance()
+
+        # Parse format string expression
+        format_string = self.parse_expression()
+
+        # Expect semicolon after format string
+        if not self.match(TokenType.SEMICOLON):
+            raise ValueError(f"Expected ';' after PRINT USING format string at line {self.current.line}")
+        self.advance()
+
+        # Parse list of expressions (separated by semicolons)
+        expressions: List[ExpressionNode] = []
+
+        while not self.at_end_of_line() and not self.match(TokenType.COLON) and not self.match(TokenType.ELSE):
+            # Check for separator first (skip it)
+            if self.match(TokenType.SEMICOLON):
+                self.advance()
+                # Check if more expressions follow
+                if self.at_end_of_line() or self.match(TokenType.COLON) or self.match(TokenType.ELSE):
+                    break
+                continue
+
+            # Parse expression
+            expr = self.parse_expression()
+            expressions.append(expr)
+
+        return PrintUsingStatementNode(
+            format_string=format_string,
+            expressions=expressions,
+            file_number=file_number,
+            line_num=print_token.line,
+            column=print_token.column
         )
 
     def parse_lprint(self) -> LprintStatementNode:

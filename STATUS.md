@@ -35,15 +35,18 @@ This document provides a comprehensive overview of what is and is not yet implem
 - ✓ DATA/READ/RESTORE
 - ✓ INPUT (console input)
 - ✓ PRINT (console output with zones and separators)
+- ✓ PRINT USING (formatted output with format strings)
+- ✓ PRINT# USING (formatted file output)
 
-### Built-in Functions (45+)
+### Built-in Functions (47+)
 - ✓ Math: ABS, ATN, COS, EXP, INT, LOG, RND, SGN, SIN, SQR, TAN
 - ✓ String: ASC, CHR$, INSTR, LEFT$, LEN, MID$, RIGHT$, SPACE$, STR$, STRING$, VAL
 - ✓ Conversion: CDBL, CINT, CSNG
 - ✓ Binary I/O: CVI, CVS, CVD (convert string to int/single/double), MKI$, MKS$, MKD$ (convert int/single/double to string)
 - ✓ Input: INKEY$ (non-blocking keyboard input)
 - ✓ File I/O: EOF() (end of file test), LOC() (record position), LOF() (file length)
-- ✓ Other: FIX, HEX$, OCT$, TAB, POS
+- ✓ Output: TAB(n) (tab to column), SPC(n) (print n spaces)
+- ✓ Other: FIX, HEX$, OCT$, POS
 
 ### String Manipulation
 - ✓ MID$(var$, start, len) = value$ - Replace substring in-place
@@ -129,12 +132,10 @@ This document provides a comprehensive overview of what is and is not yet implem
 
 - ✗ **PRINT USING** - Format output with format strings (e.g., "###.##" for numbers)
 - ✗ **PRINT# USING** - Format file output with format strings
-- ✗ **TAB(n)** - Tab to column n in PRINT statements
-- ✗ **SPC(n)** - Print n spaces in PRINT statements
 
 **Status:** Not implemented
-**Impact:** Cannot format numbers/strings for display or tabulate output
-**Workaround:** Manual string formatting with SPACE$ and STR$
+**Impact:** Cannot format numbers/strings with format templates
+**Workaround:** Manual string formatting with SPACE$, STR$, TAB(), and SPC()
 
 ### 2. Debugging and System Functions (Low Priority)
 **Priority:** Low - Useful but not critical

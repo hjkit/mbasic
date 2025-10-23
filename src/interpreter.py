@@ -7,7 +7,7 @@ Executes BASIC programs from AST.
 import sys
 import signal
 from runtime import Runtime
-from basic_builtins import BuiltinFunctions
+from basic_builtins import BuiltinFunctions, TabMarker, SpcMarker, UsingFormatter
 from tokens import TokenType
 import ast_nodes
 
@@ -369,8 +369,12 @@ class Interpreter:
         for i, expr in enumerate(stmt.expressions):
             value = self.evaluate_expression(expr)
 
+            # Check for special TAB/SPC markers
+            if isinstance(value, TabMarker) or isinstance(value, SpcMarker):
+                # Keep marker object for later processing
+                output_parts.append(value)
             # Convert to string
-            if isinstance(value, float):
+            elif isinstance(value, float):
                 # Format numbers like BASIC does
                 if value == int(value):
                     s = str(int(value))
@@ -380,15 +384,29 @@ class Interpreter:
                 if value >= 0:
                     s = " " + s
                 s = s + " "
+                output_parts.append(s)
             else:
                 s = str(value)
+                output_parts.append(s)
 
-            output_parts.append(s)
-
-        # Handle separators
+        # Handle separators and build output
         output = ""
         for i, part in enumerate(output_parts):
-            output += part
+            # Handle TAB and SPC markers
+            if isinstance(part, TabMarker):
+                # TAB(n) - move to column n (1-based)
+                target_col = part.column
+                current_col = len(output) + 1  # 1-based column
+                if current_col < target_col:
+                    # Add spaces to reach target column
+                    output += " " * (target_col - current_col)
+                # If already past target, don't move backwards
+            elif isinstance(part, SpcMarker):
+                # SPC(n) - print n spaces
+                output += " " * part.count
+            else:
+                # Regular string
+                output += part
             if i < len(stmt.separators):
                 sep = stmt.separators[i]
                 if sep == ',':
@@ -417,6 +435,40 @@ class Interpreter:
                 print(output, end='')
             else:
                 print(output)
+
+    def execute_printusing(self, stmt):
+        """Execute PRINT USING statement - formatted print to screen or file"""
+        # Check if printing to file
+        if stmt.file_number is not None:
+            file_num = int(self.evaluate_expression(stmt.file_number))
+            if file_num not in self.runtime.files:
+                raise RuntimeError(f"File #{file_num} not open")
+            file_info = self.runtime.files[file_num]
+            if file_info['mode'] not in ['O', 'A']:
+                raise RuntimeError(f"File #{file_num} not open for output")
+            file_handle = file_info['handle']
+        else:
+            file_handle = None
+
+        # Evaluate format string
+        format_str = str(self.evaluate_expression(stmt.format_string))
+
+        # Evaluate all expressions
+        values = []
+        for expr in stmt.expressions:
+            value = self.evaluate_expression(expr)
+            values.append(value)
+
+        # Create formatter and format values
+        formatter = UsingFormatter(format_str)
+        output = formatter.format_values(values)
+
+        # Output to file or screen
+        if file_handle:
+            file_handle.write(output + '\n')
+            file_handle.flush()
+        else:
+            print(output)
 
     def execute_if(self, stmt):
         """Execute IF statement"""

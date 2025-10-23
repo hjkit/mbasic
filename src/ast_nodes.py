@@ -80,6 +80,21 @@ class PrintStatementNode:
 
 
 @dataclass
+class PrintUsingStatementNode:
+    """PRINT USING statement - formatted output to screen or file
+
+    Syntax:
+        PRINT USING format$; expr1; expr2          - Print to screen
+        PRINT #filenum, USING format$; expr1       - Print to file
+    """
+    format_string: 'ExpressionNode'  # Format string expression
+    expressions: List['ExpressionNode']  # Values to format
+    file_number: Optional['ExpressionNode'] = None  # For PRINT #n, USING...
+    line_num: int = 0
+    column: int = 0
+
+
+@dataclass
 class LprintStatementNode:
     """LPRINT statement - output to line printer
 

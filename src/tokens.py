@@ -103,6 +103,7 @@ class TokenType(Enum):
     SWAP = auto()
     TRON = auto()
     TROFF = auto()
+    USING = auto()
     WAIT = auto()
     WIDTH = auto()
 
@@ -179,6 +180,8 @@ class TokenType(Enum):
     LOF = auto()             # LOF
     PEEK = auto()
     POS = auto()
+    SPC = auto()             # SPC (print spacing function)
+    TAB = auto()             # TAB (print tab function)
     USR = auto()
 
     # Delimiters
@@ -300,6 +303,7 @@ KEYWORDS = {
     'swap': TokenType.SWAP,
     'tron': TokenType.TRON,
     'troff': TokenType.TROFF,
+    'using': TokenType.USING,
     'wait': TokenType.WAIT,
     'width': TokenType.WIDTH,
 
@@ -359,5 +363,7 @@ KEYWORDS = {
     'lof': TokenType.LOF,
     'peek': TokenType.PEEK,
     'pos': TokenType.POS,
+    'spc': TokenType.SPC,
+    'tab': TokenType.TAB,
     'usr': TokenType.USR,
 }
