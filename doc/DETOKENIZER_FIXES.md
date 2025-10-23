@@ -6,6 +6,32 @@ The detokenizer has been significantly improved to produce cleaner, more accurat
 
 ### Issues Fixed
 
+#### 0. Missing Spaces After Keywords ✓ (Latest Fix)
+**Before**:
+```basic
+10 FORI=0TO10
+20 IFFOO=1THEN100
+30 PRINTX:NEXT
+```
+
+**After**:
+```basic
+10 FOR I=0 TO 10
+20 IF FOO=1 THEN 100
+30 PRINT X:NEXT
+```
+
+**Root Cause**: Old 8K BASIC didn't require spaces after keywords. Programs could be written as `FORI=0TO10` instead of `FOR I=0 TO 10`. The detokenizer was outputting tokens without proper spacing after keywords, causing the lexer to fail parsing.
+
+**Implementation**: Added `needs_space_after()` function that:
+- Checks if a keyword needs space after it (FOR, TO, IF, THEN, ELSE, etc.)
+- Peeks at the next byte to determine if space is needed
+- Doesn't add space before operators (=, <, >, +, -, etc.)
+- Doesn't add space after colon (:)
+- Doesn't add trailing space at end of line
+
+### Issues Fixed (Previous)
+
 #### 1. Excessive Spacing ✓
 **Before**:
 ```basic
@@ -172,17 +198,29 @@ These files are beyond repair and should be excluded from tests.
 
 **Changes Made**:
 
+0. **Added `needs_space_after()` function** (Latest - lines 67-162)
+   - Determines if space needed after a keyword token
+   - Peeks at next byte to decide
+   - Lists of keywords needing/not needing spaces
+   - Checks if next byte is operator/delimiter
+   - Prevents trailing spaces at end of line
+
 1. **Added `needs_space_before()` function** (lines 35-64)
    - Context-aware spacing logic
    - Special cases for operators, keywords, REMARK
 
-2. **Modified token output** (lines 154-182)
+2. **Modified token output** (lines 264-300)
    - Changed from always adding space: `print(f"{s} ", end="")`
-   - To smart spacing:
+   - To smart spacing before AND after:
      ```python
+     # Smart spacing before
      if needs_space_before(s, prev_token):
          print(" ", end="")
      print(f"{s}", end="")
+     # Smart spacing after (peek at next byte)
+     next_byte = data[count + 1] if count + 1 < len(data) else None
+     if next_byte is not None and needs_space_after(s, next_byte):
+         print(" ", end="")
      prev_token = s
      ```
 
