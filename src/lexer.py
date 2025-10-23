@@ -126,11 +126,15 @@ class Lexer:
                 num_str += self.advance()
 
             # Check for decimal point
-            if self.current_char() == '.' and self.peek_char() and self.peek_char().isdigit():
-                num_str += self.advance()  # Consume '.'
-                # Read digits after decimal point
-                while self.current_char() is not None and self.current_char().isdigit():
-                    num_str += self.advance()
+            # MBASIC allows trailing dot: 100. is valid (same as 100.0)
+            if self.current_char() == '.':
+                next_char = self.peek_char()
+                # Allow trailing dot or dot followed by digits
+                if next_char is None or next_char.isdigit() or not next_char.isalnum():
+                    num_str += self.advance()  # Consume '.'
+                    # Read digits after decimal point (if any)
+                    while self.current_char() is not None and self.current_char().isdigit():
+                        num_str += self.advance()
 
         # Check for scientific notation (E or D)
         if self.current_char() and self.current_char().upper() in ['E', 'D']:

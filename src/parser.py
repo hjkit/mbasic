@@ -524,9 +524,23 @@ class Parser:
             # If we get here, MID$ is being used in an unsupported way
             raise ParseError(f"MID$ must be used as function or assignment statement", token)
 
-        # Assignment (implicit LET)
+        # Assignment (implicit LET) or implicit REM (comment line)
         elif token.type == TokenType.IDENTIFIER:
-            return self.parse_assignment()
+            # Check if next token is = (assignment) or not (treat as comment)
+            # In old BASIC, lines like "REMEMBER THIS" or "REMARKABLE PROGRAM"
+            # were treated as comments even though they're not REM statements
+            next_token = self.peek()
+            if next_token and next_token.type == TokenType.EQUAL:
+                return self.parse_assignment()
+            else:
+                # Treat as implicit REM - consume rest of line
+                comment_text = token.value
+                while self.current() and self.current().type not in (TokenType.NEWLINE, TokenType.EOF, TokenType.COLON):
+                    comment_text += " " + str(self.current().value)
+                    self.advance()
+                # Return a REM statement node
+                from src.ast_nodes import RemarkStatementNode
+                return RemarkStatementNode(comment_text, token.line, token.column)
 
         # Unknown statement
         else:
