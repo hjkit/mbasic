@@ -468,6 +468,8 @@ class Parser:
             return self.parse_swap()
         elif token.type == TokenType.CLEAR:
             return self.parse_clear()
+        elif token.type == TokenType.OPTION:
+            return self.parse_option()
         elif token.type == TokenType.WIDTH:
             return self.parse_width()
         elif token.type == TokenType.POKE:
@@ -3079,6 +3081,38 @@ class Parser:
         return ClearStatementNode(
             string_space=string_space,
             stack_space=stack_space,
+            line_num=token.line,
+            column=token.column
+        )
+
+    def parse_option(self) -> OptionBaseStatementNode:
+        """Parse OPTION BASE statement
+
+        Syntax: OPTION BASE 0 | 1
+
+        Sets the lower bound for array indices. Default is 0.
+        Must appear before any DIM statements.
+        """
+        token = self.advance()  # Consume OPTION
+
+        # Expect BASE keyword
+        if not self.match(TokenType.BASE):
+            raise ParseError("Expected BASE after OPTION", self.current())
+        self.advance()  # Consume BASE
+
+        # Expect 0 or 1
+        base_token = self.current()
+        if base_token.type != TokenType.NUMBER:
+            raise ParseError("Expected 0 or 1 after OPTION BASE", base_token)
+
+        base_value = int(base_token.value)
+        if base_value not in (0, 1):
+            raise ParseError("OPTION BASE must be 0 or 1", base_token)
+
+        self.advance()  # Consume number
+
+        return OptionBaseStatementNode(
+            base=base_value,
             line_num=token.line,
             column=token.column
         )

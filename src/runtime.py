@@ -35,6 +35,7 @@ class Runtime:
         self.variables = {}           # name -> value
         self.arrays = {}              # name -> {'dims': [...], 'data': [...]}
         self.common_vars = []         # List of variable names declared in COMMON (order matters!)
+        self.array_base = 0           # Array index base (0 or 1, set by OPTION BASE)
 
         # Execution control
         self.current_line = None      # Currently executing LineNode
@@ -184,9 +185,10 @@ class Runtime:
         array_info = self.arrays[full_name]
         dims = array_info['dims']
         data = array_info['data']
+        base = array_info.get('base', 0)  # Get stored base, default to 0 for old arrays
 
         # Calculate flat index
-        index = self._calculate_array_index(subscripts, dims)
+        index = self._calculate_array_index(subscripts, dims, base)
 
         # Bounds check
         if index < 0 or index >= len(data):
@@ -206,19 +208,25 @@ class Runtime:
         array_info = self.arrays[full_name]
         dims = array_info['dims']
         data = array_info['data']
+        base = array_info.get('base', 0)  # Get stored base, default to 0 for old arrays
 
-        index = self._calculate_array_index(subscripts, dims)
+        index = self._calculate_array_index(subscripts, dims, base)
 
         if index < 0 or index >= len(data):
             raise RuntimeError(f"Array subscript out of range: {full_name}{subscripts}")
 
         data[index] = value
 
-    def _calculate_array_index(self, subscripts, dims):
+    def _calculate_array_index(self, subscripts, dims, base=0):
         """
         Calculate flat array index from multi-dimensional subscripts.
 
         MBASIC uses row-major order.
+
+        Args:
+            subscripts: User-provided subscript values
+            dims: Array dimension sizes
+            base: Array base (0 or 1)
         """
         if len(subscripts) != len(dims):
             raise RuntimeError(f"Wrong number of subscripts: got {len(subscripts)}, expected {len(dims)}")
@@ -228,8 +236,15 @@ class Runtime:
 
         # Calculate index (row-major order)
         for i in range(len(dims) - 1, -1, -1):
-            index += subscripts[i] * multiplier
-            multiplier *= (dims[i] + 1)  # +1 because BASIC arrays are 0-based by default
+            # Adjust subscript by base
+            adjusted_subscript = subscripts[i] - base
+            index += adjusted_subscript * multiplier
+
+            # Multiplier depends on base
+            if base == 0:
+                multiplier *= (dims[i] + 1)  # 0-based: 0 to dim inclusive
+            else:
+                multiplier *= dims[i]  # 1-based: 1 to dim inclusive
 
         return index
 
@@ -246,10 +261,15 @@ class Runtime:
         if type_suffix:
             full_name = name + type_suffix
 
-        # Calculate total size
+        # Calculate total size based on array_base
+        # If base is 0: DIM A(10) creates indices 0-10 (11 elements)
+        # If base is 1: DIM A(10) creates indices 1-10 (10 elements)
         total_size = 1
         for dim in dimensions:
-            total_size *= (dim + 1)  # +1 for 0-based indexing
+            if self.array_base == 0:
+                total_size *= (dim + 1)  # 0-based: 0 to dim inclusive
+            else:
+                total_size *= dim  # 1-based: 1 to dim inclusive
 
         # Default value based on type
         if type_suffix == '$':
@@ -260,7 +280,8 @@ class Runtime:
         # Create array
         self.arrays[full_name] = {
             'dims': dimensions,
-            'data': [default_value] * total_size
+            'data': [default_value] * total_size,
+            'base': self.array_base  # Store base for later access validation
         }
 
     def read_data(self):

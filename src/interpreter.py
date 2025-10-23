@@ -491,6 +491,16 @@ class Interpreter:
         # Note: We preserve runtime.common_vars for CHAIN compatibility
         # Note: We ignore string_space and stack_space parameters as requested
 
+    def execute_optionbase(self, stmt):
+        """Execute OPTION BASE statement
+
+        Sets the lower bound for array indices.
+        Must be executed before any DIM statements.
+
+        Syntax: OPTION BASE 0 | 1
+        """
+        self.runtime.array_base = stmt.base
+
     def execute_input(self, stmt):
         """Execute INPUT statement"""
         # Show prompt if any

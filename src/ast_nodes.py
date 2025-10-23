@@ -717,6 +717,21 @@ class ClearStatementNode:
 
 
 @dataclass
+class OptionBaseStatementNode:
+    """OPTION BASE statement - set array index base
+
+    Syntax:
+        OPTION BASE 0  - Arrays start at index 0 (default)
+        OPTION BASE 1  - Arrays start at index 1
+
+    Must appear before any array DIM statements.
+    """
+    base: int  # 0 or 1
+    line_num: int = 0
+    column: int = 0
+
+
+@dataclass
 class CommonStatementNode:
     """COMMON statement - declare shared variables for CHAIN
 
