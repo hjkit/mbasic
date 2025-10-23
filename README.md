@@ -1,6 +1,9 @@
 # MBASIC 5.21 Interpreter
 
-A complete interpreter for MBASIC 5.21 (Microsoft BASIC-80 for CP/M) written in Python.
+An interpreter for MBASIC 5.21 (Microsoft BASIC-80 for CP/M) written in Python.
+
+**Status:** Core language features complete (~65%). File I/O and error handling not yet implemented.
+See [STATUS.md](STATUS.md) for detailed implementation status.
 
 ## Installation
 
@@ -26,11 +29,12 @@ python3 mbasic.py
 
 ## Features
 
-✓ **Full MBASIC 5.21 compatibility**
+✓ **MBASIC 5.21 core features**
 - 100% parser coverage for valid MBASIC programs
-- All core language features implemented
+- Core language features implemented (math, strings, arrays, control flow)
 - Interactive command mode (REPL)
 - File execution mode
+- **Note:** File I/O and error handling not yet implemented
 
 ✓ **Complete language support**
 - Variables with type suffixes ($, %, !, #)
@@ -157,12 +161,20 @@ Result: All 20 tests PASS
 
 ### Not Yet Implemented
 
-- ⚠ WHILE/WEND (partial)
-- ⚠ ON GOTO/GOSUB
-- ⚠ File I/O (OPEN, CLOSE, PRINT#, INPUT#)
-- ⚠ Error handling (ON ERROR GOTO)
-- ⚠ Graphics commands
-- ⚠ Sound commands
+**Critical features missing:**
+- ✗ Sequential file I/O (OPEN, CLOSE, PRINT#, INPUT#, LINE INPUT#, WRITE#, EOF)
+- ✗ Random file I/O (FIELD, GET, PUT, LSET, RSET, LOC, LOF)
+- ✗ Error handling (ON ERROR GOTO, RESUME)
+- ✗ WHILE/WEND loops (parsed but not executed)
+- ✗ Computed jumps (ON GOTO, ON GOSUB)
+
+**See [STATUS.md](STATUS.md) for complete implementation status.**
+
+**What this means:**
+- Programs using file I/O will not work
+- Programs cannot trap and handle errors
+- Use FOR/NEXT instead of WHILE/WEND
+- Graphics/sound commands are not part of MBASIC 5.21 core spec
 
 ## Example Programs
 

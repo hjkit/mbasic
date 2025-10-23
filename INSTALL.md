@@ -194,11 +194,51 @@ Then try activating again.
 
 Make sure you're in the correct directory (the `mb1` folder containing `mbasic.py`).
 
+## Important Limitations
+
+This interpreter is a work in progress. Before using it, be aware of these limitations:
+
+### What Works
+- ✓ Mathematical calculations and expressions
+- ✓ String processing and manipulation
+- ✓ Arrays and data structures
+- ✓ Control flow (IF/THEN/ELSE, FOR/NEXT, GOTO, GOSUB)
+- ✓ Console input/output (INPUT, PRINT)
+- ✓ DATA/READ/RESTORE statements
+- ✓ User-defined functions (DEF FN)
+- ✓ Interactive mode commands (RUN, LIST, SAVE, LOAD, etc.)
+
+### What Does NOT Work Yet
+- ✗ **File I/O** - Cannot read or write data files (OPEN, CLOSE, PRINT#, INPUT#)
+- ✗ **Error handling** - Cannot trap errors (ON ERROR GOTO, RESUME)
+- ✗ **WHILE/WEND loops** - Parser recognizes them but runtime raises error (use FOR/NEXT instead)
+- ✗ **Computed jumps** - ON GOTO and ON GOSUB not implemented (use IF/THEN chains)
+
+### What Programs Will Work
+
+Programs that:
+- Do math calculations
+- Process strings
+- Use arrays and variables
+- Accept user input and display results
+- Use FOR/NEXT loops and IF/THEN logic
+
+### What Programs Will NOT Work
+
+Programs that:
+- Read or write data files
+- Use WHILE/WEND loops
+- Need error trapping
+- Use ON GOTO or ON GOSUB
+
+**For complete implementation status, see [STATUS.md](STATUS.md)**
+
 ## Next Steps
 
 Once installed, check out:
 
 - [README.md](README.md) - Project overview and quick start guide
+- [STATUS.md](STATUS.md) - Complete implementation status
 - [doc/](doc/) - Detailed documentation
 - [basic/bas_tests1/](basic/bas_tests1/) - Example BASIC programs to try
 

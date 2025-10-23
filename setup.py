@@ -12,8 +12,8 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="mbasic-interpreter",
-    version="1.0.0",
-    description="A complete interpreter for MBASIC 5.21 (Microsoft BASIC-80 for CP/M)",
+    version="0.65.0",  # Reflects ~65% implementation status
+    description="An interpreter for MBASIC 5.21 (Microsoft BASIC-80 for CP/M) - Core features complete, file I/O in progress",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Your Name",  # TODO: Update with your information
@@ -49,7 +49,7 @@ setup(
 
     # Package metadata
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
         "License :: OSI Approved :: MIT License",  # TODO: Update if different
