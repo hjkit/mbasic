@@ -133,6 +133,11 @@ These features are implemented and accepted by the parser/interpreter for compat
   - Why: Terminal control sequences vary widely across platforms. Modern terminals provide their own clear commands. Programs can use CLS for compatibility, but it won't actually clear the screen.
   - Note: If screen clearing is needed, use your terminal's native clear command (e.g., `clear` on Unix/Linux, `cls` on Windows) before running the program.
 
+- **WIDTH [#n,] width** - Set output width
+  - Status: ✓ Implemented as no-op
+  - Why: Modern terminals handle line width automatically and dynamically adjust to window size. Setting a fixed width is not meaningful in modern terminal contexts.
+  - Note: Programs can use WIDTH for compatibility, but it won't affect output formatting.
+
 ### Hardware Access
 
 - **PEEK(addr)** - Read byte from memory address
@@ -210,10 +215,6 @@ These features are obsolete, hardware-specific, or incompatible with modern comp
   - Status: Not implemented
   - Why: Was needed for slow mechanical teletypes; modern terminals don't need this
 
-- **WIDTH [#n,] width** - Set output width
-  - Status: Parsed but not executed
-  - Why: Modern terminals handle line width automatically; not critical for most programs
-
 **Note:** These features are documented here for completeness and to explain why they appear in MBASIC documentation but aren't implemented. Programs that rely heavily on these features cannot be run without modification.
 
 ## Testing Status
@@ -263,10 +264,10 @@ Programs that use:
 
 ### What Doesn't Work
 Programs that require:
-- Hardware/memory access (PEEK, POKE, INP, OUT, CALL, USR, VARPTR, FRE)
+- Hardware/memory access (POKE, INP, OUT, CALL, USR, VARPTR, FRE)
 - Line printer output (LPRINT, LLIST, LPOS)
 - Cassette tape storage (CLOAD, CSAVE - not in MBASIC 5.21 anyway)
-- Terminal null padding (NULL) or width control (WIDTH)
+- Terminal null padding (NULL)
 
 See the **"❌ Will Not Be Implemented"** section above for detailed explanations of why these features are not supported.
 

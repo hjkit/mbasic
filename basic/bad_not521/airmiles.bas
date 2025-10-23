@@ -247,5 +247,3 @@
 2470 'Norman Goldsmith
 2480 '5 Ranger Road
 2490 '7/5/87
-3 ,ZANESVILLE, 39.9383 , 82.0083
-2460 DATA ZURICH

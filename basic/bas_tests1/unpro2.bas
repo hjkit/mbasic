@@ -126,5 +126,3 @@
 1350 DATA 9,74,215,59,120,2,110,132,123,254,193,47,124,116,49,154
 1360 REM (we really only need positions 1 thru 13 and 1 thru 11,
 1370 REM but I snagged a few more...)
-93,47,124,116,49,154
-1360 REM (we really only need position

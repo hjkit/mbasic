@@ -94,4 +94,3 @@ REM ******TEST OF FUNCTIONS
 		NAME$=FN.GET.DATA$("EDIT ACTIVE..",NAME$,20)
 		PRINT:PRINT "ENDING WORD..";NAME$
 		GOTO 2.01
-

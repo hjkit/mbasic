@@ -60,4 +60,3 @@
 770	PRINT "Sorting completed": STOP
 800	'Error entry point...
 810	PRINT "Too many users..increase array size..ERROR.." : STOP
-

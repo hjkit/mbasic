@@ -1906,6 +1906,17 @@ class Interpreter:
         # No-op - do nothing
         pass
 
+    def execute_width(self, stmt):
+        """Execute WIDTH statement - set output width (no-op)
+
+        WIDTH is accepted for compatibility with programs that use it,
+        but does not perform any action. Modern terminals handle line
+        width automatically and WIDTH settings are not meaningful in
+        a modern terminal context.
+        """
+        # No-op - do nothing
+        pass
+
     def execute_cont(self, stmt):
         """Execute CONT statement
 
