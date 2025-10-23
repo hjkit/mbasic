@@ -2863,8 +2863,12 @@ class Parser:
             if current_token is None:
                 break
 
-            # If it's a string literal or number, parse as expression
+            # If it's a string literal, number, or signed number, parse as expression
             if current_token.type in (TokenType.STRING, TokenType.NUMBER):
+                value = self.parse_expression()
+                values.append(value)
+            elif current_token.type in (TokenType.MINUS, TokenType.PLUS):
+                # Could be a signed number - parse as expression
                 value = self.parse_expression()
                 values.append(value)
             else:

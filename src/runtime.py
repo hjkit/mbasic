@@ -54,6 +54,7 @@ class Runtime:
         # DATA statements
         self.data_items = []          # [value, value, ...]
         self.data_pointer = 0         # Current READ position
+        self.data_line_map = {}       # {data_index: line_number} - tracks which line each data item came from
 
         # User-defined functions
         self.user_functions = {}      # fn_name -> DefFnStatementNode
@@ -104,11 +105,16 @@ class Runtime:
         for line in lines_to_process:
             for stmt in line.statements:
                 if isinstance(stmt, DataStatementNode):
-                    # Flatten nested lists from DATA statement
+                    # Store data values and track which line they came from
                     for value in stmt.values:
+                        data_index = len(self.data_items)
                         if isinstance(value, list):
-                            self.data_items.extend(value)
+                            # Flatten nested lists
+                            for v in value:
+                                self.data_line_map[len(self.data_items)] = line.line_number
+                                self.data_items.append(v)
                         else:
+                            self.data_line_map[data_index] = line.line_number
                             self.data_items.append(value)
                 elif isinstance(stmt, DefFnStatementNode):
                     self.user_functions[stmt.name] = stmt
@@ -285,11 +291,17 @@ class Runtime:
             # Restore to beginning
             self.data_pointer = 0
         else:
-            # Find DATA at or after specified line
-            # This would require tracking which data items came from which lines
-            # For now, just restore to beginning
-            # TODO: Track data source lines for precise RESTORE
-            self.data_pointer = 0
+            # Find first DATA item at or after specified line
+            found = False
+            for data_index in sorted(self.data_line_map.keys()):
+                if self.data_line_map[data_index] >= line_number:
+                    self.data_pointer = data_index
+                    found = True
+                    break
+
+            if not found:
+                # No DATA at or after that line - restore to end
+                self.data_pointer = len(self.data_items)
 
     def push_gosub(self, return_line, return_stmt_index):
         """Push GOSUB return address"""

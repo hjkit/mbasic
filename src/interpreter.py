@@ -399,14 +399,24 @@ class Interpreter:
     def execute_read(self, stmt):
         """Execute READ statement"""
         for var_node in stmt.variables:
-            # Read next data value
-            value = self.runtime.read_data()
+            # Read next data value (returns AST node)
+            data_node = self.runtime.read_data()
+
+            # Evaluate the data node to get actual value
+            value = self.evaluate_expression(data_node)
 
             # Convert to appropriate type based on variable suffix
             if var_node.type_suffix == '$':
                 value = str(value)
+            elif var_node.type_suffix == '%':
+                value = int(value)
             else:
-                value = float(value) if not isinstance(value, (int, float)) else value
+                # Ensure numeric types are float
+                if not isinstance(value, (int, float)):
+                    try:
+                        value = float(value)
+                    except (ValueError, TypeError):
+                        value = 0
 
             # Store in variable
             if var_node.subscripts:
