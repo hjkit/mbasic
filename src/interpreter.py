@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 """
 MBASIC 5.21 Interpreter
 
@@ -229,8 +228,8 @@ class Interpreter:
                     # Newline
                     output += '\n'
 
-        # Print output (don't add newline if last separator was ; or ,)
-        if stmt.separators and stmt.separators[-1] in [';', ',']:
+        # Print output (don't add newline if last separator was ; or , or \n)
+        if stmt.separators and stmt.separators[-1] in [';', ',', '\n']:
             print(output, end='')
         else:
             print(output)

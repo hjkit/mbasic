@@ -61,7 +61,6 @@ class InteractiveMode:
         """Start interactive mode"""
         print("MBASIC 5.21 Interpreter")
         print("Ready")
-        print()
 
         while True:
             try:

@@ -1008,8 +1008,10 @@ class Parser:
             expr = self.parse_expression()
             expressions.append(expr)
 
-        # If no trailing separator, add newline
-        if len(separators) <= len(expressions):
+        # Add newline if there's no trailing separator
+        # Trailing separator means len(separators) == len(expressions)
+        # (each expression has a separator except the last, which has a trailing separator)
+        if len(separators) < len(expressions):
             separators.append('\n')
 
         return PrintStatementNode(
@@ -1062,8 +1064,10 @@ class Parser:
             expr = self.parse_expression()
             expressions.append(expr)
 
-        # If no trailing separator, add newline
-        if len(separators) <= len(expressions):
+        # Add newline if there's no trailing separator
+        # Trailing separator means len(separators) == len(expressions)
+        # (each expression has a separator except the last, which has a trailing separator)
+        if len(separators) < len(expressions):
             separators.append('\n')
 
         return LprintStatementNode(
