@@ -120,23 +120,60 @@ This document provides a comprehensive overview of what is and is not yet implem
 
 ## ✗ Not Yet Implemented
 
-### 1. Variable Operations
-**Priority:** Low
+### 1. Formatted Output (High Priority)
+**Priority:** High - Commonly used features
+
+- ✗ **PRINT USING** - Format output with format strings (e.g., "###.##" for numbers)
+- ✗ **PRINT# USING** - Format file output with format strings
+- ✗ **TAB(n)** - Tab to column n in PRINT statements
+- ✗ **SPC(n)** - Print n spaces in PRINT statements
+
+**Status:** Not implemented
+**Impact:** Cannot format numbers/strings for display or tabulate output
+**Workaround:** Manual string formatting with SPACE$ and STR$
+
+### 2. Binary File I/O Functions (Medium Priority)
+**Priority:** Medium - Needed for binary random file operations
+
+- ✗ **CVI/CVS/CVD** - Convert 2/4/8 byte string to integer/single/double
+- ✗ **MKI$/MKS$/MKD$** - Convert integer/single/double to 2/4/8 byte string
+
+**Status:** Not implemented
+**Impact:** Cannot read/write binary numeric data in random files
+**Workaround:** Use text representation with STR$ and VAL
+
+### 3. Debugging and System Functions (Low Priority)
+**Priority:** Low - Useful but not critical
+
+- ✗ **TRON/TROFF** - Trace program execution (shows line numbers as they execute)
+- ✗ **FRE(n)** - Return free memory available
+- ✗ **VARPTR(var)** - Return memory address of variable
+
+**Status:** Not implemented
+**Impact:** Less debugging support and memory introspection
+**Workaround:** Use other debugging techniques
+
+### 4. Variable and Terminal Operations (Low Priority)
+**Priority:** Low - Minor convenience features
 
 - ✗ **SWAP var1, var2** - Exchange values of two variables
-
-**Status:** Parsed but not executed
-**Impact:** Minor convenience feature
-**Workaround:** Use temp variable
-
-### 2. Output Control
-**Priority:** Low
-
+- ✗ **NULL n** - Set number of nulls after carriage return
 - ✗ **WIDTH [#filenum,] width** - Set output width
-- ✗ **LPRINT** - Print to printer
 
-**Status:** Parsed but not executed
-**Impact:** Cannot control display width or print to printer
+**Status:** Parsed but not executed (SWAP, WIDTH); Not implemented (NULL)
+**Impact:** Minor convenience features
+**Workaround:** Use temp variable for SWAP; not needed for NULL/WIDTH on modern terminals
+
+### 5. Printer Support (Not Planned)
+**Priority:** Very Low - Obsolete hardware
+
+- ✗ **LPRINT/LPRINT USING** - Print to printer
+- ✗ **LLIST** - List program to printer
+- ✗ **LPOS(n)** - Get printer head position
+
+**Status:** Not implemented
+**Impact:** Cannot print to line printer
+**Note:** Not planned - obsolete hardware interface
 
 ## Testing Status
 
