@@ -202,7 +202,7 @@ This interpreter is a work in progress. Before using it, be aware of these limit
 - ✓ Mathematical calculations and expressions
 - ✓ String processing and manipulation
 - ✓ Arrays and data structures
-- ✓ Control flow (IF/THEN/ELSE, FOR/NEXT, GOTO, GOSUB)
+- ✓ Control flow (IF/THEN/ELSE, FOR/NEXT, WHILE/WEND, GOTO, GOSUB)
 - ✓ Console input/output (INPUT, PRINT)
 - ✓ DATA/READ/RESTORE statements
 - ✓ User-defined functions (DEF FN)
@@ -211,7 +211,6 @@ This interpreter is a work in progress. Before using it, be aware of these limit
 ### What Does NOT Work Yet
 - ✗ **File I/O** - Cannot read or write data files (OPEN, CLOSE, PRINT#, INPUT#)
 - ✗ **Error handling** - Cannot trap errors (ON ERROR GOTO, RESUME)
-- ✗ **WHILE/WEND loops** - Parser recognizes them but runtime raises error (use FOR/NEXT instead)
 - ✗ **Computed jumps** - ON GOTO and ON GOSUB not implemented (use IF/THEN chains)
 
 ### What Programs Will Work
@@ -221,13 +220,12 @@ Programs that:
 - Process strings
 - Use arrays and variables
 - Accept user input and display results
-- Use FOR/NEXT loops and IF/THEN logic
+- Use FOR/NEXT or WHILE/WEND loops and IF/THEN logic
 
 ### What Programs Will NOT Work
 
 Programs that:
 - Read or write data files
-- Use WHILE/WEND loops
 - Need error trapping
 - Use ON GOTO or ON GOSUB
 

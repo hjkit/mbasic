@@ -141,6 +141,52 @@ class Interpreter:
                 # No jump, proceed to next line
                 line_index += 1
 
+    def find_matching_wend(self, start_line, start_stmt):
+        """Find the matching WEND for a WHILE statement
+
+        Args:
+            start_line: Line number where WHILE is located
+            start_stmt: Statement index where WHILE is located
+
+        Returns:
+            (line_number, stmt_index) of matching WEND, or None if not found
+        """
+        # Start searching from the statement after the WHILE
+        depth = 1  # Track nesting depth
+
+        # Get the line index to start searching
+        try:
+            line_idx = self.runtime.line_order.index(start_line)
+        except ValueError:
+            return None
+
+        # Start from the next statement in the same line
+        stmt_idx = start_stmt + 1
+
+        while line_idx < len(self.runtime.line_order):
+            line_num = self.runtime.line_order[line_idx]
+            line = self.runtime.line_table[line_num]
+
+            # Search through statements in this line
+            while stmt_idx < len(line.statements):
+                stmt = line.statements[stmt_idx]
+
+                if isinstance(stmt, ast_nodes.WhileStatementNode):
+                    depth += 1
+                elif isinstance(stmt, ast_nodes.WendStatementNode):
+                    depth -= 1
+                    if depth == 0:
+                        # Found matching WEND
+                        return (line_num, stmt_idx)
+
+                stmt_idx += 1
+
+            # Move to next line
+            line_idx += 1
+            stmt_idx = 0  # Start from first statement in next line
+
+        return None
+
     def execute_statement(self, stmt):
         """Execute a single statement"""
         # Get statement type name
@@ -396,15 +442,49 @@ class Interpreter:
             return False  # Loop finished
 
     def execute_while(self, stmt):
-        """Execute WHILE statement (just mark position)"""
-        # WHILE is handled by checking condition and jumping to WEND or past it
+        """Execute WHILE statement"""
+        # Evaluate the condition
         condition = self.evaluate_expression(stmt.condition)
 
         if not condition:
-            # Skip to matching WEND
-            # Find the matching WEND statement
-            # For now, throw error - full implementation needs loop tracking
-            raise NotImplementedError("WHILE/WEND not fully implemented yet")
+            # Condition is false - skip to after matching WEND
+            wend_pos = self.find_matching_wend(
+                self.runtime.current_line.line_number,
+                self.runtime.current_stmt_index
+            )
+
+            if wend_pos is None:
+                raise RuntimeError(f"WHILE without matching WEND at line {self.runtime.current_line.line_number}")
+
+            wend_line, wend_stmt = wend_pos
+
+            # Jump to the statement AFTER the WEND
+            self.runtime.next_line = wend_line
+            self.runtime.next_stmt_index = wend_stmt + 1
+        else:
+            # Condition is true - enter the loop
+            # Push loop info so WEND knows where to return
+            self.runtime.push_while_loop(
+                self.runtime.current_line.line_number,
+                self.runtime.current_stmt_index
+            )
+
+    def execute_wend(self, stmt):
+        """Execute WEND statement"""
+        # Pop the matching WHILE loop info
+        loop_info = self.runtime.peek_while_loop()
+
+        if loop_info is None:
+            raise RuntimeError(f"WEND without matching WHILE at line {self.runtime.current_line.line_number}")
+
+        # Jump back to the WHILE statement to re-evaluate the condition
+        # The WHILE will either continue the loop or exit and pop the loop
+        self.runtime.next_line = loop_info['while_line']
+        self.runtime.next_stmt_index = loop_info['while_stmt']
+
+        # Remove the loop from the stack since we're jumping back to WHILE
+        # which will re-push if the condition is still true
+        self.runtime.pop_while_loop()
 
     def execute_end(self, stmt):
         """Execute END statement"""

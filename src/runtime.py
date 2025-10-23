@@ -47,6 +47,7 @@ class Runtime:
         # Control flow stacks
         self.gosub_stack = []         # [(return_line, return_stmt_index), ...]
         self.for_loops = {}           # var_name -> {'end': val, 'step': val, 'return_line': line, 'return_stmt': idx}
+        self.while_loops = []         # [{'while_line': line, 'while_stmt': idx}, ...] - stack of active WHILE loops
 
         # Line number resolution
         self.line_table = {}          # line_number -> LineNode
@@ -546,6 +547,25 @@ class Runtime:
     def get_for_loop(self, var_name):
         """Get FOR loop info or None"""
         return self.for_loops.get(var_name)
+
+    def push_while_loop(self, while_line, while_stmt_index):
+        """Register a WHILE loop"""
+        self.while_loops.append({
+            'while_line': while_line,
+            'while_stmt': while_stmt_index
+        })
+
+    def pop_while_loop(self):
+        """Remove most recent WHILE loop"""
+        if self.while_loops:
+            return self.while_loops.pop()
+        return None
+
+    def peek_while_loop(self):
+        """Get most recent WHILE loop info without removing it"""
+        if self.while_loops:
+            return self.while_loops[-1]
+        return None
 
     def find_line(self, line_number):
         """

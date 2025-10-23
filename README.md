@@ -39,7 +39,7 @@ python3 mbasic.py
 ✓ **Complete language support**
 - Variables with type suffixes ($, %, !, #)
 - Arrays with DIM
-- Control flow (IF/THEN/ELSE, FOR/NEXT, GOSUB/RETURN, GOTO)
+- Control flow (IF/THEN/ELSE, FOR/NEXT, WHILE/WEND, GOSUB/RETURN, GOTO)
 - All arithmetic, relational, and logical operators
 - 35+ built-in functions (SIN, COS, CHR$, LEFT$, etc.)
 - User-defined functions (DEF FN)
@@ -141,6 +141,7 @@ Result: All 20 tests PASS
 - ✓ Line number resolution
 - ✓ GOSUB/RETURN stack
 - ✓ FOR/NEXT loops
+- ✓ WHILE/WEND loops
 - ✓ DATA/READ/RESTORE
 - ✓ Expression evaluation
 - ✓ All operators
@@ -165,7 +166,6 @@ Result: All 20 tests PASS
 - ✗ Sequential file I/O (OPEN, CLOSE, PRINT#, INPUT#, LINE INPUT#, WRITE#, EOF)
 - ✗ Random file I/O (FIELD, GET, PUT, LSET, RSET, LOC, LOF)
 - ✗ Error handling (ON ERROR GOTO, RESUME)
-- ✗ WHILE/WEND loops (parsed but not executed)
 - ✗ Computed jumps (ON GOTO, ON GOSUB)
 
 **See [STATUS.md](STATUS.md) for complete implementation status.**
@@ -173,7 +173,6 @@ Result: All 20 tests PASS
 **What this means:**
 - Programs using file I/O will not work
 - Programs cannot trap and handle errors
-- Use FOR/NEXT instead of WHILE/WEND
 - Graphics/sound commands are not part of MBASIC 5.21 core spec
 
 ## Example Programs
