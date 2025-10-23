@@ -70,3 +70,5 @@
 1310 : 		PRINT MSG$;": ";NAM$
 1320 : 		RETURN
 1330 : 
+FT$(NAM$,NUM-1)+" "
+				+RIGHT$(NAM$,LENGTH-NU
