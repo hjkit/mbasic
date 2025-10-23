@@ -1253,10 +1253,11 @@ class Parser:
                 line_num=token.line,
                 column=token.column
             )
-            # Check separator after prompt: semicolon suppresses "?", comma shows "?"
+            # Check separator after prompt (comma or semicolon both show "?")
+            # Note: In real MBASIC, both comma and semicolon after prompt show "?"
+            # The only way to suppress "?" is INPUT; (semicolon immediately after INPUT)
             if self.match(TokenType.SEMICOLON):
                 prompt_separator = ';'
-                suppress_question = True
                 self.advance()
             elif self.match(TokenType.COMMA):
                 prompt_separator = ','

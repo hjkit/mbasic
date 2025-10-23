@@ -116,14 +116,17 @@ class InputStatementNode:
     Syntax:
         INPUT var1, var2           - Read from keyboard (shows "? ")
         INPUT "prompt", var1       - Read with prompt (shows "prompt? ")
-        INPUT "prompt"; var1       - Read with prompt (shows "prompt" - no ?)
+        INPUT "prompt"; var1       - Read with prompt (shows "prompt? ")
         INPUT; var1                - Read without prompt (no "?")
         INPUT #filenum, var1       - Read from file
+
+    Note: Both comma and semicolon after prompt show "?" in real MBASIC.
+    Only INPUT; (semicolon immediately after INPUT) suppresses the "?".
     """
     prompt: Optional['ExpressionNode']
     variables: List['VariableNode']
     file_number: Optional['ExpressionNode'] = None  # For INPUT #n, ...
-    suppress_question: bool = False  # True if semicolon used instead of comma after prompt
+    suppress_question: bool = False  # True if INPUT; (semicolon immediately after INPUT)
     line_num: int = 0
     column: int = 0
 

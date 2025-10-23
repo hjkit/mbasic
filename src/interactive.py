@@ -41,7 +41,11 @@ def print_error(e, runtime=None):
     else:
         # Normal mode - just print error with line number if available
         if runtime and runtime.current_line:
-            print(f"?{type(e).__name__} in {runtime.current_line.line_number}: {e}")
+            line_num = runtime.current_line.line_number
+            print(f"?{type(e).__name__} in {line_num}: {e}")
+            # Also print the source code line if available
+            if hasattr(runtime, 'line_text_map') and line_num in runtime.line_text_map:
+                print(f"  {runtime.line_text_map[line_num]}")
         else:
             print(f"?{type(e).__name__}: {e}")
 
@@ -312,7 +316,8 @@ class InteractiveMode:
         try:
             # Execute using line ASTs directly (new style)
             # Runtime will reference self.line_asts which is mutable
-            runtime = Runtime(self.line_asts)
+            # Pass line text map for better error messages
+            runtime = Runtime(self.line_asts, self.lines)
             interpreter = Interpreter(runtime)
             # Pass reference to interactive mode so statements like LIST can access the line editor
             interpreter.interactive_mode = self

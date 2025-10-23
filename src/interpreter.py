@@ -1034,7 +1034,7 @@ class Interpreter:
             if stmt.prompt:
                 prompt_value = self.evaluate_expression(stmt.prompt)
                 print(prompt_value, end='')
-                # Add "? " after prompt if separator was comma (not semicolon)
+                # Always add "? " after prompt (unless INPUT; suppressed it)
                 if not stmt.suppress_question:
                     print("? ", end='')
             elif not stmt.suppress_question:

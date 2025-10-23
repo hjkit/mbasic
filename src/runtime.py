@@ -17,11 +17,12 @@ from ast_nodes import DataStatementNode, DefFnStatementNode
 class Runtime:
     """Runtime state for BASIC program execution"""
 
-    def __init__(self, ast_or_line_table):
+    def __init__(self, ast_or_line_table, line_text_map=None):
         """Initialize runtime.
 
         Args:
             ast_or_line_table: Either a ProgramNode AST (old style) or a dict {line_num: LineNode} (new style)
+            line_text_map: Optional dict {line_num: line_text} for error messages
         """
         # Support both old-style (full AST) and new-style (line table dict)
         if isinstance(ast_or_line_table, dict):
@@ -52,6 +53,7 @@ class Runtime:
         # Line number resolution
         self.line_table = {}          # line_number -> LineNode
         self.line_order = []          # [line_number, ...] in order
+        self.line_text_map = line_text_map or {}  # line_number -> source text (for error messages)
 
         # DATA statements
         self.data_items = []          # [value, value, ...]
