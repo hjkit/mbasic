@@ -456,6 +456,41 @@ class Interpreter:
             if array_name in self.runtime.arrays:
                 del self.runtime.arrays[array_name]
 
+    def execute_clear(self, stmt):
+        """Execute CLEAR statement
+
+        CLEAR resets all variables and closes all open files.
+        Optional arguments for string space and stack space are parsed but ignored.
+
+        Syntax: CLEAR [,[string_space][,stack_space]]
+
+        Effects:
+        - All simple variables are deleted
+        - All arrays are erased
+        - All open files are closed
+        - COMMON variables list is preserved (for CHAIN compatibility)
+        - String space and stack space parameters are ignored (as requested)
+        """
+        # Clear all variables
+        self.runtime.variables.clear()
+
+        # Clear all arrays
+        self.runtime.arrays.clear()
+
+        # Close all open files
+        for file_num in list(self.runtime.files.keys()):
+            try:
+                file_obj = self.runtime.files[file_num]
+                if hasattr(file_obj, 'close'):
+                    file_obj.close()
+            except:
+                pass
+        self.runtime.files.clear()
+        self.runtime.field_buffers.clear()
+
+        # Note: We preserve runtime.common_vars for CHAIN compatibility
+        # Note: We ignore string_space and stack_space parameters as requested
+
     def execute_input(self, stmt):
         """Execute INPUT statement"""
         # Show prompt if any
