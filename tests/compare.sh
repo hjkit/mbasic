@@ -12,7 +12,7 @@ echo ""
 echo "======================================"
 echo "Running with mbasic521"
 echo "======================================"
-timeout 2 tnylpo /home/wohl/cl/mbasic/com/mbasic prtusing.bas 2>&1
+../utils/mbasic521 prtusing.bas
 
 echo ""
 echo "======================================"

@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+arg=$1
+if [ -z "$arg" ]; then
+    tnylpo /home/wohl/cl/mbasic/com/mbasic
+else
+    SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+    tnylpo ${SCRIPT_DIR}/../com/mbasic ${arg}
+fi
+
+
