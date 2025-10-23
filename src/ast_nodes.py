@@ -631,6 +631,20 @@ class SwapStatementNode:
 
 
 @dataclass
+class ErrorStatementNode:
+    """ERROR statement - simulate an error
+
+    Syntax: ERROR error_code
+
+    Sets ERR to the specified error code and triggers error handling.
+    Used for testing error handlers or simulating errors.
+    """
+    error_code: 'ExpressionNode'  # Error code to simulate
+    line_num: int = 0
+    column: int = 0
+
+
+@dataclass
 class OnErrorStatementNode:
     """ON ERROR GOTO statement - error handling"""
     line_number: int

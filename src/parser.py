@@ -481,8 +481,7 @@ class Parser:
 
         # Error handling
         elif token.type == TokenType.ERROR:
-            # Check if this is "ON ERROR GOTO"
-            raise ParseError(f"Unexpected ERROR keyword (use ON ERROR GOTO)", token)
+            return self.parse_error()
         elif token.type == TokenType.RESUME:
             return self.parse_resume()
 
@@ -857,6 +856,7 @@ class Parser:
             TokenType.EXP, TokenType.LOG, TokenType.SQR, TokenType.INT, TokenType.FIX,
             TokenType.RND, TokenType.SGN, TokenType.ASC, TokenType.VAL, TokenType.LEN,
             TokenType.PEEK, TokenType.INP, TokenType.USR, TokenType.EOF_FUNC,
+            TokenType.ERR, TokenType.ERL,
             # String functions
             TokenType.LEFT, TokenType.RIGHT, TokenType.MID, TokenType.CHR, TokenType.STR,
             TokenType.INKEY, TokenType.INPUT_FUNC, TokenType.SPACE, TokenType.STRING_FUNC,
@@ -892,7 +892,17 @@ class Parser:
                 column=func_token.column
             )
 
-        # Expect opening parenthesis for other functions or RND/INKEY$ with args
+        # ERR and ERL can be called without parentheses (return last error info)
+        if func_token.type in (TokenType.ERR, TokenType.ERL) and not self.match(TokenType.LPAREN):
+            # ERR or ERL without arguments
+            return FunctionCallNode(
+                name=func_name,
+                arguments=[],
+                line_num=func_token.line,
+                column=func_token.column
+            )
+
+        # Expect opening parenthesis for other functions or RND/INKEY$/ERR/ERL with args
         self.expect(TokenType.LPAREN)
 
         # Parse arguments
@@ -3214,6 +3224,25 @@ class Parser:
         return CallStatementNode(
             target=target,
             arguments=arguments,
+            line_num=token.line,
+            column=token.column
+        )
+
+    def parse_error(self) -> ErrorStatementNode:
+        """Parse ERROR statement
+
+        Syntax: ERROR error_code
+
+        Simulates an error with the specified error code.
+        Sets ERR to error_code and ERL to current line number.
+        """
+        token = self.advance()  # Consume ERROR
+
+        # Parse error code expression
+        error_code = self.parse_expression()
+
+        return ErrorStatementNode(
+            error_code=error_code,
             line_num=token.line,
             column=token.column
         )

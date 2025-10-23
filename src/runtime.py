@@ -69,6 +69,8 @@ class Runtime:
 
         # Error handling
         self.error_handler = None     # Line number for ON ERROR GOTO
+        self.last_error_code = 0      # ERR - last error code
+        self.last_error_line = 0      # ERL - line number where last error occurred
         self.error_occurred = False
 
         # Random number seed

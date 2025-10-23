@@ -93,6 +93,8 @@ class TokenType(Enum):
     # Keywords - Other
     COMMON = auto()
     ERROR = auto()
+    ERR = auto()
+    ERL = auto()
     OUT = auto()
     POKE = auto()
     RANDOMIZE = auto()
@@ -278,6 +280,8 @@ KEYWORDS = {
 
     # Other
     'error': TokenType.ERROR,
+    'err': TokenType.ERR,
+    'erl': TokenType.ERL,
     'out': TokenType.OUT,
     'poke': TokenType.POKE,
     'randomize': TokenType.RANDOMIZE,
