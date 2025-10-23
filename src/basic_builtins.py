@@ -337,6 +337,52 @@ class BuiltinFunctions:
         # For output/append files, never at EOF
         return 0
 
+    def LOC(self, file_num):
+        """
+        Return current record position for random access file.
+
+        Returns the record number of the last GET or PUT operation.
+        For sequential files, returns approximate byte position / 128.
+        """
+        file_num = int(file_num)
+        if file_num not in self.runtime.files:
+            raise ValueError(f"File #{file_num} not open")
+
+        # For random access files, return current record number
+        if file_num in self.runtime.field_buffers:
+            return self.runtime.field_buffers[file_num]['current_record']
+
+        # For sequential files, return approximate block number (byte position / 128)
+        file_info = self.runtime.files[file_num]
+        file_handle = file_info['handle']
+        pos = file_handle.tell()
+        return pos // 128
+
+    def LOF(self, file_num):
+        """
+        Return length of file in bytes.
+
+        Returns the total size of the file.
+        """
+        file_num = int(file_num)
+        if file_num not in self.runtime.files:
+            raise ValueError(f"File #{file_num} not open")
+
+        file_info = self.runtime.files[file_num]
+        file_handle = file_info['handle']
+
+        # Save current position
+        current_pos = file_handle.tell()
+
+        # Seek to end to get size
+        file_handle.seek(0, 2)
+        size = file_handle.tell()
+
+        # Restore position
+        file_handle.seek(current_pos)
+
+        return size
+
     def USR(self, x):
         """
         Call user machine language routine (not implemented).

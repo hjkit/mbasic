@@ -167,6 +167,8 @@ class TokenType(Enum):
     # Built-in Functions - Other
     EOF_FUNC = auto()        # EOF
     INP = auto()
+    LOC = auto()             # LOC
+    LOF = auto()             # LOF
     PEEK = auto()
     POS = auto()
     USR = auto()
@@ -337,6 +339,8 @@ KEYWORDS = {
     # Other functions
     'eof': TokenType.EOF_FUNC,
     'inp': TokenType.INP,
+    'loc': TokenType.LOC,
+    'lof': TokenType.LOF,
     'peek': TokenType.PEEK,
     'pos': TokenType.POS,
     'usr': TokenType.USR,

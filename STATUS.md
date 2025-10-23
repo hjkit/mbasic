@@ -41,7 +41,7 @@ This document provides a comprehensive overview of what is and is not yet implem
 - ✓ String: ASC, CHR$, INSTR, LEFT$, LEN, MID$, RIGHT$, SPACE$, STR$, STRING$, VAL
 - ✓ Conversion: CDBL, CINT, CSNG
 - ✓ Input: INKEY$ (non-blocking keyboard input)
-- ✓ File I/O: EOF() (end of file test)
+- ✓ File I/O: EOF() (end of file test), LOC() (record position), LOF() (file length)
 - ✓ Other: FIX, HEX$, OCT$, TAB, POS
 
 ### User-Defined Features
@@ -78,6 +78,16 @@ This document provides a comprehensive overview of what is and is not yet implem
 - ✓ WRITE #n, data - Write comma-delimited data with quoted strings
 - ✓ EOF(n) - Test for end of file (respects ^Z as CP/M EOF marker)
 
+### Random Access File I/O
+- ✓ OPEN "R", #n, "file", record_len - Open random file
+- ✓ FIELD #n, width AS var$, ... - Define record layout
+- ✓ GET #n [,record] - Read record
+- ✓ PUT #n [,record] - Write record
+- ✓ LSET var$ = value$ - Left-justify in field
+- ✓ RSET var$ = value$ - Right-justify in field
+- ✓ LOC(n) - Get current record position
+- ✓ LOF(n) - Get file length
+
 ### Error Handling
 - ✓ ON ERROR GOTO line - Set error trap (GOTO)
 - ✓ ON ERROR GOSUB line - Set error trap (GOSUB)
@@ -107,22 +117,7 @@ This document provides a comprehensive overview of what is and is not yet implem
 
 ## ✗ Not Yet Implemented
 
-### 1. Random Access File I/O
-**Priority:** Medium
-
-- ✗ **OPEN "filename" AS #n LEN=reclen** - Open random file
-- ✗ **FIELD #n, width AS var$, ...** - Define record layout
-- ✗ **GET #n [,record]** - Read record
-- ✗ **PUT #n [,record]** - Write record
-- ✗ **LSET var$ = value$** - Left-justify in field
-- ✗ **RSET var$ = value$** - Right-justify in field
-- ✗ **LOC(n)** - Get current record position
-- ✗ **LOF(n)** - Get file length
-
-**Status:** Parsed but not executed
-**Impact:** Cannot access random-access database files
-
-### 3. String Manipulation
+### 1. String Manipulation
 **Priority:** Low
 
 - ✗ **MID$(var$, start, len) = value$** - Replace substring in-place
@@ -131,7 +126,7 @@ This document provides a comprehensive overview of what is and is not yet implem
 **Impact:** Cannot modify strings in-place
 **Workaround:** Use LEFT$, MID$, RIGHT$ to rebuild strings
 
-### 4. Variable Operations
+### 2. Variable Operations
 **Priority:** Low
 
 - ✗ **SWAP var1, var2** - Exchange values of two variables
@@ -140,7 +135,7 @@ This document provides a comprehensive overview of what is and is not yet implem
 **Impact:** Minor convenience feature
 **Workaround:** Use temp variable
 
-### 5. Output Control
+### 3. Output Control
 **Priority:** Low
 
 - ✗ **WIDTH [#filenum,] width** - Set output width
@@ -149,7 +144,7 @@ This document provides a comprehensive overview of what is and is not yet implem
 **Status:** Parsed but not executed
 **Impact:** Cannot control display width or print to printer
 
-### 6. Graphics and Sound
+### 4. Graphics and Sound
 **Priority:** Very Low (Not Planned)
 
 Graphics commands (SCREEN, LINE, CIRCLE, PSET, etc.) and sound commands (SOUND, BEEP, PLAY) are not part of MBASIC 5.21 core specification and are not planned for implementation.
@@ -171,6 +166,7 @@ Graphics commands (SCREEN, LINE, CIRCLE, PSET, etc.) and sound commands (SOUND, 
 - **ON GOTO/GOSUB:** Tested with multiple values, out-of-range, expressions
 - **File system ops:** Tested (KILL, NAME AS, RESET)
 - **Sequential file I/O:** Fully tested (OPEN, CLOSE, PRINT#, INPUT#, LINE INPUT#, WRITE#, EOF with ^Z support)
+- **Random file I/O:** Fully tested (FIELD, GET, PUT, LSET, RSET, LOC, LOF)
 
 ## Compatibility Notes
 
@@ -184,13 +180,13 @@ Programs that use:
 - User input/output
 - Non-blocking keyboard input (INKEY$)
 - Sequential file I/O (OPEN, CLOSE, PRINT#, INPUT#, LINE INPUT#, WRITE#, EOF)
+- Random access file I/O (FIELD, GET, PUT, LSET, RSET, LOC, LOF)
 - File system operations (KILL, NAME AS, RESET)
 - DATA statements
 - User-defined functions
 
 ### What Doesn't Work
 Programs that require:
-- Random access file I/O (FIELD, GET, PUT, LSET, RSET)
 - Hardware access (PEEK, POKE, ports)
 
 ## Roadmap
@@ -215,8 +211,12 @@ Programs that require:
 - ✓ WRITE# statement
 - ✓ EOF() function with ^Z support
 
-### Phase 4 (Planned) - Extended Features
-- ⚠ Random file I/O (FIELD, GET, PUT, LSET, RSET)
+### Phase 4 (Completed) - Random File I/O ✓
+- ✓ OPEN "R" for random access
+- ✓ FIELD statement for record layout
+- ✓ GET/PUT for record read/write
+- ✓ LSET/RSET for field assignment
+- ✓ LOC/LOF functions
 
 ### Phase 5 (Future) - Enhancements
 - Documentation improvements
@@ -232,8 +232,7 @@ Programs that require:
 
 ## Known Limitations
 
-1. **No random access file I/O** - Cannot use FIELD, GET, PUT for binary file access
-2. **Integer division precision** - May differ slightly from original MBASIC due to Python float handling
+1. **Integer division precision** - May differ slightly from original MBASIC due to Python float handling
 
 ## Testing Your Program
 
@@ -259,8 +258,8 @@ To check if your MBASIC program will work:
 ## Contributing
 
 Contributions welcome! Priority areas:
-1. Random file I/O implementation (FIELD, GET, PUT)
-2. Additional test cases
-3. Performance optimization
+1. Additional test cases
+2. Performance optimization
+3. Enhanced error messages and debugging features
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for details.

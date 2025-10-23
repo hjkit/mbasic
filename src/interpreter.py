@@ -1394,6 +1394,210 @@ class Interpreter:
             self.runtime.files[file_num]['handle'].close()
             del self.runtime.files[file_num]
 
+    def execute_field(self, stmt):
+        """Execute FIELD statement - define random-access file buffer
+
+        Syntax: FIELD #n, width AS var$, width AS var$, ...
+
+        Defines the layout of a record buffer for random file access.
+        Each variable is mapped to a position and width in the buffer.
+        """
+        file_num = int(self.evaluate_expression(stmt.file_number))
+
+        if file_num not in self.runtime.files:
+            raise RuntimeError(f"File #{file_num} not open")
+
+        file_info = self.runtime.files[file_num]
+        if file_info['mode'] != 'R':
+            raise RuntimeError(f"File #{file_num} not open for random access")
+
+        # Initialize field buffer for this file if not exists
+        if file_num not in self.runtime.field_buffers:
+            self.runtime.field_buffers[file_num] = {
+                'buffer': bytearray(),
+                'fields': {},  # var_name -> (offset, width)
+                'current_record': 0
+            }
+
+        buffer_info = self.runtime.field_buffers[file_num]
+        offset = 0
+
+        # Process each field
+        for width_expr, var_node in stmt.fields:
+            width = int(self.evaluate_expression(width_expr))
+            var_name = var_node.name + (var_node.type_suffix or '')
+
+            # Store field mapping
+            buffer_info['fields'][var_name] = (offset, width)
+            offset += width
+
+        # Initialize buffer to appropriate size
+        buffer_info['buffer'] = bytearray(offset)
+
+    def execute_get(self, stmt):
+        """Execute GET statement - read record from random-access file
+
+        Syntax:
+            GET #n          - Read next record
+            GET #n, record  - Read specific record number
+        """
+        file_num = int(self.evaluate_expression(stmt.file_number))
+
+        if file_num not in self.runtime.files:
+            raise RuntimeError(f"File #{file_num} not open")
+
+        file_info = self.runtime.files[file_num]
+        if file_info['mode'] != 'R':
+            raise RuntimeError(f"File #{file_num} not open for random access")
+
+        if file_num not in self.runtime.field_buffers:
+            raise RuntimeError(f"File #{file_num} has no FIELD defined")
+
+        buffer_info = self.runtime.field_buffers[file_num]
+        file_handle = file_info['handle']
+
+        # Determine record number
+        if stmt.record_number:
+            record_num = int(self.evaluate_expression(stmt.record_number))
+        else:
+            # Use next record
+            record_num = buffer_info['current_record'] + 1
+
+        # Seek to record position (records are 1-based)
+        record_size = len(buffer_info['buffer'])
+        file_handle.seek((record_num - 1) * record_size)
+
+        # Read data into buffer
+        data = file_handle.read(record_size)
+        if len(data) < record_size:
+            # Pad with spaces if we read past EOF
+            data += b' ' * (record_size - len(data))
+
+        buffer_info['buffer'] = bytearray(data)
+        buffer_info['current_record'] = record_num
+
+        # Update field variables from buffer
+        for var_name, (offset, width) in buffer_info['fields'].items():
+            value = buffer_info['buffer'][offset:offset+width].decode('latin-1')
+            # Strip variable name to get base name and suffix
+            if var_name.endswith('$'):
+                self.runtime.set_variable_raw(var_name, value)
+            else:
+                # For non-string fields (unusual but possible), convert to number
+                try:
+                    self.runtime.set_variable_raw(var_name, float(value.strip()))
+                except ValueError:
+                    self.runtime.set_variable_raw(var_name, 0.0)
+
+    def execute_put(self, stmt):
+        """Execute PUT statement - write record to random-access file
+
+        Syntax:
+            PUT #n          - Write to next record
+            PUT #n, record  - Write to specific record number
+        """
+        file_num = int(self.evaluate_expression(stmt.file_number))
+
+        if file_num not in self.runtime.files:
+            raise RuntimeError(f"File #{file_num} not open")
+
+        file_info = self.runtime.files[file_num]
+        if file_info['mode'] != 'R':
+            raise RuntimeError(f"File #{file_num} not open for random access")
+
+        if file_num not in self.runtime.field_buffers:
+            raise RuntimeError(f"File #{file_num} has no FIELD defined")
+
+        buffer_info = self.runtime.field_buffers[file_num]
+        file_handle = file_info['handle']
+
+        # Determine record number
+        if stmt.record_number:
+            record_num = int(self.evaluate_expression(stmt.record_number))
+        else:
+            # Use next record
+            record_num = buffer_info['current_record'] + 1
+
+        # Seek to record position (records are 1-based)
+        record_size = len(buffer_info['buffer'])
+        file_handle.seek((record_num - 1) * record_size)
+
+        # Write buffer to file
+        file_handle.write(buffer_info['buffer'])
+        file_handle.flush()
+
+        buffer_info['current_record'] = record_num
+
+    def execute_lset(self, stmt):
+        """Execute LSET statement - left-justify string in field variable
+
+        Syntax: LSET var$ = expr$
+
+        Assigns value to a field variable, left-justified and padded with spaces.
+        Used with random access files.
+        """
+        var_name = stmt.variable.name + (stmt.variable.type_suffix or '')
+        value = str(self.evaluate_expression(stmt.expression))
+
+        # Find which file buffer this variable belongs to
+        found = False
+        for file_num, buffer_info in self.runtime.field_buffers.items():
+            if var_name in buffer_info['fields']:
+                offset, width = buffer_info['fields'][var_name]
+
+                # Left-justify and pad/truncate to width
+                if len(value) < width:
+                    value = value + ' ' * (width - len(value))
+                else:
+                    value = value[:width]
+
+                # Update buffer
+                buffer_info['buffer'][offset:offset+width] = value.encode('latin-1')
+
+                # Also update variable
+                self.runtime.set_variable_raw(var_name, value)
+                found = True
+                break
+
+        if not found:
+            # If not a field variable, just do normal assignment
+            self.runtime.set_variable_raw(var_name, value)
+
+    def execute_rset(self, stmt):
+        """Execute RSET statement - right-justify string in field variable
+
+        Syntax: RSET var$ = expr$
+
+        Assigns value to a field variable, right-justified and padded with spaces.
+        Used with random access files.
+        """
+        var_name = stmt.variable.name + (stmt.variable.type_suffix or '')
+        value = str(self.evaluate_expression(stmt.expression))
+
+        # Find which file buffer this variable belongs to
+        found = False
+        for file_num, buffer_info in self.runtime.field_buffers.items():
+            if var_name in buffer_info['fields']:
+                offset, width = buffer_info['fields'][var_name]
+
+                # Right-justify and pad/truncate to width
+                if len(value) < width:
+                    value = ' ' * (width - len(value)) + value
+                else:
+                    value = value[:width]
+
+                # Update buffer
+                buffer_info['buffer'][offset:offset+width] = value.encode('latin-1')
+
+                # Also update variable
+                self.runtime.set_variable_raw(var_name, value)
+                found = True
+                break
+
+        if not found:
+            # If not a field variable, just do normal assignment
+            self.runtime.set_variable_raw(var_name, value)
+
     def execute_list(self, stmt):
         """Execute LIST statement"""
         # Evaluate start and end expressions
