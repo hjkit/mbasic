@@ -55,7 +55,9 @@
       "Bash(break)",
       "Bash(printf:*)",
       "Bash(DEBUG=1 python3:*)",
-      "WebFetch(domain:bitsavers.org)"
+      "WebFetch(domain:bitsavers.org)",
+      "Bash(/tmp/test_interactive_def.sh)",
+      "Bash(/tmp/test_interactive_all_def.sh)"
     ],
     "deny": [],
     "ask": []

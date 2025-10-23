@@ -36,17 +36,21 @@ class Parser:
     2. parse_program() - Parse program with global type information
     """
 
-    def __init__(self, tokens: List[Token]):
+    def __init__(self, tokens: List[Token], def_type_map: Dict[str, str] = None):
         self.tokens = tokens
         self.position = 0
 
         # Global type mapping from DEF statements
         # Maps first letter (a-z) to type (INTEGER, SINGLE, DOUBLE, STRING)
-        self.def_type_map: Dict[str, str] = {}
-
-        # Default type is SINGLE for all letters (use lowercase since lexer normalizes to lowercase)
-        for letter in 'abcdefghijklmnopqrstuvwxyz':
-            self.def_type_map[letter] = TypeInfo.SINGLE
+        if def_type_map is not None:
+            # Use provided def_type_map (for interactive mode)
+            self.def_type_map = def_type_map
+        else:
+            # Create new def_type_map (for batch mode)
+            self.def_type_map: Dict[str, str] = {}
+            # Default type is SINGLE for all letters (use lowercase since lexer normalizes to lowercase)
+            for letter in 'abcdefghijklmnopqrstuvwxyz':
+                self.def_type_map[letter] = TypeInfo.SINGLE
 
         # Symbol table - maps variable names to their types
         self.symbol_table: Dict[str, str] = {}
@@ -2228,8 +2232,9 @@ class Parser:
     def parse_deftype(self) -> DefTypeStatementNode:
         """Parse DEFINT/DEFSNG/DEFDBL/DEFSTR statement
 
-        Note: Type collection already happened in first pass.
-        This just creates the AST node for documentation purposes.
+        Note: In batch mode, type collection already happened in first pass.
+        In interactive mode, this updates the def_type_map.
+        This creates the AST node for documentation purposes.
         """
         token = self.advance()
         var_type = TypeInfo.from_def_statement(token.type)
@@ -2241,16 +2246,25 @@ class Parser:
             # Get first letter
             letter_token = self.expect(TokenType.IDENTIFIER)
             first_letter = letter_token.value[0].upper()
+            first_letter_lower = first_letter.lower()
 
             # Check for range (A-Z)
             if self.match(TokenType.MINUS):
                 self.advance()
                 last_letter_token = self.expect(TokenType.IDENTIFIER)
                 last_letter = last_letter_token.value[0].upper()
+                last_letter_lower = last_letter.lower()
                 letter_ranges.append((first_letter, last_letter))
+
+                # Update def_type_map for range (use lowercase)
+                for letter in range(ord(first_letter_lower), ord(last_letter_lower) + 1):
+                    self.def_type_map[chr(letter)] = var_type
             else:
                 # Single letter
                 letter_ranges.append((first_letter, first_letter))
+
+                # Update def_type_map for single letter (use lowercase)
+                self.def_type_map[first_letter_lower] = var_type
 
             # Check for comma (more letters)
             if self.match(TokenType.COMMA):

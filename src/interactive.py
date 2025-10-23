@@ -59,6 +59,14 @@ class InteractiveMode:
         self.program_interpreter = None  # Interpreter for RUN (preserved for CONT)
         self.ctrl_c_count = 0  # Track consecutive Ctrl+C presses
 
+        # Initialize DEF type map (like Parser does)
+        # Import TypeInfo here to avoid circular dependency
+        from parser import TypeInfo
+        self.def_type_map = {}
+        # Default type is SINGLE for all letters (use lowercase)
+        for letter in 'abcdefghijklmnopqrstuvwxyz':
+            self.def_type_map[letter] = TypeInfo.SINGLE
+
     def parse_single_line(self, line_text):
         """Parse a single line into a LineNode AST.
 
@@ -66,7 +74,7 @@ class InteractiveMode:
         """
         try:
             tokens = list(tokenize(line_text))
-            parser = Parser(tokens)
+            parser = Parser(tokens, self.def_type_map)
             line_node = parser.parse_line()
             return line_node
         except Exception as e:
@@ -1271,7 +1279,7 @@ class InteractiveMode:
 
         try:
             tokens = list(tokenize(program_text))
-            parser = Parser(tokens)
+            parser = Parser(tokens, self.def_type_map)
             ast = parser.parse()
 
             # Choose which runtime to use:
