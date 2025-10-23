@@ -513,6 +513,10 @@ class Interpreter:
         # Evaluate format string
         format_str = str(self.evaluate_expression(stmt.format_string))
 
+        # Check for empty format string
+        if not format_str:
+            raise RuntimeError("Illegal function call")
+
         # Evaluate all expressions
         values = []
         for expr in stmt.expressions:

@@ -259,19 +259,31 @@ class UsingFormatter:
         else:
             precision = 0
 
+        # Determine sign BEFORE rounding (for negative zero handling)
+        original_negative = value < 0
+
         # Round to precision
         if precision > 0:
             rounded = round(value, precision)
         else:
             rounded = round(value)
 
-        # Determine sign
-        is_negative = rounded < 0
+        # Determine sign - use original sign for values that round to zero
+        if rounded == 0 and original_negative:
+            is_negative = True
+        else:
+            is_negative = rounded < 0
         abs_value = abs(rounded)
 
         # Format number string
         if precision > 0:
             num_str = f"{abs_value:.{precision}f}"
+            # Special case: if format has no digits before decimal (like .##),
+            # and value < 1, omit the leading zero
+            if spec['decimal_pos'] == 0 and abs_value < 1:
+                # Remove leading "0" from "0.xx"
+                if num_str.startswith('0.'):
+                    num_str = num_str[1:]  # Keep just ".xx"
         else:
             num_str = f"{int(abs_value)}"
 
@@ -292,10 +304,10 @@ class UsingFormatter:
         if spec['leading_sign'] or spec['trailing_sign'] or spec['trailing_minus_only']:
             field_width += 1  # Sign takes up one position
 
-        # Available width for the number itself (excluding sign)
+        # Available width for the number itself (excluding sign/space)
         available_width = field_width
-        if spec['leading_sign'] or spec['trailing_sign'] or (spec['trailing_minus_only'] and is_negative):
-            available_width -= 1  # Reserve space for sign
+        if spec['leading_sign'] or spec['trailing_sign'] or spec['trailing_minus_only']:
+            available_width -= 1  # Reserve space for sign (or space for trailing_minus_only)
 
         # Adjust for dollar sign
         if spec['dollar_sign']:
@@ -321,8 +333,8 @@ class UsingFormatter:
         content_width = len(num_str)
         if spec['dollar_sign']:
             content_width += 1
-        # Add sign to content width
-        if spec['leading_sign'] or spec['trailing_sign'] or (spec['trailing_minus_only'] and is_negative):
+        # Add sign to content width (trailing_minus_only ALWAYS adds a char, - or space)
+        if spec['leading_sign'] or spec['trailing_sign'] or spec['trailing_minus_only']:
             content_width += 1
 
         padding_needed = field_width - content_width
@@ -353,8 +365,9 @@ class UsingFormatter:
         # Trailing sign
         if spec['trailing_sign']:
             result_parts.append('-' if is_negative else '+')
-        elif spec['trailing_minus_only'] and is_negative:
-            result_parts.append('-')
+        elif spec['trailing_minus_only']:
+            # Add '-' for negative, ' ' for positive
+            result_parts.append('-' if is_negative else ' ')
 
         return ''.join(result_parts)
 

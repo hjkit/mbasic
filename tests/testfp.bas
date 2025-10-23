@@ -1,0 +1,4 @@
+10 X = 12345.67
+20 PRINT X
+30 PRINT USING "##,###.##"; X
+40 END
