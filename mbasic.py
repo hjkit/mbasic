@@ -8,6 +8,7 @@ Usage:
 """
 
 import sys
+import os
 from pathlib import Path
 
 # Add src to path
@@ -50,8 +51,11 @@ def run_file(program_path):
             print(f"Error in {runtime.current_line.line_number}: {e}", file=sys.stderr)
         else:
             print(f"Error: {e}", file=sys.stderr)
-        import traceback
-        traceback.print_exc()
+
+        # Print traceback only in DEBUG mode
+        if os.environ.get('DEBUG'):
+            import traceback
+            traceback.print_exc()
         sys.exit(1)
 
 

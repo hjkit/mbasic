@@ -52,7 +52,9 @@
       "Bash(do if python3 mbasic.py \"$f\")",
       "Bash(/dev/null)",
       "Bash(then echo \"SUCCESS: $f\")",
-      "Bash(break)"
+      "Bash(break)",
+      "Bash(printf:*)",
+      "Bash(DEBUG=1 python3:*)"
     ],
     "deny": [],
     "ask": []

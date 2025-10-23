@@ -9,12 +9,28 @@ Implements the interactive REPL with:
 
 import sys
 import re
+import os
+import traceback
 from pathlib import Path
 from lexer import tokenize
 from parser import Parser
 from runtime import Runtime
 from interpreter import Interpreter
 import ast_nodes
+
+
+def print_error(e, runtime=None):
+    """Print error with optional traceback in DEBUG mode"""
+    if os.environ.get('DEBUG'):
+        # Print full traceback in debug mode
+        print(f"?{type(e).__name__}: {e}")
+        traceback.print_exc()
+    else:
+        # Normal mode - just print error with line number if available
+        if runtime and runtime.current_line:
+            print(f"?{type(e).__name__} in {runtime.current_line.line_number}: {e}")
+        else:
+            print(f"?{type(e).__name__}: {e}")
 
 
 class InteractiveMode:
@@ -83,7 +99,7 @@ class InteractiveMode:
                 print("Break")
                 continue
             except Exception as e:
-                print(f"?{type(e).__name__}: {e}")
+                print_error(e)
 
     def process_line(self, line):
         """Process a line of input (numbered line or direct command)"""
@@ -146,7 +162,9 @@ class InteractiveMode:
             try:
                 self.execute_immediate(cmd)
             except Exception as e:
-                print(f"?{type(e).__name__}: {e}")
+                # Use the runtime from immediate mode or program runtime
+                runtime = self.program_runtime if self.program_runtime else self.runtime
+                print_error(e, runtime)
 
     def cmd_run(self):
         """RUN - Execute the program"""
@@ -169,11 +187,7 @@ class InteractiveMode:
             interpreter.run()
 
         except Exception as e:
-            # Report line number if available
-            if runtime.current_line:
-                print(f"?{type(e).__name__} in {runtime.current_line.line_number}: {e}")
-            else:
-                print(f"?{type(e).__name__}: {e}")
+            print_error(e, runtime)
 
     def cmd_cont(self):
         """CONT - Continue execution after STOP or Break"""
@@ -196,11 +210,7 @@ class InteractiveMode:
             self.program_interpreter.run_from_current()
 
         except Exception as e:
-            # Report line number if available
-            if self.program_runtime.current_line:
-                print(f"?{type(e).__name__} in {self.program_runtime.current_line.line_number}: {e}")
-            else:
-                print(f"?{type(e).__name__}: {e}")
+            print_error(e, self.program_runtime)
 
     def cmd_list(self, args):
         """LIST [start][-][end] - List program lines"""
@@ -1036,6 +1046,9 @@ class InteractiveMode:
         # Build a minimal program with line 0
         program_text = "0 " + statement
 
+        # Initialize runtime to None in case parsing fails
+        runtime = None
+
         try:
             tokens = list(tokenize(program_text))
             parser = Parser(tokens)
@@ -1077,14 +1090,8 @@ class InteractiveMode:
                 runtime.current_stmt_index = old_index
 
         except Exception as e:
-            # Report line number if available
-            if runtime.current_line and runtime.current_line.line_number == 0:
-                # Immediate mode - don't show line 0, just show error
-                print(f"?{type(e).__name__}: {e}")
-            elif runtime.current_line:
-                print(f"?{type(e).__name__} in {runtime.current_line.line_number}: {e}")
-            else:
-                print(f"?{type(e).__name__}: {e}")
+            # Use helper function for consistent error reporting
+            print_error(e, runtime)
 
     def get_program_text(self):
         """Get program as text"""
