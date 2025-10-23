@@ -788,6 +788,11 @@ class Parser:
         token = self.advance()
         name = token.value
 
+        # Extract type suffix and strip it from name
+        type_suffix = self.get_type_suffix(name)
+        if type_suffix:
+            name = name[:-1]  # Remove the suffix character from the name
+
         # Check for array subscripts or function arguments
         if self.match(TokenType.LPAREN):
             self.advance()
@@ -809,7 +814,7 @@ class Parser:
             # (function calls are handled separately for built-in functions)
             return VariableNode(
                 name=name,
-                type_suffix=self.get_type_suffix(name),
+                type_suffix=type_suffix,
                 subscripts=args,
                 line_num=token.line,
                 column=token.column
@@ -818,7 +823,7 @@ class Parser:
             # Simple variable
             return VariableNode(
                 name=name,
-                type_suffix=self.get_type_suffix(name),
+                type_suffix=type_suffix,
                 subscripts=None,
                 line_num=token.line,
                 column=token.column

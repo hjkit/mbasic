@@ -442,6 +442,20 @@ class Interpreter:
                 name = name[:-1]
             self.runtime.dimension_array(name, type_suffix, dimensions)
 
+    def execute_erase(self, stmt):
+        """Execute ERASE statement
+
+        ERASE removes arrays from memory to reclaim space.
+        After ERASE, the array must be re-dimensioned with DIM before use.
+
+        Syntax: ERASE array1, array2, ...
+        """
+        for array_name in stmt.array_names:
+            # Array name already includes type suffix from parser
+            # Just remove it from runtime if it exists
+            if array_name in self.runtime.arrays:
+                del self.runtime.arrays[array_name]
+
     def execute_input(self, stmt):
         """Execute INPUT statement"""
         # Show prompt if any
