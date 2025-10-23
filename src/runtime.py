@@ -76,6 +76,9 @@ class Runtime:
         self.stop_line = None             # Line where STOP occurred
         self.stop_stmt_index = None       # Statement index where STOP occurred
 
+        # Break handling (Ctrl+C)
+        self.break_requested = False      # True when Ctrl+C pressed during execution
+
     def setup(self):
         """
         Initialize runtime by building lookup tables.

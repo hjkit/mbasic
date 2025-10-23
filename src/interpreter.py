@@ -5,6 +5,7 @@ Executes BASIC programs from AST.
 """
 
 import sys
+import signal
 from runtime import Runtime
 from basic_builtins import BuiltinFunctions
 from tokens import TokenType
@@ -18,13 +19,33 @@ class Interpreter:
         self.runtime = runtime
         self.builtins = BuiltinFunctions(runtime)
 
+    def _setup_break_handler(self):
+        """Setup Ctrl+C handler to set break flag"""
+        def signal_handler(sig, frame):
+            self.runtime.break_requested = True
+
+        # Save old handler to restore later
+        self.old_signal_handler = signal.signal(signal.SIGINT, signal_handler)
+
+    def _restore_break_handler(self):
+        """Restore original Ctrl+C handler"""
+        if hasattr(self, 'old_signal_handler'):
+            signal.signal(signal.SIGINT, self.old_signal_handler)
+
     def run(self):
         """Execute the program from start to finish"""
         # Setup runtime tables
         self.runtime.setup()
 
-        # Execute from the beginning
-        self._run_loop(start_index=0)
+        # Setup Ctrl+C handler
+        self._setup_break_handler()
+
+        try:
+            # Execute from the beginning
+            self._run_loop(start_index=0)
+        finally:
+            # Restore original handler
+            self._restore_break_handler()
 
     def run_from_current(self):
         """Resume execution from current position (for CONT after STOP)
@@ -42,8 +63,15 @@ class Interpreter:
         except ValueError:
             raise RuntimeError(f"Current line {line_number} not found in program")
 
-        # Execute from current position
-        self._run_loop(start_index=line_index)
+        # Setup Ctrl+C handler
+        self._setup_break_handler()
+
+        try:
+            # Execute from current position
+            self._run_loop(start_index=line_index)
+        finally:
+            # Restore original handler
+            self._restore_break_handler()
 
     def _run_loop(self, start_index=0):
         """Internal: Execute the main interpreter loop
@@ -54,6 +82,17 @@ class Interpreter:
         # Execute lines in sequential order
         line_index = start_index
         while line_index < len(self.runtime.line_order) and not self.runtime.halted:
+            # Check for Ctrl+C break
+            if self.runtime.break_requested:
+                self.runtime.break_requested = False
+                # Set stopped state like STOP command
+                self.runtime.stopped = True
+                self.runtime.stop_line = self.runtime.current_line
+                self.runtime.stop_stmt_index = self.runtime.current_stmt_index
+                print()  # Newline after ^C
+                print(f"Break in {self.runtime.current_line.line_number if self.runtime.current_line else '?'}")
+                return
+
             line_number = self.runtime.line_order[line_index]
             line_node = self.runtime.line_table[line_number]
 
