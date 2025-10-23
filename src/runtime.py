@@ -341,8 +341,13 @@ class Runtime:
         # Resolve full array name
         full_name, _ = self._resolve_variable_name(name, type_suffix, def_type_map)
 
+        # Auto-dimension array to (10) if not explicitly dimensioned (MBASIC behavior)
         if full_name not in self._arrays:
-            raise RuntimeError(f"Array {full_name} not dimensioned")
+            # Determine number of dimensions from subscripts
+            num_dims = len(subscripts)
+            # Default dimension size is 10 for each dimension
+            default_dims = [10] * num_dims
+            self.dimension_array(name, type_suffix, default_dims, def_type_map)
 
         array_info = self._arrays[full_name]
         dims = array_info['dims']
@@ -372,8 +377,13 @@ class Runtime:
         # Resolve full array name
         full_name, _ = self._resolve_variable_name(name, type_suffix, def_type_map)
 
+        # Auto-dimension array to (10) if not explicitly dimensioned (MBASIC behavior)
         if full_name not in self._arrays:
-            raise RuntimeError(f"Array {full_name} not dimensioned")
+            # Determine number of dimensions from subscripts
+            num_dims = len(subscripts)
+            # Default dimension size is 10 for each dimension
+            default_dims = [10] * num_dims
+            self.dimension_array(name, type_suffix, default_dims, def_type_map)
 
         array_info = self._arrays[full_name]
         dims = array_info['dims']

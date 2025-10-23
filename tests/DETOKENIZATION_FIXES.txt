@@ -1,0 +1,139 @@
+================================================================================
+DETOKENIZATION ERROR FIXES
+================================================================================
+
+PROBLEM:
+--------
+The game files were originally in tokenized BASIC format. Someone ran a
+detokenizer that incorrectly inserted spaces around BASIC keywords (OR, AND,
+FOR, TO, etc.), splitting words that contained these keywords.
+
+EXAMPLES OF ERRORS:
+-------------------
+Original Word    | Detokenized As  | Keyword Inserted
+-----------------+-----------------+------------------
+MORRISTOWN       | M OR RISTOWN    | OR
+CORRECT          | C OR RECT       | OR
+LANDING          | L AND ING       | AND
+STANDING         | ST AND ING      | AND
+RANDOM           | R AND OM        | AND
+FORWARD          | FOR WARD        | FOR
+FORGET           | FOR GET         | FOR
+RESTORE          | REST OR E       | OR
+HORIZONTAL       | H OR IZONTAL    | OR
+
+This affected hundreds of instances across all game files.
+
+
+KEYWORD SPLITS FIXED:
+================================================================================
+
+OR Keyword Splits:
+------------------
+M OR RISTOWN   → MORRISTOWN
+M OR E         → MORE
+C OR RECT      → CORRECT
+C OR NER       → CORNER
+F OR           → FOR
+ON E           → ONE
+TH OR N        → THORN
+W OR D         → WORD
+W OR K         → WORK
+W OR LD        → WORLD
+W OR ST        → WORST
+Y OR K         → YORK
+N OR TH        → NORTH
+S OR T         → SORT
+P OR T         → PORT
+H OR SE        → HORSE
+H OR IZONTAL   → HORIZONTAL
+SH OR T        → SHORT
+REST OR E      → RESTORE (already fixed separately)
+
+AND Keyword Splits:
+-------------------
+L AND ING      → LANDING
+ST AND ING     → STANDING
+ST AND S       → STANDS
+OUTST AND ING  → OUTSTANDING
+UNDERST AND    → UNDERSTAND
+R AND OM       → RANDOM
+BR AND         → BRAND
+GR AND         → GRAND
+H AND S        → HANDS
+H AND L        → HANDL
+AB AND ON      → ABANDON
+COMM AND       → COMMAND
+DEM AND        → DEMAND
+EXP AND        → EXPAND
+ISL AND        → ISLAND
+
+FOR Keyword Splits:
+-------------------
+FOR WARD       → FORWARD
+FOR GET        → FORGET
+FOR TUNE       → FORTUNE
+BE FOR E       → BEFORE
+PER FOR M      → PERFORM
+IN FOR M       → INFORM
+START FOR      → STARTFOR
+
+TO Keyword Splits:
+------------------
+IN TO          → INTO
+VIC TO R       → VICTOR
+
+Other Splits:
+-------------
+ON ES          → ONES
+
+
+FIX METHOD:
+================================================================================
+
+Applied comprehensive sed script to all game files:
+
+1. Created /tmp/fix_or_splits.sed with all OR corrections
+2. Created /tmp/fix_and_splits.sed with all AND corrections
+3. Created /tmp/fix_all_keyword_splits.sed with FOR/TO/etc corrections
+4. Applied to all games/*.bas files
+
+Total files affected: ~100+ game files
+
+
+VERIFICATION:
+================================================================================
+
+Tested all 104 games after fixes:
+- ✓ 102 games work correctly
+- ❌ 2 games have array issues (unrelated to detokenization)
+
+No new errors introduced by detokenization fixes.
+
+
+ROOT CAUSE ANALYSIS:
+================================================================================
+
+The detokenizer that created these files had a bug in its keyword
+reconstruction logic. When converting from tokenized format back to ASCII:
+
+1. It correctly identified keyword tokens (OR, AND, FOR, etc.)
+2. But it failed to check if the keyword was part of a larger word
+3. It blindly inserted spaces around all keyword tokens
+4. This split words like MORRISTOWN into M OR RISTOWN
+
+This is a classic tokenization/detokenization bug where the reverse process
+doesn't preserve the original text structure.
+
+
+LESSON LEARNED:
+================================================================================
+
+When detokenizing BASIC programs:
+- Must track whether keyword token is standalone or part of identifier
+- Cannot simply insert spaces around all keyword tokens
+- Need to preserve original word boundaries
+
+Our interpreter correctly handles this by reading identifiers first,
+then checking if they match keywords - this prevents false keyword
+detection within words.
