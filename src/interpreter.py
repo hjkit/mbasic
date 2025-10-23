@@ -103,6 +103,10 @@ class Interpreter:
 
             self.runtime.current_line = line_node
 
+            # Print trace output if TRON is enabled
+            if self.runtime.trace_on:
+                print(f"[{line_number}]")
+
             # Check if we're returning from GOSUB with a specific statement index
             # OR if we're continuing from STOP at a specific statement index
             if self.runtime.next_stmt_index is not None:
@@ -1726,6 +1730,18 @@ class Interpreter:
 
         # Halt execution (returns to interactive mode)
         self.runtime.halted = True
+
+    def execute_tron(self, stmt):
+        """Execute TRON statement - enable execution trace
+
+        When trace is enabled, each line number is printed in square brackets
+        as the line is executed. This is useful for debugging.
+        """
+        self.runtime.trace_on = True
+
+    def execute_troff(self, stmt):
+        """Execute TROFF statement - disable execution trace"""
+        self.runtime.trace_on = False
 
     def execute_cont(self, stmt):
         """Execute CONT statement

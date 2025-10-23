@@ -438,6 +438,20 @@ class StopStatementNode:
 
 
 @dataclass
+class TronStatementNode:
+    """TRON statement - enable execution trace (shows line numbers)"""
+    line_num: int = 0
+    column: int = 0
+
+
+@dataclass
+class TroffStatementNode:
+    """TROFF statement - disable execution trace"""
+    line_num: int = 0
+    column: int = 0
+
+
+@dataclass
 class SystemStatementNode:
     """SYSTEM statement - return control to operating system
 

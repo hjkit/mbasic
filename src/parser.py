@@ -438,6 +438,10 @@ class Parser:
             return self.parse_end()
         elif token.type == TokenType.STOP:
             return self.parse_stop()
+        elif token.type == TokenType.TRON:
+            return self.parse_tron()
+        elif token.type == TokenType.TROFF:
+            return self.parse_troff()
         elif token.type == TokenType.SYSTEM:
             return self.parse_system()
         elif token.type == TokenType.RUN:
@@ -1322,6 +1326,24 @@ class Parser:
         token = self.advance()
 
         return StopStatementNode(
+            line_num=token.line,
+            column=token.column
+        )
+
+    def parse_tron(self) -> TronStatementNode:
+        """Parse TRON statement"""
+        token = self.advance()
+
+        return TronStatementNode(
+            line_num=token.line,
+            column=token.column
+        )
+
+    def parse_troff(self) -> TroffStatementNode:
+        """Parse TROFF statement"""
+        token = self.advance()
+
+        return TroffStatementNode(
             line_num=token.line,
             column=token.column
         )

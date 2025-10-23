@@ -47,6 +47,9 @@ This document provides a comprehensive overview of what is and is not yet implem
 ### String Manipulation
 - ✓ MID$(var$, start, len) = value$ - Replace substring in-place
 
+### Debugging
+- ✓ TRON/TROFF - Trace program execution (shows line numbers as they execute)
+
 ### User-Defined Features
 - ✓ DEF FN (user-defined functions)
 - ✓ DEFINT/DEFSNG/DEFDBL/DEFSTR (type declarations)
@@ -145,13 +148,12 @@ This document provides a comprehensive overview of what is and is not yet implem
 ### 3. Debugging and System Functions (Low Priority)
 **Priority:** Low - Useful but not critical
 
-- ✗ **TRON/TROFF** - Trace program execution (shows line numbers as they execute)
 - ✗ **FRE(n)** - Return free memory available
 - ✗ **VARPTR(var)** - Return memory address of variable
 
 **Status:** Not implemented
-**Impact:** Less debugging support and memory introspection
-**Workaround:** Use other debugging techniques
+**Impact:** Less memory introspection
+**Workaround:** Not critical for most programs
 
 ### 4. Variable and Terminal Operations (Low Priority)
 **Priority:** Low - Minor convenience features
@@ -194,6 +196,7 @@ This document provides a comprehensive overview of what is and is not yet implem
 - **Sequential file I/O:** Fully tested (OPEN, CLOSE, PRINT#, INPUT#, LINE INPUT#, WRITE#, EOF with ^Z support)
 - **Random file I/O:** Fully tested (FIELD, GET, PUT, LSET, RSET, LOC, LOF)
 - **MID$ assignment:** Fully tested (replace substring in-place, simple vars and arrays)
+- **TRON/TROFF:** Fully tested (execution trace for debugging)
 
 ## Compatibility Notes
 
@@ -204,6 +207,7 @@ Programs that use:
 - Arrays and data structures
 - Control flow (IF, FOR, WHILE/WEND, GOSUB, ON GOTO/GOSUB)
 - Error handling (ON ERROR GOTO/GOSUB, RESUME)
+- Debugging (TRON/TROFF execution trace)
 - User input/output
 - Non-blocking keyboard input (INKEY$)
 - Sequential file I/O (OPEN, CLOSE, PRINT#, INPUT#, LINE INPUT#, WRITE#, EOF)

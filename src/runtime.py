@@ -92,6 +92,9 @@ class Runtime:
         # Break handling (Ctrl+C)
         self.break_requested = False      # True when Ctrl+C pressed during execution
 
+        # Trace flag (TRON/TROFF)
+        self.trace_on = False             # True if execution trace is enabled
+
         # Initialize system variables (ERR% and ERL%)
         self.set_variable_raw('err%', 0)
         self.set_variable_raw('erl%', 0)

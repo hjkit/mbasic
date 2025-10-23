@@ -101,6 +101,8 @@ class TokenType(Enum):
     REM = auto()
     REMARK = auto()          # Synonym for REM
     SWAP = auto()
+    TRON = auto()
+    TROFF = auto()
     WAIT = auto()
     WIDTH = auto()
 
@@ -290,6 +292,8 @@ KEYWORDS = {
     'rem': TokenType.REM,
     'remark': TokenType.REMARK,
     'swap': TokenType.SWAP,
+    'tron': TokenType.TRON,
+    'troff': TokenType.TROFF,
     'wait': TokenType.WAIT,
     'width': TokenType.WIDTH,
 
