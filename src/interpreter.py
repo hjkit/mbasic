@@ -1042,12 +1042,19 @@ class Interpreter:
                 print("? ", end='')
 
             # Read input
+            # Temporarily restore default signal handler so Ctrl+C can interrupt input()
+            signal.signal(signal.SIGINT, self.old_signal_handler if hasattr(self, 'old_signal_handler') else signal.default_int_handler)
             try:
                 line = input()
             except KeyboardInterrupt:
                 # User pressed Ctrl+C during input - break to command mode
                 print()  # Newline after ^C
+                # Re-install our signal handler
+                self._setup_break_handler()
                 raise BreakException()
+            finally:
+                # Always re-install our signal handler
+                self._setup_break_handler()
 
         # Parse comma-separated values
         values = [v.strip() for v in line.split(',')]
@@ -1134,12 +1141,19 @@ class Interpreter:
                 prompt_value = self.evaluate_expression(stmt.prompt)
                 print(prompt_value, end='')
 
+            # Temporarily restore default signal handler so Ctrl+C can interrupt input()
+            signal.signal(signal.SIGINT, self.old_signal_handler if hasattr(self, 'old_signal_handler') else signal.default_int_handler)
             try:
                 line = input()
             except KeyboardInterrupt:
                 # User pressed Ctrl+C during input - break to command mode
                 print()  # Newline after ^C
+                # Re-install our signal handler
+                self._setup_break_handler()
                 raise BreakException()
+            finally:
+                # Always re-install our signal handler
+                self._setup_break_handler()
 
         # Assign entire line to variable (no parsing)
         var_node = stmt.variable

@@ -82,11 +82,17 @@ class InteractiveMode:
             line_node = parser.parse_line()
             return line_node
         except Exception as e:
+            # Strip "Parse error at line X, " from parser error messages
+            error_msg = str(e)
+            # Remove "Parse error at line N, " prefix since we show the BASIC line number
+            import re
+            error_msg = re.sub(r'^Parse error at line \d+, ', '', error_msg)
+
             if basic_line_num is not None:
-                print(f"?Syntax error in {basic_line_num}: {e}")
+                print(f"?Syntax error in {basic_line_num}: {error_msg}")
                 print(f"  {line_text}")
             else:
-                print(f"?Syntax error: {e}")
+                print(f"?Syntax error: {error_msg}")
             return None
 
     def clear_execution_state(self):
