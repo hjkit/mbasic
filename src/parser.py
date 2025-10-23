@@ -785,12 +785,12 @@ class Parser:
         elif token.type == TokenType.FN:
             return self.parse_fn_call()
 
-        # ERR and ERL are system variables (not functions)
+        # ERR and ERL are system variables (integer type)
         elif token.type in (TokenType.ERR, TokenType.ERL):
             self.advance()
             return VariableNode(
                 name=token.type.name,  # 'ERR' or 'ERL'
-                type_suffix='',
+                type_suffix='%',       # Integer type
                 subscripts=[],
                 line_num=token.line,
                 column=token.column

@@ -511,12 +511,12 @@ class Interpreter:
         """
         error_code = int(self.evaluate_expression(stmt.error_code))
 
-        # Set error information in variable table
-        self.runtime.variables['ERR'] = error_code
+        # Set error information in variable table (integer variables, lowercase)
+        self.runtime.variables['err%'] = error_code
         if self.runtime.current_line:
-            self.runtime.variables['ERL'] = self.runtime.current_line.line_number
+            self.runtime.variables['erl%'] = self.runtime.current_line.line_number
         else:
-            self.runtime.variables['ERL'] = 0
+            self.runtime.variables['erl%'] = 0
 
         # Raise the error
         raise RuntimeError(f"ERROR {error_code}")

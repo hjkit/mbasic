@@ -71,10 +71,10 @@ class Runtime:
         self.error_handler = None     # Line number for ON ERROR GOTO
         self.error_occurred = False
 
-        # ERR and ERL are system variables, not functions
-        # Initialize them in the variable table
-        self.variables['ERR'] = 0
-        self.variables['ERL'] = 0
+        # ERR and ERL are system variables (integer type), not functions
+        # Initialize them in the variable table with % suffix (lowercase)
+        self.variables['err%'] = 0
+        self.variables['erl%'] = 0
 
         # Random number seed
         self.rnd_last = 0.5
