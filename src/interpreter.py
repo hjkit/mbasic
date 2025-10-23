@@ -322,17 +322,43 @@ class Interpreter:
         )
 
     def execute_next(self, stmt):
-        """Execute NEXT statement"""
-        # Get variable name
+        """Execute NEXT statement
+
+        Syntax: NEXT [variable [, variable ...]]
+
+        NEXT I, J, K is equivalent to: NEXT I: NEXT J: NEXT K
+        If any loop continues (not finished), we jump back and stop processing.
+        """
+        # Determine which variables to process
         if stmt.variables:
-            var_node = stmt.variables[0]
-            var_name = var_node.name + (var_node.type_suffix or "")
+            # Process variables in order: NEXT I, J means close I first, then J
+            var_list = stmt.variables
         else:
             # NEXT without variable - use innermost loop
             if not self.runtime.for_loops:
                 raise RuntimeError("NEXT without FOR")
-            var_name = list(self.runtime.for_loops.keys())[-1]
+            var_list = []  # Will process one loop below
 
+        # If no variables specified, process innermost loop only
+        if not var_list:
+            var_name = list(self.runtime.for_loops.keys())[-1]
+            self._execute_next_single(var_name)
+        else:
+            # Process each variable in order
+            for var_node in var_list:
+                var_name = var_node.name + (var_node.type_suffix or "")
+                # Process this NEXT
+                should_continue = self._execute_next_single(var_name)
+                # If this loop continues (jumps back), don't process remaining variables
+                if should_continue:
+                    return
+
+    def _execute_next_single(self, var_name):
+        """Execute NEXT for a single variable.
+
+        Returns:
+            True if loop continues (jumped back), False if loop finished
+        """
         # Get loop info
         loop_info = self.runtime.get_for_loop(var_name)
         if not loop_info:
@@ -363,9 +389,11 @@ class Interpreter:
             self.runtime.next_line = return_line
             # Resume at the statement AFTER the FOR statement
             self.runtime.next_stmt_index = return_stmt + 1
+            return True  # Loop continues
         else:
             # Loop finished
             self.runtime.pop_for_loop(var_name)
+            return False  # Loop finished
 
     def execute_while(self, stmt):
         """Execute WHILE statement (just mark position)"""
