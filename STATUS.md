@@ -5,7 +5,7 @@ This document provides a comprehensive overview of what is and is not yet implem
 ## Summary
 
 **Parser Coverage:** 100% - All MBASIC 5.21 syntax is parsed correctly
-**Runtime Implementation:** ~95% - Core features and file I/O complete
+**Runtime Implementation:** ~96% - Core features, file I/O, and string manipulation complete
 
 ## ✓ Fully Implemented
 
@@ -43,6 +43,9 @@ This document provides a comprehensive overview of what is and is not yet implem
 - ✓ Input: INKEY$ (non-blocking keyboard input)
 - ✓ File I/O: EOF() (end of file test), LOC() (record position), LOF() (file length)
 - ✓ Other: FIX, HEX$, OCT$, TAB, POS
+
+### String Manipulation
+- ✓ MID$(var$, start, len) = value$ - Replace substring in-place
 
 ### User-Defined Features
 - ✓ DEF FN (user-defined functions)
@@ -117,16 +120,7 @@ This document provides a comprehensive overview of what is and is not yet implem
 
 ## ✗ Not Yet Implemented
 
-### 1. String Manipulation
-**Priority:** Low
-
-- ✗ **MID$(var$, start, len) = value$** - Replace substring in-place
-
-**Status:** Parsed but not executed
-**Impact:** Cannot modify strings in-place
-**Workaround:** Use LEFT$, MID$, RIGHT$ to rebuild strings
-
-### 2. Variable Operations
+### 1. Variable Operations
 **Priority:** Low
 
 - ✗ **SWAP var1, var2** - Exchange values of two variables
@@ -135,7 +129,7 @@ This document provides a comprehensive overview of what is and is not yet implem
 **Impact:** Minor convenience feature
 **Workaround:** Use temp variable
 
-### 3. Output Control
+### 2. Output Control
 **Priority:** Low
 
 - ✗ **WIDTH [#filenum,] width** - Set output width
@@ -144,7 +138,7 @@ This document provides a comprehensive overview of what is and is not yet implem
 **Status:** Parsed but not executed
 **Impact:** Cannot control display width or print to printer
 
-### 4. Graphics and Sound
+### 3. Graphics and Sound
 **Priority:** Very Low (Not Planned)
 
 Graphics commands (SCREEN, LINE, CIRCLE, PSET, etc.) and sound commands (SOUND, BEEP, PLAY) are not part of MBASIC 5.21 core specification and are not planned for implementation.
@@ -167,13 +161,14 @@ Graphics commands (SCREEN, LINE, CIRCLE, PSET, etc.) and sound commands (SOUND, 
 - **File system ops:** Tested (KILL, NAME AS, RESET)
 - **Sequential file I/O:** Fully tested (OPEN, CLOSE, PRINT#, INPUT#, LINE INPUT#, WRITE#, EOF with ^Z support)
 - **Random file I/O:** Fully tested (FIELD, GET, PUT, LSET, RSET, LOC, LOF)
+- **MID$ assignment:** Fully tested (replace substring in-place, simple vars and arrays)
 
 ## Compatibility Notes
 
 ### What Works
 Programs that use:
 - Mathematical calculations
-- String processing
+- String processing (including MID$ assignment for in-place modification)
 - Arrays and data structures
 - Control flow (IF, FOR, WHILE/WEND, GOSUB, ON GOTO/GOSUB)
 - Error handling (ON ERROR GOTO/GOSUB, RESUME)

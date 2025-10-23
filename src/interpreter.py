@@ -1598,6 +1598,73 @@ class Interpreter:
             # If not a field variable, just do normal assignment
             self.runtime.set_variable_raw(var_name, value)
 
+    def execute_midassignment(self, stmt):
+        """Execute MID$ assignment statement - replace substring in-place
+
+        Syntax: MID$(string_var, start, length) = value
+
+        Replaces 'length' characters in string_var starting at position 'start' (1-based).
+        - If value is shorter than length, only those characters are replaced
+        - If value is longer than length, only 'length' characters are used
+        - If start is beyond the string length, no replacement occurs
+        - The string variable is modified in-place
+        """
+        # Evaluate the current value of the string variable
+        current_value = self.evaluate_expression(stmt.string_var)
+        if not isinstance(current_value, str):
+            current_value = str(current_value)
+
+        # Evaluate the parameters
+        start = int(self.evaluate_expression(stmt.start))
+        length = int(self.evaluate_expression(stmt.length))
+        new_value = str(self.evaluate_expression(stmt.value))
+
+        # Convert to 0-based index
+        start_idx = start - 1
+
+        # Validate start position
+        if start_idx < 0 or start_idx >= len(current_value):
+            # Start position is out of bounds - no replacement
+            return
+
+        # Calculate how many characters to actually replace
+        # This is the minimum of: length parameter, length of new_value, and available space in string
+        chars_to_replace = min(length, len(new_value), len(current_value) - start_idx)
+
+        # Build the new string
+        # prefix: everything before start position
+        # replacement: the first 'chars_to_replace' characters from new_value
+        # suffix: everything after the replaced section
+        prefix = current_value[:start_idx]
+        replacement = new_value[:chars_to_replace]
+        suffix = current_value[start_idx + chars_to_replace:]
+
+        modified_value = prefix + replacement + suffix
+
+        # Assign the modified string back to the variable
+        # Handle both simple variables and array elements
+        if isinstance(stmt.string_var, ast_nodes.VariableNode):
+            var_node = stmt.string_var
+            if var_node.subscripts:
+                # Array element
+                subscripts = [int(self.evaluate_expression(sub)) for sub in var_node.subscripts]
+                self.runtime.set_array_element(
+                    var_node.name,
+                    var_node.type_suffix,
+                    subscripts,
+                    modified_value
+                )
+            else:
+                # Simple variable
+                self.runtime.set_variable(
+                    var_node.name,
+                    var_node.type_suffix,
+                    modified_value
+                )
+        else:
+            # If it's a more complex expression, we can't modify it in-place
+            raise RuntimeError("MID$ assignment requires a variable, not an expression")
+
     def execute_list(self, stmt):
         """Execute LIST statement"""
         # Evaluate start and end expressions
