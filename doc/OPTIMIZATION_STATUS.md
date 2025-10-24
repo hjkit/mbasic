@@ -808,6 +808,128 @@ This document tracks all optimizations implemented, planned, and possible for th
 
 ---
 
+### 26. String Concatenation in Loops
+**Status:** ✅ Complete (Detection/Warning)
+**Location:** `src/semantic_analyzer.py` - `_analyze_string_concat_in_loops()`, `StringConcatInLoop`
+**What it does:**
+- Detects inefficient string concatenation patterns inside loops
+- Identifies self-concatenation (S$ = S$ + "text")
+- Estimates memory allocations and performance impact
+- Warns about high-impact cases in large loops
+- Suggests alternative approaches for better performance
+
+**Algorithm:**
+- Analyzes each detected loop (FOR, WHILE, IF-GOTO)
+- Scans loop body for string variable assignments
+- Detects pattern: `VAR$ = VAR$ + expression` (self-concatenation)
+- Counts occurrences and estimates allocations
+- Uses loop iteration count (when known) to calculate impact
+- Classifies impact as Low/Medium/HIGH based on iterations
+
+**Problem:**
+In BASIC, string concatenation creates temporary allocations:
+```basic
+S$ = S$ + "X"  ' Creates a new string, copies S$, appends "X"
+```
+
+In a loop with N iterations:
+- Each concatenation allocates a new string
+- Total: N allocations × string size growth
+- Memory fragmentation increases
+- Performance degrades linearly with iterations
+
+**Examples:**
+```basic
+' HIGH IMPACT: 1000 iterations = 1000 allocations
+10 S$ = ""
+20 FOR I = 1 TO 1000
+30   LET S$ = S$ + "*"
+40 NEXT I
+50 END
+
+' MEDIUM IMPACT: 50 iterations = 50 allocations
+10 RESULT$ = ""
+20 FOR I = 1 TO 50
+30   LET RESULT$ = RESULT$ + STR$(I) + " "
+40 NEXT I
+50 END
+
+' LOW IMPACT: 5 iterations = 5 allocations
+10 NAME$ = ""
+20 FOR I = 1 TO 5
+30   LET NAME$ = NAME$ + CHR$(65 + I)
+40 NEXT I
+50 END
+
+' Multiple concatenations per iteration: 2×10 = 20 allocations
+10 S$ = ""
+20 FOR I = 1 TO 10
+30   LET S$ = S$ + "A"
+40   LET S$ = S$ + "B"
+50 NEXT I
+60 END
+```
+
+**Impact Classification:**
+- **Low**: ≤10 iterations
+- **Medium**: 11-100 iterations
+- **HIGH**: >100 iterations
+- **Unknown**: Variable iteration count (WHILE, IF-GOTO)
+
+**Better Alternatives:**
+1. **Use array and JOIN**: Store parts in array, concatenate once
+   ```basic
+   10 DIM PARTS$(100)
+   20 FOR I = 1 TO 100
+   30   PARTS$(I) = "*"
+   40 NEXT I
+   50 S$ = ""
+   60 FOR I = 1 TO 100
+   70   S$ = S$ + PARTS$(I)  ' Only 100 allocations instead of nested
+   80 NEXT I
+   ```
+
+2. **Pre-allocate with SPACE$**: Reserve space upfront
+   ```basic
+   10 S$ = SPACE$(100)
+   20 FOR I = 1 TO 100
+   30   MID$(S$, I, 1) = "*"  ' In-place modification
+   40 NEXT I
+   ```
+
+3. **Build outside loop**: Avoid concatenation in loop body
+   ```basic
+   10 PART$ = "*"
+   20 S$ = ""
+   30 FOR I = 1 TO 100
+   40   S$ = S$ + PART$  ' Same result, but makes pattern clear
+   50 NEXT I
+   ' Better: S$ = STRING$(100, "*")
+   ```
+
+**Benefits:**
+- Identifies performance bottlenecks in string-heavy code
+- Warns about memory allocation overhead
+- Helps programmers understand hidden costs
+- Particularly important for vintage hardware (limited memory)
+- Suggests refactoring opportunities
+
+**Limitations:**
+- Detection only (doesn't refactor code)
+- Doesn't detect all string operations (only self-concatenation)
+- Can't optimize string building automatically
+- Iteration count unknown for WHILE/IF-GOTO loops
+
+**Note:**
+- Works with loop analysis to get iteration counts
+- Integrates with string constant pooling analysis
+- Only flags string variables (ending with $)
+- Detects concatenation on either side (S$ + X or X + S$)
+
+**TODO:** Suggest specific STRING$() or array-based alternatives (needs code generation phase)
+
+---
+
 ## 📋 READY TO IMPLEMENT NOW (Semantic Analysis Phase)
 
 These optimizations can be implemented in the semantic analyzer without requiring code generation:
@@ -924,20 +1046,13 @@ These require actual code generation/transformation, not just analysis:
 
 ## 🤔 WHAT WE'VE MISSED (Could Add)
 
-### Analysis Phase
-
-1. **String Concatenation in Loops**
-   - Detect string concatenation in loops
-   - Eliminate temporary string allocations
-   - Note: String constant pooling is already done
-
 ### Detection/Warning Phase
 
-2. **Type-Based Optimizations**
+1. **Type-Based Optimizations**
    - BASIC has weak typing but could detect mismatches
    - Suggest INTEGER for loop counters (performance)
 
-3. **Memory Access Pattern Analysis**
+2. **Memory Access Pattern Analysis**
    - Detect non-sequential array access
    - Could suggest array layout changes
 
@@ -986,11 +1101,12 @@ These require actual code generation/transformation, not just analysis:
 10. ✅ **Array Bounds Analysis** - DONE (Detects out-of-bounds access at compile time)
 11. ✅ **Alias Analysis** - DONE (Detects potential aliasing between array elements)
 12. ✅ **Available Expression Analysis** - DONE (Tracks expressions available on all paths)
+13. ✅ **String Concatenation in Loops** - DONE (Detects inefficient string building patterns)
 
 ### Long Term (Code Generation Required)
-13. **Peephole Optimization** - Foundation for codegen
-14. **Register Allocation** - Core of codegen
-15. **Actual Code Motion** - Apply loop-invariant transformation
+14. **Peephole Optimization** - Foundation for codegen
+15. **Register Allocation** - Core of codegen
+16. **Actual Code Motion** - Apply loop-invariant transformation
 
 ---
 
@@ -1019,6 +1135,7 @@ These require actual code generation/transformation, not just analysis:
 - ✅ Array bounds checking - **Standard** (compile-time bounds violation detection)
 - ✅ Alias analysis - **Standard** (array aliasing detection, optimization safety)
 - ✅ Available expression analysis - **Standard** (dataflow analysis, redundancy elimination)
+- ✅ String concatenation in loops - **Standard** (inefficient pattern detection, performance warnings)
 
 ### What We're Missing (that modern compilers have)
 - ❌ SSA form - Not needed for BASIC's simplicity
@@ -1041,7 +1158,7 @@ We've implemented a **strong foundation** of compiler optimizations that are:
 3. **Complete for analysis** - Detection and transformation done
 4. **Modern-quality analysis** - Comparable to modern compilers' semantic phase
 
-**Current Status: 25 optimizations implemented!**
+**Current Status: 26 optimizations implemented!**
 
 **Semantic analysis phase:** ✅ COMPLETE
 

@@ -11,5 +11,6 @@
 190 print c
 200 end
 1000 rem do some sort of math we dont know precision
+1005 rem note the type of c is different on each call integer, then float, then double
 1010 c=a+b
 1020 return

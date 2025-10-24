@@ -367,6 +367,18 @@ class AvailableExpression:
 
 
 @dataclass
+class StringConcatInLoop:
+    """Information about string concatenation inside loops"""
+    loop_start_line: int  # Line where loop starts
+    loop_type: str  # "FOR", "WHILE", "IF-GOTO"
+    string_var: str  # String variable being concatenated to
+    concat_lines: List[int] = field(default_factory=list)  # Lines where concatenation occurs
+    iteration_count: Optional[int] = None  # Known iteration count (for FOR loops)
+    estimated_allocations: int = 0  # Estimated number of temporary string allocations
+    impact: str = ""  # Performance impact description
+
+
+@dataclass
 class InductionVariable:
     """Information about an induction variable in a loop"""
     variable: str  # Variable name (e.g., "I")
@@ -815,6 +827,9 @@ class SemanticAnalyzer:
         self.available_expr_analysis: List[AvailableExpression] = []  # All available expression analysis results
         self.expr_computations: Dict[str, List[int]] = {}  # expr_hash -> [line1, line2, ...] all computation points
 
+        # String concatenation in loops tracking
+        self.string_concat_in_loops: List[StringConcatInLoop] = []  # All detected string concatenations in loops
+
     def analyze(self, program: ProgramNode) -> bool:
         """
         Analyze a program AST.
@@ -862,6 +877,9 @@ class SemanticAnalyzer:
 
             # Thirteenth pass: available expression analysis
             self._analyze_available_expressions(program)
+
+            # Fourteenth pass: string concatenation in loops
+            self._analyze_string_concat_in_loops(program)
 
             # Generate warnings for required compilation switches
             self._check_compilation_switches()
@@ -4604,6 +4622,149 @@ class SemanticAnalyzer:
                         modified.add(var.name.upper())
 
         return modified
+
+    def _analyze_string_concat_in_loops(self, program: ProgramNode):
+        """
+        Detect string concatenation inside loops.
+
+        String concatenation in loops is inefficient in BASIC because:
+        1. Each concatenation creates a new temporary string
+        2. In a loop with N iterations, this creates N-1 temporary allocations
+        3. Better to use an array or pre-allocate
+        """
+        self.string_concat_in_loops.clear()
+
+        # Analyze each loop
+        for loop_start_line, loop_info in self.loops.items():
+            # Find all string concatenations in this loop
+            string_concats = self._find_string_concats_in_loop(program, loop_info)
+
+            for string_var, concat_lines in string_concats.items():
+                if len(concat_lines) == 0:
+                    continue
+
+                # Estimate allocations
+                estimated_allocations = len(concat_lines)
+                if loop_info.iteration_count:
+                    estimated_allocations = len(concat_lines) * loop_info.iteration_count
+
+                # Determine impact
+                impact = self._get_string_concat_impact(loop_info, estimated_allocations)
+
+                concat_info = StringConcatInLoop(
+                    loop_start_line=loop_start_line,
+                    loop_type=loop_info.loop_type.value,
+                    string_var=string_var,
+                    concat_lines=concat_lines,
+                    iteration_count=loop_info.iteration_count,
+                    estimated_allocations=estimated_allocations,
+                    impact=impact
+                )
+                self.string_concat_in_loops.append(concat_info)
+
+    def _find_string_concats_in_loop(self, program: ProgramNode, loop_info) -> Dict[str, List[int]]:
+        """Find all string concatenation operations in a loop"""
+        string_concats = {}  # var_name -> [line1, line2, ...]
+
+        # Get all lines in the loop
+        loop_lines = []
+        in_loop = False
+        for line in program.lines:
+            if line.line_number == loop_info.start_line:
+                in_loop = True
+            if in_loop:
+                loop_lines.append(line)
+            if loop_info.end_line and line.line_number == loop_info.end_line:
+                break
+
+        # Check each line for string concatenation
+        for line in loop_lines:
+            for stmt in line.statements:
+                self._check_stmt_for_string_concat(stmt, line.line_number, string_concats)
+
+        return string_concats
+
+    def _check_stmt_for_string_concat(self, stmt, line_num: int, string_concats: Dict[str, List[int]]):
+        """Check if a statement contains string concatenation to itself"""
+        if stmt is None:
+            return
+
+        from parser import LetStatementNode, VariableNode, BinaryOpNode
+
+        if isinstance(stmt, LetStatementNode):
+            # Check if this is a string variable
+            if isinstance(stmt.variable, VariableNode):
+                # Get full variable name with type suffix
+                var_name = stmt.variable.name.upper()
+                if stmt.variable.type_suffix:
+                    var_name += stmt.variable.type_suffix
+
+                # Only track string variables (ending with $)
+                if not var_name.endswith('$'):
+                    return
+
+                # Check if RHS contains concatenation with same variable
+                # Pattern: A$ = A$ + something or A$ = something + A$
+                if self._is_self_concat(stmt.expression, var_name):
+                    if var_name not in string_concats:
+                        string_concats[var_name] = []
+                    string_concats[var_name].append(line_num)
+
+    def _is_self_concat(self, expr, var_name: str) -> bool:
+        """Check if expression is a concatenation with the variable itself"""
+        if expr is None:
+            return False
+
+        from parser import BinaryOpNode, VariableNode
+        from tokens import TokenType
+
+        if isinstance(expr, BinaryOpNode):
+            # Check for PLUS operator (string concatenation in BASIC)
+            if expr.operator == TokenType.PLUS:
+                # Check if either side references the variable
+                left_has_var = self._expr_contains_variable(expr.left, var_name)
+                right_has_var = self._expr_contains_variable(expr.right, var_name)
+                return left_has_var or right_has_var
+
+        return False
+
+    def _expr_contains_variable(self, expr, var_name: str) -> bool:
+        """Check if expression contains a reference to the given variable"""
+        if expr is None:
+            return False
+
+        from parser import VariableNode, BinaryOpNode, UnaryOpNode, FunctionCallNode
+
+        if isinstance(expr, VariableNode):
+            # Get full variable name with type suffix
+            full_name = expr.name.upper()
+            if expr.type_suffix:
+                full_name += expr.type_suffix
+            return full_name == var_name
+
+        elif isinstance(expr, BinaryOpNode):
+            return (self._expr_contains_variable(expr.left, var_name) or
+                    self._expr_contains_variable(expr.right, var_name))
+
+        elif isinstance(expr, UnaryOpNode):
+            return self._expr_contains_variable(expr.operand, var_name)
+
+        elif isinstance(expr, FunctionCallNode):
+            return any(self._expr_contains_variable(arg, var_name) for arg in expr.arguments)
+
+        return False
+
+    def _get_string_concat_impact(self, loop_info, estimated_allocations: int) -> str:
+        """Determine the performance impact of string concatenation in a loop"""
+        if loop_info.iteration_count:
+            if loop_info.iteration_count <= 10:
+                return f"Low impact: {loop_info.iteration_count} iterations, {estimated_allocations} allocations"
+            elif loop_info.iteration_count <= 100:
+                return f"Medium impact: {loop_info.iteration_count} iterations, {estimated_allocations} allocations"
+            else:
+                return f"HIGH IMPACT: {loop_info.iteration_count} iterations, {estimated_allocations} allocations"
+        else:
+            return f"Unknown impact: iteration count not determined, {estimated_allocations} concatenations per iteration"
 
     def _check_compilation_switches(self):
         """Generate warnings for required compilation switches"""
