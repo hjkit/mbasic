@@ -642,30 +642,33 @@ class SemanticAnalyzer:
                 # Don't analyze THEN branch - it won't execute
         else:
             # Cannot evaluate condition at compile time
-            # Need to analyze both branches and merge constant states
+            # Need to analyze both branches and merge constant states AND available expressions
 
-            # Clear available expressions - control flow uncertainty
-            self._clear_all_available_expressions()
-
-            # Save current constant state
+            # Save current state (both constants and available expressions)
             constants_before = self.evaluator.runtime_constants.copy()
+            available_before = self.available_expressions.copy()
 
             # Analyze THEN branch
             then_constants = None
+            then_available = None
             if stmt.then_statements:
                 for then_stmt in stmt.then_statements:
                     self._analyze_statement(then_stmt)
                 then_constants = self.evaluator.runtime_constants.copy()
+                then_available = self.available_expressions.copy()
 
             # Restore state and analyze ELSE branch
             self.evaluator.runtime_constants = constants_before.copy()
+            self.available_expressions = available_before.copy()
             else_constants = None
+            else_available = None
             if stmt.else_statements:
                 for else_stmt in stmt.else_statements:
                     self._analyze_statement(else_stmt)
                 else_constants = self.evaluator.runtime_constants.copy()
+                else_available = self.available_expressions.copy()
 
-            # Merge: a variable is only constant after the IF if it has the same
+            # Merge runtime constants: a variable is only constant after the IF if it has the same
             # constant value in both branches (or only one branch exists)
             if then_constants is not None and else_constants is not None:
                 # Both branches exist - keep only constants that are the same in both
@@ -688,6 +691,38 @@ class SemanticAnalyzer:
             else:
                 # No branches - restore original state
                 self.evaluator.runtime_constants = constants_before
+
+            # Merge available expressions: an expression is available after the IF if:
+            # 1. It was available before and is still available in both branches, OR
+            # 2. It was computed in both branches (new in both)
+            if then_available is not None and else_available is not None:
+                # Both branches exist - keep expressions available in both
+                merged_available = {}
+
+                # First, keep expressions that were available before and still are in both branches
+                for expr_hash in available_before:
+                    if expr_hash in then_available and expr_hash in else_available:
+                        # Use the earlier line number (from before the IF)
+                        merged_available[expr_hash] = available_before[expr_hash]
+
+                # Second, add expressions that were computed in BOTH branches (even if new)
+                for expr_hash in then_available:
+                    if expr_hash in else_available and expr_hash not in merged_available:
+                        # This expression was computed in both branches
+                        # Use the earlier of the two occurrences
+                        merged_available[expr_hash] = min(then_available[expr_hash],
+                                                         else_available[expr_hash])
+
+                self.available_expressions = merged_available
+            elif then_available is not None:
+                # Only THEN branch exists - use its available expressions
+                self.available_expressions = then_available
+            elif else_available is not None:
+                # Only ELSE branch exists - use its available expressions
+                self.available_expressions = else_available
+            else:
+                # No branches - restore original state
+                self.available_expressions = available_before
 
         # Analyze the condition expression itself for variable references
         # Don't track folding since we already evaluated it above

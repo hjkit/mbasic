@@ -290,10 +290,32 @@ The CSE implementation performs sophisticated safety analysis to ensure correctn
    40 Z = A * 2       ' NEW computation, not a CSE
    ```
 
-2. **Control Flow Analysis**: Available expressions are cleared at control flow boundaries
+2. **IF THEN ELSE Control Flow Analysis**: CSE properly handles conditional branches
+
+   **Case 1: Expression available before IF and survives**
    ```basic
-   10 X = A + B
-   20 IF C THEN Y = A + B  ' Different control flow - clear available expressions
+   10 X = A + B       ' A + B is available
+   20 IF C THEN Y = 10 ' Neither A nor B modified
+   30 Z = A + B       ' CSE: can reuse A + B
+   ```
+
+   **Case 2: Expression computed in both branches**
+   ```basic
+   10 IF C THEN M = E * F ELSE N = E * F  ' E * F in both branches
+   20 P = E * F       ' CSE: can reuse E * F (computed in both branches)
+   ```
+
+   **Case 3: Expression invalidated in one branch**
+   ```basic
+   10 X = A * 2       ' A * 2 is available
+   20 IF C THEN A = 100  ' A modified in THEN branch
+   30 Y = A * 2       ' NOT a CSE (A may have changed)
+   ```
+
+   **Case 4: Expression in only one branch**
+   ```basic
+   10 IF C THEN M = A + B  ' A + B only in THEN
+   20 N = A + B       ' May be CSE depending on implementation
    ```
 
 3. **INPUT/READ Invalidation**: Expressions are invalidated when variables are read
@@ -302,6 +324,14 @@ The CSE implementation performs sophisticated safety analysis to ensure correctn
    20 INPUT N         ' N is modified - invalidate N * 2
    30 Y = N * 2       ' NEW computation, not a CSE
    ```
+
+**IF THEN ELSE Merging Logic**:
+
+After analyzing both branches of an IF statement, the analyzer merges available expressions using these rules:
+
+1. An expression is available after the IF if it was available before AND is still available in both branches
+2. An expression is available after the IF if it was computed in BOTH branches (even if new)
+3. Expressions computed in only one branch are NOT available after (conservative approach)
 
 **Types of Expressions Tracked**:
 - Arithmetic expressions: `A + B`, `X * Y`, etc.
