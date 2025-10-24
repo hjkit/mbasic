@@ -20,6 +20,7 @@ from typing import Dict, List, Set, Optional, Tuple, Any, Union
 from dataclasses import dataclass, field
 from enum import Enum
 from ast_nodes import *
+from tokens import TokenType
 
 
 class VarType(Enum):
@@ -44,7 +45,8 @@ class VariableInfo:
     name: str
     var_type: VarType
     is_array: bool = False
-    dimensions: Optional[List[int]] = None  # For arrays, stores dimension sizes
+    dimensions: Optional[List[int]] = None  # For arrays, stores dimension sizes (original multi-dimensional)
+    flattened_size: Optional[int] = None  # Total size after flattening (product of all dimensions)
     first_use_line: Optional[int] = None
     is_parameter: bool = False  # For DEF FN parameters
 
@@ -517,6 +519,9 @@ class SemanticAnalyzer:
         self.loop_analysis_stack: List[LoopAnalysis] = []  # Stack for nested loop analysis
         self.current_loop: Optional[LoopAnalysis] = None  # Currently analyzing loop
 
+        # Array handling
+        self.array_base: int = 0  # 0 or 1, set by OPTION BASE statement
+
     def analyze(self, program: ProgramNode) -> bool:
         """
         Analyze a program AST.
@@ -720,6 +725,10 @@ class SemanticAnalyzer:
         # WEND statement
         elif isinstance(stmt, WendStatementNode):
             self._analyze_wend(stmt)
+
+        # OPTION BASE statement
+        elif isinstance(stmt, OptionBaseStatementNode):
+            self._analyze_option_base(stmt)
 
         # ON ERROR GOTO
         elif isinstance(stmt, OnErrorStatementNode):
@@ -1017,6 +1026,100 @@ class SemanticAnalyzer:
         # Don't track folding since we already evaluated it above
         self._analyze_expression(stmt.condition, track_folding=False)
 
+    def _flatten_array_subscripts(self, var_name: str, subscripts: List, dimensions: List[int]) -> 'ExpressionNode':
+        """
+        Transform multi-dimensional array subscripts into a single flattened index.
+
+        For OPTION BASE 0 (row-major order):
+            A(i, j, k) with DIM A(d1, d2, d3) becomes:
+            A(i * (d2+1) * (d3+1) + j * (d3+1) + k)
+
+        For OPTION BASE 1:
+            A(i, j, k) with DIM A(d1, d2, d3) becomes:
+            A((i-1) * d2 * d3 + (j-1) * d3 + (k-1))
+
+        This uses row-major order (rightmost index varies fastest).
+        """
+        if len(subscripts) == 1:
+            # Already 1D, return as-is
+            return subscripts[0]
+
+        # Build the flattened index expression
+        # Formula: idx = s[0] * stride[0] + s[1] * stride[1] + ... + s[n-1]
+        # where stride[i] = product of (dim[i+1] * dim[i+2] * ... * dim[n-1])
+
+        # Calculate strides for each dimension
+        strides = []
+        for i in range(len(dimensions)):
+            stride = 1
+            for j in range(i + 1, len(dimensions)):
+                if self.array_base == 0:
+                    stride *= (dimensions[j] + 1)
+                else:
+                    stride *= dimensions[j]
+            strides.append(stride)
+
+        # Build the expression: sum of (subscript[i] * stride[i])
+        # For BASE 1, we need to subtract 1 from each subscript first
+        terms = []
+        for i, (sub, stride) in enumerate(zip(subscripts, strides)):
+            if self.array_base == 1:
+                # Subtract 1 from subscript: (sub - 1)
+                adjusted_sub = BinaryOpNode(
+                    operator=TokenType.MINUS,
+                    left=sub,
+                    right=NumberNode(1, 0, 0),
+                    line_num=sub.line_num if hasattr(sub, 'line_num') else 0,
+                    column=sub.column if hasattr(sub, 'column') else 0
+                )
+            else:
+                adjusted_sub = sub
+
+            # Multiply by stride
+            if stride > 1:
+                term = BinaryOpNode(
+                    operator=TokenType.MULTIPLY,
+                    left=adjusted_sub,
+                    right=NumberNode(stride, 0, 0),
+                    line_num=sub.line_num if hasattr(sub, 'line_num') else 0,
+                    column=sub.column if hasattr(sub, 'column') else 0
+                )
+            else:
+                term = adjusted_sub
+
+            terms.append(term)
+
+        # Sum all terms
+        result = terms[0]
+        for term in terms[1:]:
+            result = BinaryOpNode(
+                operator=TokenType.PLUS,
+                left=result,
+                right=term,
+                line_num=term.line_num if hasattr(term, 'line_num') else 0,
+                column=term.column if hasattr(term, 'column') else 0
+            )
+
+        return result
+
+    def _analyze_option_base(self, stmt: OptionBaseStatementNode):
+        """Analyze OPTION BASE statement - set array index base"""
+        if stmt.base not in (0, 1):
+            raise SemanticError(
+                f"OPTION BASE must be 0 or 1, got {stmt.base}",
+                self.current_line
+            )
+
+        # Check if any arrays have already been dimensioned
+        for var_name, var_info in self.symbols.variables.items():
+            if var_info.is_array:
+                raise SemanticError(
+                    f"OPTION BASE must appear before any array declarations (found {var_name})",
+                    self.current_line
+                )
+
+        self.array_base = stmt.base
+
     def _analyze_dim(self, stmt: DimStatementNode):
         """Analyze DIM statement - evaluate subscripts as constants"""
         for array_decl in stmt.arrays:
@@ -1065,6 +1168,18 @@ class SemanticAnalyzer:
 
                 dimensions.append(const_val)
 
+            # Calculate flattened size for multi-dimensional arrays
+            # Each dimension is stored as the maximum index, so actual size is (dim + 1 - base)
+            flattened_size = 1
+            for dim in dimensions:
+                # dim is the maximum index value
+                # For OPTION BASE 0: size = dim + 1
+                # For OPTION BASE 1: size = dim (since indices go from 1 to dim)
+                if self.array_base == 0:
+                    flattened_size *= (dim + 1)
+                else:  # array_base == 1
+                    flattened_size *= dim
+
             # Register the array
             var_type = self._get_type_from_name(array_decl.name)
             self.symbols.variables[var_name] = VariableInfo(
@@ -1072,6 +1187,7 @@ class SemanticAnalyzer:
                 var_type=var_type,
                 is_array=True,
                 dimensions=dimensions,
+                flattened_size=flattened_size,
                 first_use_line=self.current_line
             )
 
@@ -1342,10 +1458,20 @@ class SemanticAnalyzer:
                     first_use_line=self.current_line
                 )
 
-            # Analyze subscripts if present
+            # Analyze and flatten subscripts if present
             if expr.subscripts:
+                # First analyze each subscript expression
                 for subscript in expr.subscripts:
                     self._analyze_expression(subscript, "array subscript", track_folding=False, track_cse=True)
+
+                # If multi-dimensional, flatten the subscripts
+                if len(expr.subscripts) > 1:
+                    var_info = self.symbols.variables.get(var_name)
+                    if var_info and var_info.is_array and var_info.dimensions:
+                        # Transform multi-dimensional subscripts to flat index
+                        flattened = self._flatten_array_subscripts(var_name, expr.subscripts, var_info.dimensions)
+                        # Replace the subscripts list with a single flattened expression
+                        expr.subscripts = [flattened]
 
         elif isinstance(expr, BinaryOpNode):
             self._analyze_expression(expr.left, "binary operation", track_folding=False, track_cse=True)

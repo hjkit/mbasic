@@ -26,6 +26,10 @@ This directory contains tests for the semantic analyzer's advanced optimization 
 - **test_if_goto_loops.py** - IF-GOTO backward jump loop detection
 - **test_loop_invariants.py** - Loop-invariant expression detection (4 tests)
 
+### Array Flattening
+- **test_array_flattening.py** - Multi-dimensional array flattening (4 tests)
+- **test_array_flattening_benefits.py** - Demonstration of optimization benefits
+
 ### Comprehensive Tests
 - **test_optimization_report.py** - Full optimization report generation
 - **test_comprehensive_analysis.py** - All features together
@@ -59,6 +63,11 @@ done
 7. **Loop Unrolling Candidates** - Small loops with constant bounds
 8. **Subroutine Side-Effect Analysis** - Tracking variable modifications through GOSUB calls
 9. **Transitive Modifications** - Tracking modifications through nested GOSUB calls
+10. **Array Flattening** - Multi-dimensional arrays transformed to 1D:
+    - Automatic stride calculation
+    - OPTION BASE 0/1 support
+    - Index calculations become CSE candidates
+    - Enables better code generation
 
 ## Expected Results
 
