@@ -101,6 +101,18 @@ class ConstantEvaluator:
 
     def __init__(self, symbols: SymbolTable):
         self.symbols = symbols
+        # Runtime constant tracking: maps variable names to their known constant values
+        self.runtime_constants: Dict[str, Union[int, float, str]] = {}
+
+    def set_constant(self, var_name: str, value: Union[int, float, str]):
+        """Mark a variable as having a known constant value"""
+        self.runtime_constants[var_name.upper()] = value
+
+    def clear_constant(self, var_name: str):
+        """Mark a variable as no longer having a known constant value"""
+        var_name_upper = var_name.upper()
+        if var_name_upper in self.runtime_constants:
+            del self.runtime_constants[var_name_upper]
 
     def evaluate(self, expr) -> Optional[Union[int, float, str]]:
         """
@@ -112,6 +124,16 @@ class ConstantEvaluator:
 
         if isinstance(expr, StringNode):
             return expr.value
+
+        # Check if it's a variable with a known constant value
+        if isinstance(expr, VariableNode):
+            # Only simple variables (not arrays) can be runtime constants
+            if expr.subscripts is None:
+                var_name = expr.name.upper()
+                if var_name in self.runtime_constants:
+                    return self.runtime_constants[var_name]
+            # Variable not known or is an array - cannot evaluate
+            return None
 
         if isinstance(expr, BinaryOpNode):
             left = self.evaluate(expr.left)
@@ -367,6 +389,24 @@ class SemanticAnalyzer:
                 self.current_line
             )
 
+        # INPUT - variables are no longer constants after being read
+        elif isinstance(stmt, InputStatementNode):
+            for var in stmt.variables:
+                self.evaluator.clear_constant(var.name)
+
+        # READ - variables are no longer constants after being read
+        elif isinstance(stmt, ReadStatementNode):
+            for var in stmt.variables:
+                self.evaluator.clear_constant(var.name)
+
+        # LINE INPUT - variables are no longer constants
+        elif isinstance(stmt, LineInputStatementNode):
+            if hasattr(stmt, 'variable'):
+                self.evaluator.clear_constant(stmt.variable.name)
+            elif hasattr(stmt, 'variables'):
+                for var in stmt.variables:
+                    self.evaluator.clear_constant(var.name)
+
         # Check for variable references in expressions
         if hasattr(stmt, 'expression'):
             self._analyze_expression(stmt.expression)
@@ -385,22 +425,35 @@ class SemanticAnalyzer:
                         self.current_line
                     )
 
-            # Evaluate all subscripts as constant expressions
+            # Evaluate all subscripts as constant expressions (or runtime-evaluable constants)
             dimensions = []
             for subscript in array_decl.dimensions:
                 const_val = self.evaluator.evaluate_to_int(subscript)
 
                 if const_val is None:
-                    # In compiler, subscripts must be integer constants
-                    # But we're extending this to allow constant expressions!
-                    raise SemanticError(
-                        f"Array subscript must be a constant expression in {var_name}",
-                        self.current_line
-                    )
+                    # Try to provide a helpful error message
+                    if isinstance(subscript, VariableNode) and subscript.subscripts is None:
+                        var_ref = subscript.name.upper()
+                        if var_ref in self.evaluator.runtime_constants:
+                            # Should have been evaluated - this is unexpected
+                            raise SemanticError(
+                                f"Internal error: variable {var_ref} is constant but couldn't evaluate",
+                                self.current_line
+                            )
+                        else:
+                            raise SemanticError(
+                                f"Array subscript in {var_name} uses variable {var_ref} which has no known constant value at this point",
+                                self.current_line
+                            )
+                    else:
+                        raise SemanticError(
+                            f"Array subscript in {var_name} must be a constant expression or variable with known constant value",
+                            self.current_line
+                        )
 
                 if const_val < 0:
                     raise SemanticError(
-                        f"Array subscript cannot be negative in {var_name}",
+                        f"Array subscript cannot be negative in {var_name} (evaluated to {const_val})",
                         self.current_line
                     )
 
@@ -417,7 +470,7 @@ class SemanticAnalyzer:
             )
 
     def _analyze_assignment(self, stmt: LetStatementNode):
-        """Analyze assignment - track variable usage"""
+        """Analyze assignment - track variable usage and constant values"""
         var_name = stmt.variable.name.upper()
 
         # Register variable if not seen before
@@ -444,6 +497,17 @@ class SemanticAnalyzer:
 
         # Analyze the expression
         self._analyze_expression(stmt.expression)
+
+        # Track runtime constants: if this is a simple variable (not array) assignment
+        # and the expression evaluates to a constant, track it
+        if stmt.variable.subscripts is None:
+            const_val = self.evaluator.evaluate(stmt.expression)
+            if const_val is not None:
+                # Variable now has a known constant value
+                self.evaluator.set_constant(var_name, const_val)
+            else:
+                # Variable assigned a non-constant expression, clear it if it was constant
+                self.evaluator.clear_constant(var_name)
 
     def _analyze_for(self, stmt: ForStatementNode):
         """Analyze FOR statement - track for loop nesting"""
@@ -472,6 +536,9 @@ class SemanticAnalyzer:
         self._analyze_expression(stmt.end_expr)
         if stmt.step_expr:
             self._analyze_expression(stmt.step_expr)
+
+        # FOR loop variable is modified, so it's no longer a constant
+        self.evaluator.clear_constant(var_name)
 
     def _analyze_next(self, stmt: NextStatementNode):
         """Analyze NEXT statement - validate loop nesting"""
@@ -695,16 +762,24 @@ if __name__ == '__main__':
     from parser import Parser
 
     test_program = """
-10 REM Test program
-20 DIM A(10), B(5, 5)
-30 DIM C(2+3)
-40 FOR I% = 1 TO 10
-50   A(I%) = I% * 2
-60 NEXT I%
-70 DEF FN DOUBLE(X) = X * 2
-80 PRINT FN DOUBLE(5)
-90 ON ERROR GOTO 1000
-100 END
+10 REM Test program - demonstrates runtime constant evaluation
+20 REM Constants defined early
+30 N% = 10
+40 M% = N% * 2
+50 REM Arrays using constant expressions and variables
+60 DIM A(N%), B(5, M%), C(2+3)
+70 TOTAL% = N% + M%
+80 DIM D(TOTAL%)
+90 REM DEF FN with constant evaluation
+100 DEF FN DOUBLE(X) = X * 2
+110 REM Loop (I% becomes non-constant)
+120 FOR I% = 1 TO 10
+130   A(I%) = FN DOUBLE(I%)
+140 NEXT I%
+150 REM Error handling
+160 ON ERROR GOTO 1000
+170 PRINT A(5)
+180 END
 1000 RESUME NEXT
 """
 
