@@ -355,6 +355,18 @@ class AliasInfo:
 
 
 @dataclass
+class AvailableExpression:
+    """Information about available expressions (computed on all paths)"""
+    expression_hash: str  # Canonical representation
+    expression_desc: str  # Human-readable description
+    first_computed_line: int  # Where first computed
+    available_at_lines: List[int] = field(default_factory=list)  # Lines where available from all paths
+    variables_used: Set[str] = field(default_factory=set)  # Variables in expression
+    killed_at_lines: List[int] = field(default_factory=list)  # Lines where expression becomes unavailable
+    redundant_computations: int = 0  # How many redundant computations could be eliminated
+
+
+@dataclass
 class InductionVariable:
     """Information about an induction variable in a loop"""
     variable: str  # Variable name (e.g., "I")
@@ -799,6 +811,10 @@ class SemanticAnalyzer:
         self.alias_info: List[AliasInfo] = []
         self.array_element_accesses: Dict[str, List[Tuple[int, str]]] = {}  # array_name -> [(line, access_pattern)]
 
+        # Available expression analysis tracking
+        self.available_expr_analysis: List[AvailableExpression] = []  # All available expression analysis results
+        self.expr_computations: Dict[str, List[int]] = {}  # expr_hash -> [line1, line2, ...] all computation points
+
     def analyze(self, program: ProgramNode) -> bool:
         """
         Analyze a program AST.
@@ -843,6 +859,9 @@ class SemanticAnalyzer:
 
             # Twelfth pass: alias analysis
             self._analyze_aliases(program)
+
+            # Thirteenth pass: available expression analysis
+            self._analyze_available_expressions(program)
 
             # Generate warnings for required compilation switches
             self._check_compilation_switches()
@@ -4286,6 +4305,305 @@ class SemanticAnalyzer:
             return "Conservative: must assume aliasing; limits CSE and loop optimizations"
         else:
             return "No impact"
+
+    def _analyze_available_expressions(self, program: ProgramNode):
+        """
+        Perform available expression analysis.
+
+        An expression is "available" at a point if:
+        1. It has been computed on ALL paths leading to that point
+        2. None of its operands have been modified since computation
+
+        This is more sophisticated than simple CSE because it considers
+        control flow - an expression must be computed on every path, not just seen once.
+        """
+        self.available_expr_analysis.clear()
+        self.expr_computations.clear()
+
+        # Build control flow graph representation
+        line_to_index = {}
+        for idx, line in enumerate(program.lines):
+            line_to_index[line.line_number] = idx
+
+        # First pass: collect all expression computations
+        for line in program.lines:
+            for stmt in line.statements:
+                self._collect_expr_computations_from_statement(stmt, line.line_number)
+
+        # Second pass: for each expression computed multiple times,
+        # analyze if it's available at subsequent computation points
+        for expr_hash, computation_lines in self.expr_computations.items():
+            if len(computation_lines) < 2:
+                continue  # Need at least 2 computations for optimization
+
+            # Get expression description and variables
+            # We'll reconstruct this from the first computation
+            first_line = computation_lines[0]
+            expr_desc = None
+            expr_vars = set()
+
+            # Find the expression node at first_line to get description
+            for line in program.lines:
+                if line.line_number == first_line:
+                    expr_desc, expr_vars = self._find_expr_info_in_line(line, expr_hash)
+                    break
+
+            if not expr_desc:
+                continue
+
+            # Analyze availability at each subsequent computation
+            available_at = []
+            killed_at = []
+            redundant_count = 0
+
+            for i in range(1, len(computation_lines)):
+                current_line = computation_lines[i]
+                previous_line = computation_lines[i-1]
+
+                # Check if expression is available at current_line
+                # (computed at previous_line and variables not modified in between)
+                is_available = self._is_expr_available_between_lines(
+                    program, previous_line, current_line, expr_vars, line_to_index
+                )
+
+                if is_available:
+                    available_at.append(current_line)
+                    redundant_count += 1
+                else:
+                    killed_at.append(current_line)
+
+            # Create available expression record
+            if len(available_at) > 0:
+                avail_expr = AvailableExpression(
+                    expression_hash=expr_hash,
+                    expression_desc=expr_desc,
+                    first_computed_line=computation_lines[0],
+                    available_at_lines=available_at,
+                    variables_used=expr_vars,
+                    killed_at_lines=killed_at,
+                    redundant_computations=redundant_count
+                )
+                self.available_expr_analysis.append(avail_expr)
+
+    def _collect_expr_computations_from_statement(self, stmt, line_num: int):
+        """Collect all expression computations from a statement"""
+        if stmt is None:
+            return
+
+        from parser import (LetStatementNode, IfStatementNode, PrintStatementNode,
+                          ForStatementNode, WhileStatementNode)
+
+        if isinstance(stmt, LetStatementNode):
+            self._collect_expr_computations_from_expr(stmt.expression, line_num)
+
+        elif isinstance(stmt, IfStatementNode):
+            self._collect_expr_computations_from_expr(stmt.condition, line_num)
+            if stmt.then_statements:
+                for then_stmt in stmt.then_statements:
+                    self._collect_expr_computations_from_statement(then_stmt, line_num)
+            if stmt.else_statements:
+                for else_stmt in stmt.else_statements:
+                    self._collect_expr_computations_from_statement(else_stmt, line_num)
+
+        elif isinstance(stmt, PrintStatementNode):
+            for expr in stmt.expressions:
+                if expr is not None:
+                    self._collect_expr_computations_from_expr(expr, line_num)
+
+        elif isinstance(stmt, ForStatementNode):
+            self._collect_expr_computations_from_expr(stmt.start_expr, line_num)
+            self._collect_expr_computations_from_expr(stmt.end_expr, line_num)
+            if stmt.step_expr:
+                self._collect_expr_computations_from_expr(stmt.step_expr, line_num)
+
+        elif isinstance(stmt, WhileStatementNode):
+            self._collect_expr_computations_from_expr(stmt.condition, line_num)
+
+    def _collect_expr_computations_from_expr(self, expr, line_num: int):
+        """Collect computations from an expression recursively"""
+        if expr is None:
+            return
+
+        from parser import (BinaryOpNode, UnaryOpNode, FunctionCallNode, VariableNode,
+                          NumberNode, StringNode)
+
+        # Only track non-trivial expressions (binary ops, function calls)
+        if isinstance(expr, BinaryOpNode):
+            expr_hash = self._hash_expression(expr)
+            if expr_hash not in self.expr_computations:
+                self.expr_computations[expr_hash] = []
+            self.expr_computations[expr_hash].append(line_num)
+
+            # Recurse into subexpressions
+            self._collect_expr_computations_from_expr(expr.left, line_num)
+            self._collect_expr_computations_from_expr(expr.right, line_num)
+
+        elif isinstance(expr, UnaryOpNode):
+            # Skip trivial unary operations like simple negation
+            self._collect_expr_computations_from_expr(expr.operand, line_num)
+
+        elif isinstance(expr, FunctionCallNode):
+            expr_hash = self._hash_expression(expr)
+            if expr_hash not in self.expr_computations:
+                self.expr_computations[expr_hash] = []
+            self.expr_computations[expr_hash].append(line_num)
+
+            # Recurse into arguments
+            for arg in expr.arguments:
+                self._collect_expr_computations_from_expr(arg, line_num)
+
+        elif isinstance(expr, VariableNode):
+            # Check array subscripts
+            if expr.subscripts:
+                for subscript in expr.subscripts:
+                    self._collect_expr_computations_from_expr(subscript, line_num)
+
+    def _find_expr_info_in_line(self, line, expr_hash: str) -> Tuple[Optional[str], Set[str]]:
+        """Find expression description and variables for a given hash in a line"""
+        for stmt in line.statements:
+            result = self._find_expr_info_in_statement(stmt, expr_hash)
+            if result[0] is not None:
+                return result
+        return (None, set())
+
+    def _find_expr_info_in_statement(self, stmt, expr_hash: str) -> Tuple[Optional[str], Set[str]]:
+        """Recursively search for expression in statement"""
+        if stmt is None:
+            return (None, set())
+
+        from parser import (LetStatementNode, IfStatementNode, PrintStatementNode,
+                          ForStatementNode, WhileStatementNode)
+
+        if isinstance(stmt, LetStatementNode):
+            return self._find_expr_info_in_expr(stmt.expression, expr_hash)
+
+        elif isinstance(stmt, IfStatementNode):
+            result = self._find_expr_info_in_expr(stmt.condition, expr_hash)
+            if result[0]:
+                return result
+            if stmt.then_statements:
+                for then_stmt in stmt.then_statements:
+                    result = self._find_expr_info_in_statement(then_stmt, expr_hash)
+                    if result[0]:
+                        return result
+            if stmt.else_statements:
+                for else_stmt in stmt.else_statements:
+                    result = self._find_expr_info_in_statement(else_stmt, expr_hash)
+                    if result[0]:
+                        return result
+
+        elif isinstance(stmt, PrintStatementNode):
+            for expr in stmt.expressions:
+                if expr is not None:
+                    result = self._find_expr_info_in_expr(expr, expr_hash)
+                    if result[0]:
+                        return result
+
+        elif isinstance(stmt, ForStatementNode):
+            for expr in [stmt.start_expr, stmt.end_expr, stmt.step_expr]:
+                if expr is not None:
+                    result = self._find_expr_info_in_expr(expr, expr_hash)
+                    if result[0]:
+                        return result
+
+        elif isinstance(stmt, WhileStatementNode):
+            return self._find_expr_info_in_expr(stmt.condition, expr_hash)
+
+        return (None, set())
+
+    def _find_expr_info_in_expr(self, expr, expr_hash: str) -> Tuple[Optional[str], Set[str]]:
+        """Check if this expression matches the hash"""
+        if expr is None:
+            return (None, set())
+
+        test_hash = self._hash_expression(expr)
+        if test_hash == expr_hash:
+            desc = self._describe_expression(expr)
+            vars_used = self._get_expression_variables(expr)
+            return (desc, vars_used)
+
+        # Recurse into subexpressions
+        from parser import BinaryOpNode, UnaryOpNode, FunctionCallNode, VariableNode
+
+        if isinstance(expr, BinaryOpNode):
+            result = self._find_expr_info_in_expr(expr.left, expr_hash)
+            if result[0]:
+                return result
+            return self._find_expr_info_in_expr(expr.right, expr_hash)
+
+        elif isinstance(expr, UnaryOpNode):
+            return self._find_expr_info_in_expr(expr.operand, expr_hash)
+
+        elif isinstance(expr, FunctionCallNode):
+            for arg in expr.arguments:
+                result = self._find_expr_info_in_expr(arg, expr_hash)
+                if result[0]:
+                    return result
+
+        elif isinstance(expr, VariableNode):
+            if expr.subscripts:
+                for subscript in expr.subscripts:
+                    result = self._find_expr_info_in_expr(subscript, expr_hash)
+                    if result[0]:
+                        return result
+
+        return (None, set())
+
+    def _is_expr_available_between_lines(self, program: ProgramNode,
+                                          start_line: int, end_line: int,
+                                          expr_vars: Set[str],
+                                          line_to_index: Dict[int, int]) -> bool:
+        """
+        Check if an expression is available between two lines.
+        Returns True if none of the expression's variables are modified between start and end.
+        """
+        if start_line not in line_to_index or end_line not in line_to_index:
+            return False
+
+        start_idx = line_to_index[start_line]
+        end_idx = line_to_index[end_line]
+
+        # Check all lines between start and end (exclusive)
+        for idx in range(start_idx + 1, end_idx):
+            line = program.lines[idx]
+            # Check if any variable in expr_vars is modified in this line
+            modified_vars = self._get_modified_variables_in_line(line)
+            if any(var in expr_vars for var in modified_vars):
+                return False  # Expression is killed
+
+        return True  # Expression remains available
+
+    def _get_modified_variables_in_line(self, line) -> Set[str]:
+        """Get all variables modified in a line"""
+        modified = set()
+
+        from parser import (LetStatementNode, ForStatementNode, InputStatementNode,
+                          ReadStatementNode, VariableNode)
+
+        for stmt in line.statements:
+            if isinstance(stmt, LetStatementNode):
+                if isinstance(stmt.variable, VariableNode):
+                    modified.add(stmt.variable.name.upper())
+
+            elif isinstance(stmt, ForStatementNode):
+                # stmt.variable is a VariableNode
+                from parser import VariableNode as VarNode
+                if isinstance(stmt.variable, VarNode):
+                    modified.add(stmt.variable.name.upper())
+                elif isinstance(stmt.variable, str):
+                    modified.add(stmt.variable.upper())
+
+            elif isinstance(stmt, InputStatementNode):
+                for var in stmt.variables:
+                    if isinstance(var, VariableNode):
+                        modified.add(var.name.upper())
+
+            elif isinstance(stmt, ReadStatementNode):
+                for var in stmt.variables:
+                    if isinstance(var, VariableNode):
+                        modified.add(var.name.upper())
+
+        return modified
 
     def _check_compilation_switches(self):
         """Generate warnings for required compilation switches"""

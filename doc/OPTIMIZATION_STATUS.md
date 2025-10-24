@@ -729,6 +729,85 @@ This document tracks all optimizations implemented, planned, and possible for th
 
 ---
 
+### 25. Available Expression Analysis
+**Status:** ✅ Complete (Detection)
+**Location:** `src/semantic_analyzer.py` - `_analyze_available_expressions()`, `AvailableExpression`
+**What it does:**
+- More sophisticated than basic CSE - tracks expressions computed on **all** paths
+- Identifies expressions available at program points for safe elimination
+- Detects when variables are modified between computations (kills availability)
+- Reports redundant computations that could be eliminated
+- Provides detailed availability information for optimization decisions
+
+**Algorithm:**
+- First pass: Collect all expression computations throughout program
+- For each expression computed multiple times:
+  - Check if it's available at subsequent computation points
+  - Track variable modifications between computations
+  - Expression is "killed" if any operand is modified (LET, INPUT, READ, FOR)
+- Build control flow-aware availability sets
+- Report expressions that remain available despite control flow
+
+**Key Concepts:**
+- **Available**: Expression computed on all paths and operands not modified
+- **Killed**: Expression invalidated by operand modification
+- **Redundant**: Expression recomputed when previous value still available
+
+**Examples:**
+```basic
+10 LET X = A + B   ' First computation
+20 LET Y = C + D   ' Neither A nor B modified
+30 LET Z = A + B   ' AVAILABLE: can reuse X (redundant computation)
+40 END
+
+10 LET X = A + B   ' First computation
+20 LET A = 10      ' A is modified - KILLS the expression
+30 LET Z = A + B   ' NOT available: must recompute (not redundant)
+40 END
+
+10 LET X = A * B   ' First computation
+20 LET Y = A * B   ' AVAILABLE: redundant #1
+30 LET Z = C + D   ' Neither A nor B modified
+40 LET W = A * B   ' AVAILABLE: redundant #2
+50 END
+' Result: A*B has 2 redundant computations
+
+10 LET X = SIN(A)  ' First computation
+20 INPUT A         ' A modified by INPUT - KILLS
+30 LET Y = SIN(A)  ' NOT available (must recompute)
+40 END
+```
+
+**Compared to Basic CSE:**
+- **Basic CSE**: Tracks expressions as encountered, clears on control flow
+- **Available Expression**: Considers all paths, tracks kills precisely
+- **Basic CSE**: "Have we seen this before?"
+- **Available Expression**: "Is this computed on ALL paths and still valid?"
+
+**Benefits:**
+- More precise than simple CSE
+- Identifies truly redundant computations
+- Tracks expression killing by variable modifications
+- Considers control flow for safety
+- Enables code motion and hoisting opportunities
+- Reports optimization potential with redundancy counts
+
+**Limitations:**
+- Simplified control flow (linear programs work best)
+- Doesn't handle complex branching (IF with multiple paths)
+- Conservative for loops (treats each iteration separately)
+- Detection only (actual elimination needs code generation)
+
+**Note:**
+- Works with existing expression hashing and variable tracking
+- Integrates with constant propagation and CSE
+- Builds on Live Variable Analysis infrastructure
+- Particularly valuable for straight-line code
+
+**TODO:** Use availability information for code motion and redundancy elimination (needs code generation phase)
+
+---
+
 ## 📋 READY TO IMPLEMENT NOW (Semantic Analysis Phase)
 
 These optimizations can be implemented in the semantic analyzer without requiring code generation:
@@ -847,23 +926,18 @@ These require actual code generation/transformation, not just analysis:
 
 ### Analysis Phase
 
-1. **Available Expression Analysis**
-   - More sophisticated than our current CSE
-   - Track which expressions are computed on all paths
-   - We do this partially but could be more comprehensive
-
-2. **String Concatenation in Loops**
+1. **String Concatenation in Loops**
    - Detect string concatenation in loops
    - Eliminate temporary string allocations
    - Note: String constant pooling is already done
 
 ### Detection/Warning Phase
 
-3. **Type-Based Optimizations**
+2. **Type-Based Optimizations**
    - BASIC has weak typing but could detect mismatches
    - Suggest INTEGER for loop counters (performance)
 
-4. **Memory Access Pattern Analysis**
+3. **Memory Access Pattern Analysis**
    - Detect non-sequential array access
    - Could suggest array layout changes
 
@@ -911,11 +985,12 @@ These require actual code generation/transformation, not just analysis:
 9. ✅ **Built-in Function Purity Analysis** - DONE (Classifies pure vs impure, enables optimization)
 10. ✅ **Array Bounds Analysis** - DONE (Detects out-of-bounds access at compile time)
 11. ✅ **Alias Analysis** - DONE (Detects potential aliasing between array elements)
+12. ✅ **Available Expression Analysis** - DONE (Tracks expressions available on all paths)
 
 ### Long Term (Code Generation Required)
-12. **Peephole Optimization** - Foundation for codegen
-13. **Register Allocation** - Core of codegen
-14. **Actual Code Motion** - Apply loop-invariant transformation
+13. **Peephole Optimization** - Foundation for codegen
+14. **Register Allocation** - Core of codegen
+15. **Actual Code Motion** - Apply loop-invariant transformation
 
 ---
 
@@ -943,6 +1018,7 @@ These require actual code generation/transformation, not just analysis:
 - ✅ Function purity analysis - **Standard** (pure/impure classification, optimization enabling)
 - ✅ Array bounds checking - **Standard** (compile-time bounds violation detection)
 - ✅ Alias analysis - **Standard** (array aliasing detection, optimization safety)
+- ✅ Available expression analysis - **Standard** (dataflow analysis, redundancy elimination)
 
 ### What We're Missing (that modern compilers have)
 - ❌ SSA form - Not needed for BASIC's simplicity
@@ -965,7 +1041,7 @@ We've implemented a **strong foundation** of compiler optimizations that are:
 3. **Complete for analysis** - Detection and transformation done
 4. **Modern-quality analysis** - Comparable to modern compilers' semantic phase
 
-**Current Status: 24 optimizations implemented!**
+**Current Status: 25 optimizations implemented!**
 
 **Semantic analysis phase:** ✅ COMPLETE
 
