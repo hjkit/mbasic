@@ -179,6 +179,25 @@ class CopyPropagation:
     propagated_lines: List[int] = field(default_factory=list)  # Lines where propagation occurred
 
 
+@dataclass
+class InductionVariable:
+    """Information about an induction variable in a loop"""
+    variable: str  # Variable name (e.g., "I")
+    loop_start_line: int  # Line where loop starts
+    is_primary: bool = False  # True if this is the loop control variable (FOR I = ...)
+
+    # Linear relationship: variable = base + coefficient * primary_iv
+    # For primary IV: coefficient = step, base = start
+    # For derived IV: e.g., J = I * 2, coefficient = 2, base_var = "I"
+    base_value: Optional[Any] = None  # Constant base (for primary IV, this is start value)
+    coefficient: Optional[Any] = None  # Multiplier (step for primary, or derived relationship)
+    base_var: Optional[str] = None  # For derived IVs: base variable name
+
+    # Optimization opportunities
+    related_expressions: List[Tuple[int, str, str]] = field(default_factory=list)  # (line, expr_desc, optimized_desc)
+    strength_reduction_opportunities: int = 0  # Count of optimizable expressions
+
+
 class CompilerFlags:
     """Flags for features requiring compilation switches"""
     def __init__(self):
@@ -562,6 +581,10 @@ class SemanticAnalyzer:
         self.copy_propagations: List[CopyPropagation] = []
         self.active_copies: Dict[str, str] = {}  # copy_var -> source_var (currently active copies)
 
+        # Induction variable tracking
+        self.induction_variables: List[InductionVariable] = []  # All detected induction variables
+        self.active_ivs: Dict[str, InductionVariable] = {}  # var_name -> IV (currently in a loop)
+
     def analyze(self, program: ProgramNode) -> bool:
         """
         Analyze a program AST.
@@ -864,6 +887,15 @@ class SemanticAnalyzer:
         if hasattr(stmt, 'expression'):
             self._analyze_expression(stmt.expression)
 
+        # For LET/assignment statements, also analyze the LHS variable's subscripts
+        if isinstance(stmt, LetStatementNode) and stmt.variable.subscripts:
+            for subscript in stmt.variable.subscripts:
+                self._analyze_expression(subscript, "array subscript", track_folding=False, track_cse=True)
+            # Check for IV strength reduction in LHS array subscripts
+            if self.current_loop:
+                for subscript in stmt.variable.subscripts:
+                    self._detect_iv_strength_reduction(stmt.variable.name.upper(), subscript)
+
     def _analyze_gosub(self, stmt: GosubStatementNode):
         """
         Analyze GOSUB statement.
@@ -968,6 +1000,192 @@ class SemanticAnalyzer:
                             reason_no_hoist=reason
                         )
                         loop.invariants[cse_hash] = invariant
+
+    def _detect_derived_induction_variable(self, var_name: str, expr: Any):
+        """
+        Detect derived induction variables in a loop.
+
+        A derived IV has the form:
+        - J = I * constant (linear relationship to primary IV)
+        - J = I + constant
+        - J = I (simple copy of IV)
+
+        where I is the primary induction variable (loop control variable).
+        """
+        if not self.current_loop or not self.current_loop.control_variable:
+            return
+
+        primary_iv_name = self.current_loop.control_variable
+        primary_iv = self.active_ivs.get(primary_iv_name)
+
+        if not primary_iv:
+            return  # No primary IV active
+
+        # Check for patterns:
+        # 1. J = I (copy of IV)
+        if isinstance(expr, VariableNode) and expr.subscripts is None:
+            if expr.name.upper() == primary_iv_name:
+                # J = I (coefficient = 1, base = 0)
+                iv = InductionVariable(
+                    variable=var_name,
+                    loop_start_line=self.current_loop.start_line,
+                    is_primary=False,
+                    base_value=0,
+                    coefficient=1,
+                    base_var=primary_iv_name
+                )
+                self.active_ivs[var_name] = iv
+                self.induction_variables.append(iv)
+                return
+
+        # 2. J = I * constant or J = constant * I
+        if isinstance(expr, BinaryOpNode) and expr.operator == TokenType.MULTIPLY:
+            left_is_iv = (isinstance(expr.left, VariableNode) and
+                         expr.left.subscripts is None and
+                         expr.left.name.upper() == primary_iv_name)
+            right_is_iv = (isinstance(expr.right, VariableNode) and
+                          expr.right.subscripts is None and
+                          expr.right.name.upper() == primary_iv_name)
+
+            if left_is_iv:
+                # J = I * constant
+                const_val = self.evaluator.evaluate(expr.right)
+                if const_val is not None:
+                    iv = InductionVariable(
+                        variable=var_name,
+                        loop_start_line=self.current_loop.start_line,
+                        is_primary=False,
+                        base_value=0,
+                        coefficient=const_val,
+                        base_var=primary_iv_name
+                    )
+                    self.active_ivs[var_name] = iv
+                    self.induction_variables.append(iv)
+            elif right_is_iv:
+                # J = constant * I
+                const_val = self.evaluator.evaluate(expr.left)
+                if const_val is not None:
+                    iv = InductionVariable(
+                        variable=var_name,
+                        loop_start_line=self.current_loop.start_line,
+                        is_primary=False,
+                        base_value=0,
+                        coefficient=const_val,
+                        base_var=primary_iv_name
+                    )
+                    self.active_ivs[var_name] = iv
+                    self.induction_variables.append(iv)
+            return
+
+        # 3. J = I + constant or J = constant + I
+        if isinstance(expr, BinaryOpNode) and expr.operator == TokenType.PLUS:
+            left_is_iv = (isinstance(expr.left, VariableNode) and
+                         expr.left.subscripts is None and
+                         expr.left.name.upper() == primary_iv_name)
+            right_is_iv = (isinstance(expr.right, VariableNode) and
+                          expr.right.subscripts is None and
+                          expr.right.name.upper() == primary_iv_name)
+
+            if left_is_iv:
+                # J = I + constant
+                const_val = self.evaluator.evaluate(expr.right)
+                if const_val is not None:
+                    iv = InductionVariable(
+                        variable=var_name,
+                        loop_start_line=self.current_loop.start_line,
+                        is_primary=False,
+                        base_value=const_val,
+                        coefficient=1,
+                        base_var=primary_iv_name
+                    )
+                    self.active_ivs[var_name] = iv
+                    self.induction_variables.append(iv)
+            elif right_is_iv:
+                # J = constant + I
+                const_val = self.evaluator.evaluate(expr.left)
+                if const_val is not None:
+                    iv = InductionVariable(
+                        variable=var_name,
+                        loop_start_line=self.current_loop.start_line,
+                        is_primary=False,
+                        base_value=const_val,
+                        coefficient=1,
+                        base_var=primary_iv_name
+                    )
+                    self.active_ivs[var_name] = iv
+                    self.induction_variables.append(iv)
+            return
+
+    def _clear_loop_ivs(self, loop_start_line: int):
+        """Clear induction variables when exiting a loop"""
+        to_remove = []
+        for var_name, iv in self.active_ivs.items():
+            if iv.loop_start_line == loop_start_line:
+                to_remove.append(var_name)
+        for var_name in to_remove:
+            del self.active_ivs[var_name]
+
+    def _detect_iv_strength_reduction(self, array_name: str, subscript_expr: Any):
+        """
+        Detect strength reduction opportunities for array subscripts using induction variables.
+
+        Pattern: A(I * constant) can be optimized to:
+        - Initialize: ptr = start * constant
+        - Each iteration: ptr = ptr + step * constant (instead of I * constant)
+
+        This replaces multiplication with addition in the loop body.
+        """
+        if not self.current_loop:
+            return
+
+        primary_iv_name = self.current_loop.control_variable
+        primary_iv = self.active_ivs.get(primary_iv_name) if primary_iv_name else None
+
+        if not primary_iv or not primary_iv.is_primary:
+            return
+
+        # Check for pattern: I * constant or constant * I
+        if isinstance(subscript_expr, BinaryOpNode) and subscript_expr.operator == TokenType.MULTIPLY:
+            left_is_primary = (isinstance(subscript_expr.left, VariableNode) and
+                              subscript_expr.left.subscripts is None and
+                              subscript_expr.left.name.upper() == primary_iv_name)
+            right_is_primary = (isinstance(subscript_expr.right, VariableNode) and
+                               subscript_expr.right.subscripts is None and
+                               subscript_expr.right.name.upper() == primary_iv_name)
+
+            if left_is_primary:
+                # I * constant
+                const_val = self.evaluator.evaluate(subscript_expr.right)
+                if const_val is not None:
+                    expr_desc = f"{array_name}({primary_iv_name} * {const_val})"
+                    optimized_desc = f"Use pointer increment by {const_val} instead of multiply"
+                    primary_iv.related_expressions.append((self.current_line, expr_desc, optimized_desc))
+                    primary_iv.strength_reduction_opportunities += 1
+                    return  # Added return to prevent fall-through
+            elif right_is_primary:
+                # constant * I
+                const_val = self.evaluator.evaluate(subscript_expr.left)
+                if const_val is not None:
+                    expr_desc = f"{array_name}({const_val} * {primary_iv_name})"
+                    optimized_desc = f"Use pointer increment by {const_val} instead of multiply"
+                    primary_iv.related_expressions.append((self.current_line, expr_desc, optimized_desc))
+                    primary_iv.strength_reduction_opportunities += 1
+                    return  # Added return to prevent fall-through
+
+        # Check for pattern using derived IV: J where J = I * constant
+        elif isinstance(subscript_expr, VariableNode) and subscript_expr.subscripts is None:
+            derived_var = subscript_expr.name.upper()
+            derived_iv = self.active_ivs.get(derived_var)
+
+            if derived_iv and not derived_iv.is_primary and derived_iv.base_var == primary_iv_name:
+                # Using a derived IV in array subscript
+                expr_desc = f"{array_name}({derived_var})"
+                if derived_iv.coefficient != 1:
+                    optimized_desc = f"Derived IV: increment {derived_var} by {derived_iv.coefficient} instead of computing from {primary_iv_name}"
+                else:
+                    optimized_desc = f"Derived IV: use {derived_var} directly (tracks {primary_iv_name})"
+                primary_iv.related_expressions.append((self.current_line, expr_desc, optimized_desc))
+                primary_iv.strength_reduction_opportunities += 1
 
     def _analyze_if(self, stmt: IfStatementNode):
         """Analyze IF statement - handle compile-time evaluation when possible"""
@@ -1323,6 +1541,11 @@ class SemanticAnalyzer:
                 # Not a simple copy, invalidate if it was one
                 if var_name in self.active_copies:
                     del self.active_copies[var_name]
+
+            # Induction variable detection: Check if this is a derived IV
+            # Pattern: J = I * constant or J = I + constant (where I is primary IV)
+            if self.current_loop:
+                self._detect_derived_induction_variable(var_name, stmt.expression)
         else:
             # Array assignment, invalidate copy if it was one
             if var_name in self.active_copies:
@@ -1408,6 +1631,17 @@ class SemanticAnalyzer:
         self._invalidate_expressions(var_name)
         self.evaluator.clear_constant(var_name)
 
+        # Create primary induction variable
+        iv = InductionVariable(
+            variable=var_name,
+            loop_start_line=self.current_line or 0,
+            is_primary=True,
+            base_value=start_val,
+            coefficient=step_val
+        )
+        self.active_ivs[var_name] = iv
+        self.induction_variables.append(iv)
+
     def _analyze_next(self, stmt: NextStatementNode):
         """Analyze NEXT statement - validate loop nesting and close loop"""
         if not self.loop_stack:
@@ -1441,6 +1675,8 @@ class SemanticAnalyzer:
                 # Close loop analysis
                 if self.current_loop and self.current_loop.control_variable == var_name:
                     self.current_loop.end_line = self.current_line
+                    # Clear induction variables for this loop
+                    self._clear_loop_ivs(self.current_loop.start_line)
                     # Restore previous loop context
                     if self.loop_analysis_stack:
                         self.current_loop = self.loop_analysis_stack.pop()
@@ -1451,6 +1687,8 @@ class SemanticAnalyzer:
             # Close loop analysis
             if self.current_loop:
                 self.current_loop.end_line = self.current_line
+                # Clear induction variables for this loop
+                self._clear_loop_ivs(self.current_loop.start_line)
                 # Restore previous loop context
                 if self.loop_analysis_stack:
                     self.current_loop = self.loop_analysis_stack.pop()
@@ -1564,6 +1802,11 @@ class SemanticAnalyzer:
                 # First analyze each subscript expression
                 for subscript in expr.subscripts:
                     self._analyze_expression(subscript, "array subscript", track_folding=False, track_cse=True)
+
+                # Check for induction variable optimization opportunities in subscripts
+                if self.current_loop:
+                    for subscript in expr.subscripts:
+                        self._detect_iv_strength_reduction(var_name, subscript)
 
                 # If multi-dimensional, flatten the subscripts
                 if len(expr.subscripts) > 1:
@@ -2507,6 +2750,56 @@ class SemanticAnalyzer:
                         lines.append(f"    Note: Non-hoistable expressions:")
                         for inv in sorted(non_hoistable, key=lambda x: x.first_line):
                             lines.append(f"      • {inv.expression_desc} - {inv.reason_no_hoist}")
+
+                lines.append("")
+
+        # Induction Variable Analysis
+        if self.induction_variables:
+            lines.append(f"\nInduction Variable Analysis:")
+            lines.append(f"  Found {len(self.induction_variables)} induction variable(s)")
+            lines.append("")
+
+            # Group by loop
+            ivs_by_loop: Dict[int, List[InductionVariable]] = {}
+            for iv in self.induction_variables:
+                if iv.loop_start_line not in ivs_by_loop:
+                    ivs_by_loop[iv.loop_start_line] = []
+                ivs_by_loop[iv.loop_start_line].append(iv)
+
+            for loop_start, ivs in sorted(ivs_by_loop.items()):
+                lines.append(f"  Loop at line {loop_start}:")
+
+                # Primary IVs
+                primary_ivs = [iv for iv in ivs if iv.is_primary]
+                for iv in primary_ivs:
+                    lines.append(f"    Primary IV: {iv.variable}")
+                    if iv.base_value is not None:
+                        lines.append(f"      Start: {iv.base_value}")
+                    if iv.coefficient is not None:
+                        lines.append(f"      Step: {iv.coefficient}")
+                    if iv.strength_reduction_opportunities > 0:
+                        lines.append(f"      ✓ {iv.strength_reduction_opportunities} optimization opportunity(s)")
+                        for line_num, expr_desc, optimized_desc in iv.related_expressions:
+                            lines.append(f"        Line {line_num}: {expr_desc}")
+                            lines.append(f"          → {optimized_desc}")
+
+                # Derived IVs
+                derived_ivs = [iv for iv in ivs if not iv.is_primary]
+                if derived_ivs:
+                    lines.append(f"    Derived IVs:")
+                    for iv in derived_ivs:
+                        relationship = f"{iv.variable} = "
+                        if iv.base_value != 0:
+                            relationship += f"{iv.base_value} + "
+                        if iv.coefficient != 1:
+                            relationship += f"{iv.coefficient} * "
+                        relationship += iv.base_var
+                        lines.append(f"      • {relationship}")
+                        if iv.strength_reduction_opportunities > 0:
+                            lines.append(f"        ✓ {iv.strength_reduction_opportunities} optimization opportunity(s)")
+                            for line_num, expr_desc, optimized_desc in iv.related_expressions:
+                                lines.append(f"          Line {line_num}: {expr_desc}")
+                                lines.append(f"            → {optimized_desc}")
 
                 lines.append("")
 

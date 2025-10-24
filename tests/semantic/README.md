@@ -43,6 +43,9 @@ This directory contains tests for the semantic analyzer's advanced optimization 
 ### Algebraic Simplification
 - **test_algebraic_simplification.py** - Boolean and algebraic simplification (10 tests)
 
+### Induction Variable Optimization
+- **test_induction_variables.py** - IV detection and strength reduction (10 tests)
+
 ### Comprehensive Tests
 - **test_optimization_report.py** - Full optimization report generation
 - **test_comprehensive_analysis.py** - All features together
@@ -106,6 +109,12 @@ done
     - Constant folding for Boolean values
     - Self-operation simplification (`X AND X` → `X`)
     - Combines with strength reduction for complete coverage
+15. **Induction Variable Optimization** - IV detection and optimization:
+    - Primary induction variable detection (FOR loop control)
+    - Derived induction variable detection (`J = I * constant`, `J = I + constant`, `J = I`)
+    - Strength reduction for array subscripts (`A(I * 10)` → pointer increment)
+    - Nested loop support
+    - STEP value support
 
 ## Expected Results
 

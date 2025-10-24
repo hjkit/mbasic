@@ -209,23 +209,40 @@ This document tracks all optimizations implemented, planned, and possible for th
 - Constant folding for Boolean values
 - Cleaner generated code
 
+### 13. Induction Variable Optimization
+**Status:** ✅ Complete (Detection)
+**Location:** `src/semantic_analyzer.py` - `InductionVariable` class, `_detect_derived_induction_variable()`, `_detect_iv_strength_reduction()`
+**What it does:**
+- Detects primary induction variables (FOR loop control variables)
+- Detects derived induction variables:
+  - `J = I` (copy of IV)
+  - `J = I * constant` (scaled IV)
+  - `J = I + constant` (offset IV)
+- Identifies strength reduction opportunities in array subscripts
+- Example: `A(I * 10)` → can use pointer increment by 10 instead of multiply each iteration
+
+**Example:**
+```basic
+10 FOR I = 1 TO 100
+20   J = I * 5
+30   A(J) = I      ' Can increment J by 5 instead of computing I*5
+40   B(I * 10) = I ' Can use pointer increment by 10
+50 NEXT I
+```
+
+**Benefits:**
+- Replace multiplication with addition in loop bodies
+- Use pointer arithmetic for array access
+- Eliminate redundant IV computations
+- Significant performance gain for array-intensive loops
+
+**TODO:** Actual code transformation (needs code generation phase)
+
 ---
 
 ## 📋 READY TO IMPLEMENT NOW (Semantic Analysis Phase)
 
 These optimizations can be implemented in the semantic analyzer without requiring code generation:
-
-### 1. Induction Variable Optimization
-**Complexity:** Medium-Hard
-**What it does:**
-- Detect induction variables in loops (e.g., `I = I + 1`)
-- Optimize related expressions
-- Example: `A(I*10)` → increment by 10 each iteration instead of multiply
-
-**Implementation:**
-- Extend loop analysis
-- Track linear relationships between variables
-- Generate optimized access patterns
 
 ### 5. Expression Reassociation
 **Complexity:** Medium
@@ -450,7 +467,7 @@ These require actual code generation/transformation, not just analysis:
 ### High Value, High Effort
 1. ✅ Loop-Invariant Detection - DONE (transformation needs codegen)
 2. ✅ Array Flattening - DONE
-3. Induction Variable Optimization - Complex but valuable
+3. ✅ Induction Variable Optimization - DONE (detection complete, transformation needs codegen)
 4. Register Allocation - Needs codegen, critical for performance
 
 ### Low Value for BASIC
@@ -468,9 +485,8 @@ These require actual code generation/transformation, not just analysis:
 
 ### Immediate (Semantic Analysis)
 1. **Range Analysis** - Improves dead code detection
-2. **Induction Variable Optimization** - Critical for array loops
-3. **Forward Substitution** - Eliminate single-use temporaries
-4. **Expression Reassociation** - Exposes constant folding
+2. **Forward Substitution** - Eliminate single-use temporaries
+3. **Expression Reassociation** - Exposes constant folding
 
 ### Short Term (Still Semantic)
 5. **Live Variable Analysis** - Completes the analysis suite
@@ -496,6 +512,7 @@ These require actual code generation/transformation, not just analysis:
 - ✅ Strength reduction - **Standard** (critical optimization)
 - ✅ Copy propagation - **Standard** (dataflow analysis)
 - ✅ Algebraic simplification - **Standard** (Boolean + arithmetic)
+- ✅ Induction variable optimization - **Standard** (IV detection and SR opportunities)
 
 ### What We're Missing (that modern compilers have)
 - ❌ SSA form - Not needed for BASIC's simplicity
@@ -519,11 +536,10 @@ We've implemented a **strong foundation** of compiler optimizations that are:
 3. **Complete for analysis** - Detection and transformation done
 4. **Modern-quality analysis** - Comparable to modern compilers' semantic phase
 
-**Current Status: 12 optimizations implemented!**
+**Current Status: 13 optimizations implemented!**
 
 **What's left for semantic analysis:**
 - Range analysis
-- Induction variable optimization
 - Expression reassociation
 - Forward substitution
 - Live variable analysis
