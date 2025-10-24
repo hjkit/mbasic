@@ -217,6 +217,14 @@ class BranchOptimization:
 
 
 @dataclass
+class UninitializedVariableWarning:
+    """Warning about a potentially uninitialized variable"""
+    line: int  # Line where uninitialized use occurs
+    variable: str  # Variable name
+    context: str  # Description of where it's used (e.g., "in expression", "in PRINT")
+
+
+@dataclass
 class InductionVariable:
     """Information about an induction variable in a loop"""
     variable: str  # Variable name (e.g., "I")
@@ -630,6 +638,10 @@ class SemanticAnalyzer:
         # Branch optimization tracking
         self.branch_optimizations: List[BranchOptimization] = []
 
+        # Uninitialized variable tracking
+        self.uninitialized_warnings: List[UninitializedVariableWarning] = []
+        self.initialized_variables: Set[str] = set()  # Variables that have been assigned
+
         # Induction variable tracking
         self.induction_variables: List[InductionVariable] = []  # All detected induction variables
         self.active_ivs: Dict[str, InductionVariable] = {}  # var_name -> IV (currently in a loop)
@@ -851,6 +863,18 @@ class SemanticAnalyzer:
         if isinstance(stmt, IfStatementNode):
             self._analyze_if(stmt)
 
+        # DEF FN - analyze function body with parameters marked as initialized
+        elif isinstance(stmt, DefFnStatementNode):
+            # Save current state
+            saved_initialized = self.initialized_variables.copy()
+            # Mark parameters as initialized (they are function arguments)
+            for param in stmt.parameters:
+                self.initialized_variables.add(param.name.upper())
+            # Analyze the function body
+            self._analyze_expression(stmt.expression, "DEF FN body")
+            # Restore state (DEF FN has local scope)
+            self.initialized_variables = saved_initialized
+
         # DIM statement - validate and evaluate subscripts
         elif isinstance(stmt, DimStatementNode):
             self._analyze_dim(stmt)
@@ -914,29 +938,44 @@ class SemanticAnalyzer:
             for var in stmt.variables:
                 self._invalidate_expressions(var.name)
                 self.evaluator.clear_constant(var.name)
+                # INPUT initializes the variable
+                self.initialized_variables.add(var.name.upper())
 
         # READ - variables are no longer constants after being read
         elif isinstance(stmt, ReadStatementNode):
             for var in stmt.variables:
                 self._invalidate_expressions(var.name)
                 self.evaluator.clear_constant(var.name)
+                # READ initializes the variable
+                self.initialized_variables.add(var.name.upper())
 
         # LINE INPUT - variables are no longer constants
         elif isinstance(stmt, LineInputStatementNode):
             if hasattr(stmt, 'variable'):
                 self._invalidate_expressions(stmt.variable.name)
                 self.evaluator.clear_constant(stmt.variable.name)
+                # LINE INPUT initializes the variable
+                self.initialized_variables.add(stmt.variable.name.upper())
             elif hasattr(stmt, 'variables'):
                 for var in stmt.variables:
                     self._invalidate_expressions(var.name)
                     self.evaluator.clear_constant(var.name)
+                    # LINE INPUT initializes the variable
+                    self.initialized_variables.add(var.name.upper())
 
         # GOSUB - subroutine call (conservative: invalidate all state)
         elif isinstance(stmt, GosubStatementNode):
             self._analyze_gosub(stmt)
 
+        # PRINT - analyze all expressions
+        elif isinstance(stmt, PrintStatementNode):
+            for expr in stmt.expressions:
+                if expr is not None:  # Skip TAB() separators which are None
+                    self._analyze_expression(expr, "print")
+
         # Check for variable references in expressions
-        if hasattr(stmt, 'expression'):
+        # (but skip DEF FN - already handled above with proper parameter scope)
+        if hasattr(stmt, 'expression') and not isinstance(stmt, DefFnStatementNode):
             self._analyze_expression(stmt.expression)
 
         # For LET/assignment statements, also analyze the LHS variable's subscripts
@@ -1582,6 +1621,10 @@ class SemanticAnalyzer:
 
         # Note: Expression analysis is handled by the generic check in _analyze_statement
 
+        # Track that this variable is now initialized
+        if stmt.variable.subscripts is None:
+            self.initialized_variables.add(var_name)
+
         # Track variable modification in current loop
         if self.current_loop:
             self.current_loop.variables_modified.add(var_name)
@@ -1647,6 +1690,9 @@ class SemanticAnalyzer:
                 is_array=False,
                 first_use_line=self.current_line
             )
+
+        # FOR loop variable is initialized by the loop
+        self.initialized_variables.add(var_name)
 
         # Create loop analysis structure
         loop_analysis = LoopAnalysis(
@@ -1868,6 +1914,18 @@ class SemanticAnalyzer:
                     is_array=is_array,
                     first_use_line=self.current_line
                 )
+
+            # Check for uninitialized variable use (only for simple variables, not arrays)
+            # Note: BASIC defaults all variables to 0, but this is still a useful warning
+            if expr.subscripts is None and var_name not in self.initialized_variables:
+                # Check if this is in a DIM statement or FOR loop (those initialize)
+                # Skip warnings for FOR loop variables as they're initialized by the FOR statement
+                if context not in ("DIM", "FOR start", "FOR end", "FOR step"):
+                    self.uninitialized_warnings.append(UninitializedVariableWarning(
+                        line=self.current_line or 0,
+                        variable=var_name,
+                        context=context
+                    ))
 
             # Track copy propagation opportunities:
             # If this variable is a copy of another variable, record a propagation opportunity
@@ -3239,6 +3297,33 @@ class SemanticAnalyzer:
                         else:
                             lines.append(f"      Suggestion: Remove IF statement entirely")
                         lines.append("")
+
+        # Uninitialized Variable Warnings
+        if self.uninitialized_warnings:
+            lines.append(f"\nUninitialized Variable Warnings:")
+            lines.append(f"  Found {len(self.uninitialized_warnings)} potential use(s) of uninitialized variable(s)")
+            lines.append("")
+
+            # Group warnings by variable
+            warnings_by_var = {}
+            for warning in self.uninitialized_warnings:
+                var_name = warning.variable
+                if var_name not in warnings_by_var:
+                    warnings_by_var[var_name] = []
+                warnings_by_var[var_name].append(warning)
+
+            for var_name, warnings in sorted(warnings_by_var.items()):
+                lines.append(f"  Variable: {var_name}")
+                if len(warnings) == 1:
+                    w = warnings[0]
+                    lines.append(f"    Line {w.line}: Used before assignment in {w.context}")
+                else:
+                    lines.append(f"    Used before assignment at {len(warnings)} location(s):")
+                    for w in warnings:
+                        lines.append(f"      Line {w.line}: {w.context}")
+                lines.append(f"    Note: BASIC defaults uninitialized variables to 0")
+                lines.append(f"    Suggestion: Explicitly initialize before use to avoid bugs")
+                lines.append("")
 
         # Common Subexpression Elimination (CSE)
         if self.common_subexpressions:

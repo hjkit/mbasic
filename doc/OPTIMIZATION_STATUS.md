@@ -353,6 +353,41 @@ This document tracks all optimizations implemented, planned, and possible for th
 
 **TODO:** Actual branch elimination (needs code generation phase)
 
+### 18. Uninitialized Variable Detection
+**Status:** ✅ Complete (Detection/Warning)
+**Location:** `src/semantic_analyzer.py` - `_analyze_expression()`
+**What it does:**
+- Tracks which variables have been assigned before use
+- Detects use-before-assignment errors
+- Warns about potential bugs from uninitialized variables
+- Handles special cases: FOR loops, INPUT, READ, LINE INPUT
+- DEF FN parameter scoping (parameters are initialized)
+
+**Examples:**
+```basic
+10 PRINT X       ' Warning: X used before assignment
+20 X = 10
+
+10 FOR I = 1 TO 10   ' OK: FOR initializes loop variable
+20 PRINT I
+30 NEXT I
+
+10 INPUT A       ' OK: INPUT initializes variable
+20 PRINT A
+
+10 DEF FNTEST(X) = X + Y   ' Warning: Y uninitialized (X is a parameter)
+20 Y = 10
+```
+
+**Benefits:**
+- Catches common programming errors
+- Helps identify typos and logic bugs
+- Documents variable initialization requirements
+- Even though BASIC defaults to 0, explicit initialization is clearer
+- Improves code quality and maintainability
+
+**Note:** BASIC automatically initializes all variables to 0, so this is a warning, not an error. However, it's still useful for catching bugs where the programmer forgot to initialize a variable or misspelled a variable name.
+
 ---
 
 ## 📋 READY TO IMPLEMENT NOW (Semantic Analysis Phase)
@@ -580,16 +615,17 @@ These require actual code generation/transformation, not just analysis:
 2. ✅ **Boolean Simplification** - DONE (NOT inversion, De Morgan, absorption)
 3. ✅ **Forward Substitution** - DONE (Detects single-use temporaries and dead stores)
 4. ✅ **Branch Optimization** - DONE (Constant condition detection, unreachable branch identification)
-5. **Range Analysis** - Improves dead code detection
+5. ✅ **Uninitialized Variable Detection** - DONE (Warns about use-before-assignment)
+6. **Range Analysis** - Improves dead code detection
 
 ### Short Term (Still Semantic)
-6. **Live Variable Analysis** - Completes the analysis suite
-7. **String Optimization** - String constant pooling
+7. **Live Variable Analysis** - Completes the analysis suite
+8. **String Optimization** - String constant pooling
 
 ### Long Term (Code Generation Required)
-8. **Peephole Optimization** - Foundation for codegen
-9. **Register Allocation** - Core of codegen
-10. **Actual Code Motion** - Apply loop-invariant transformation
+9. **Peephole Optimization** - Foundation for codegen
+10. **Register Allocation** - Core of codegen
+11. **Actual Code Motion** - Apply loop-invariant transformation
 
 ---
 
@@ -610,6 +646,7 @@ These require actual code generation/transformation, not just analysis:
 - ✅ Boolean simplification - **Standard** (relational inversion, De Morgan, absorption)
 - ✅ Forward substitution - **Standard** (temporary elimination, dead store detection)
 - ✅ Branch optimization - **Standard** (constant condition evaluation, unreachable code)
+- ✅ Uninitialized variable detection - **Standard** (use-before-definition analysis)
 
 ### What We're Missing (that modern compilers have)
 - ❌ SSA form - Not needed for BASIC's simplicity
@@ -633,7 +670,7 @@ We've implemented a **strong foundation** of compiler optimizations that are:
 3. **Complete for analysis** - Detection and transformation done
 4. **Modern-quality analysis** - Comparable to modern compilers' semantic phase
 
-**Current Status: 17 optimizations implemented!**
+**Current Status: 18 optimizations implemented!**
 
 **What's left for semantic analysis:**
 - Range analysis
