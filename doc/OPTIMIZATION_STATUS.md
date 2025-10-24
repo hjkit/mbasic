@@ -442,21 +442,120 @@ This document tracks all optimizations implemented, planned, and possible for th
 
 ---
 
+### 20. Live Variable Analysis
+**Status:** ✅ Complete (Detection)
+**Location:** `src/semantic_analyzer.py` - `_analyze_live_variables()`, `_update_live_set_for_statement()`
+**What it does:**
+- Performs backward dataflow analysis to track which variables are "live" (will be used later)
+- Identifies dead writes: variables written but never read before program end or reassignment
+- Complements forward substitution and dead store detection
+
+**Algorithm:**
+- Backward dataflow analysis (processes program in reverse order)
+- Iterates until fixpoint (no changes in live variable sets)
+- Tracks live variables at each program point
+- Propagates liveness information along control flow edges
+
+**Dead Write Detection:**
+- Variable written but never read afterwards → dead write
+- Variable overwritten before being read → first write is dead
+- Works across control flow (GOTO, IF-THEN-ELSE, loops)
+
+**Examples:**
+```basic
+10 X = 10
+20 END
+' Dead write: X assigned but never used
+
+10 X = 10
+20 X = 20
+30 PRINT X
+' Dead write at line 10: X overwritten before being read
+
+10 X = 10
+20 IF Y > 5 THEN Z = 20
+30 END
+' Dead write: Z assigned but never used (even though in conditional)
+
+10 X = 0
+20 FOR I = 1 TO 10
+30   X = X + I
+40 NEXT I
+50 PRINT X
+' No dead writes: X is live throughout
+```
+
+**Benefits:**
+- Identifies unused variables and dead code
+- Helps programmers clean up their code
+- Detects logic errors (forgotten variable uses)
+- Foundational for register allocation in code generation
+- Improves code quality and maintainability
+
+**Limitations:**
+- Approximates control flow (conservative analysis)
+- Doesn't track array elements individually (treats whole array as one variable)
+- May miss some dead writes in complex control flow
+
+**TODO:** Use liveness information for register allocation (needs code generation phase)
+
+---
+
+### 21. String Constant Pooling
+**Status:** ✅ Complete (Detection)
+**Location:** `src/semantic_analyzer.py` - `_analyze_string_constants()`, `StringConstantPool`
+**What it does:**
+- Detects duplicate string constants throughout the program
+- Identifies strings appearing 2+ times
+- Generates unique pool IDs (STR1$, STR2$, etc.) for each duplicate string
+- Tracks all occurrences (line numbers) of each string
+- Calculates memory savings from pooling
+- Reports optimization opportunities
+
+**Algorithm:**
+- Recursively collects all string constants from statements and expressions
+- Handles strings in PRINT, LET, IF, FOR, DATA, INPUT prompts
+- Only pools strings that appear multiple times
+- Case-sensitive string matching
+- Calculates size and occurrence count for each string
+
+**Examples:**
+```basic
+10 PRINT "Error"
+20 PRINT "Success"
+30 PRINT "Error"
+40 PRINT "Success"
+50 PRINT "Error"
+60 END
+' "Error" appears 3 times → pool as STR1$ (saves 10 bytes)
+' "Success" appears 2 times → pool as STR2$ (saves 7 bytes)
+```
+
+**Memory Savings Calculation:**
+- For each string: `size * (occurrences - 1)` bytes saved
+- Example: "Error" (5 bytes) × 3 occurrences = 5 × 2 = 10 bytes saved
+
+**Benefits:**
+- Reduces memory usage for string-heavy programs
+- Identifies repeated string constants
+- Suggests variable names for pooled strings
+- Particularly valuable for error messages, prompts, menu items
+- Historical context: Memory was precious in 1980s BASIC
+
+**Limitations:**
+- Detection only (actual pooling requires code generation)
+- Doesn't pool strings appearing only once
+- Case-sensitive (different from some BASIC implementations)
+
+**TODO:** Actual string pooling transformation (needs code generation phase)
+
+---
+
 ## 📋 READY TO IMPLEMENT NOW (Semantic Analysis Phase)
 
 These optimizations can be implemented in the semantic analyzer without requiring code generation:
 
-### Live Variable Analysis
-**Complexity:** Medium
-**What it does:**
-- Track which variables are "live" (will be used later)
-- Detect variables that are written but never read
-- Complement to dead code detection
-
-**Implementation:**
-- Backward dataflow analysis
-- Track variable usage
-- Identify write-only variables
+**All semantic analyses are complete!** The semantic analysis phase is feature-complete.
 
 ---
 
@@ -570,53 +669,39 @@ These require actual code generation/transformation, not just analysis:
 
 ### Analysis Phase
 
-1. **Range Analysis**
-   - Track possible value ranges of variables
-   - Example: `IF X > 0 THEN...` means X > 0 in that branch
-   - Enables more constant propagation and dead code detection
-
-2. **Alias Analysis**
+1. **Alias Analysis**
    - Track which variables/arrays might refer to same memory
    - BASIC doesn't have pointers, so limited applicability
    - Mainly for array optimizations
 
-3. **Live Variable Analysis**
-   - Track which variables are "live" (will be used later)
-   - Detect variables that are written but never read
-   - Complement to dead code detection
-
-4. **Available Expression Analysis**
+2. **Available Expression Analysis**
    - More sophisticated than our current CSE
    - Track which expressions are computed on all paths
    - We do this partially but could be more comprehensive
 
-5. **String Optimization**
-   - Detect string concatenation in loops
-   - String constant pooling
-   - Eliminate temporary string allocations
-
-6. **Function Call Analysis**
+3. **Function Call Analysis**
    - Detect pure functions (no side effects)
    - Enable more aggressive CSE across function calls
    - We handle DEF FN but could be more thorough
 
+4. **String Concatenation in Loops**
+   - Detect string concatenation in loops
+   - Eliminate temporary string allocations
+   - Note: String constant pooling is already done
+
 ### Detection/Warning Phase
 
-7. **Uninitialized Variable Detection**
-   - Warn when variables used before assignment
-   - BASIC defaults to 0, but still useful
-
-8. **Array Bounds Analysis**
+5. **Array Bounds Analysis**
    - Detect out-of-bounds array accesses at compile time
    - We have dimensions; could check constant indices
 
-9. **Type-Based Optimizations**
+6. **Type-Based Optimizations**
    - BASIC has weak typing but could detect mismatches
    - Suggest INTEGER for loop counters (performance)
 
-10. **Memory Access Pattern Analysis**
-    - Detect non-sequential array access
-    - Could suggest array layout changes
+7. **Memory Access Pattern Analysis**
+   - Detect non-sequential array access
+   - Could suggest array layout changes
 
 ---
 
@@ -657,10 +742,8 @@ These require actual code generation/transformation, not just analysis:
 4. ✅ **Branch Optimization** - DONE (Constant condition detection, unreachable branch identification)
 5. ✅ **Uninitialized Variable Detection** - DONE (Warns about use-before-assignment)
 6. ✅ **Range Analysis** - DONE (Tracks value ranges, enables constant propagation)
-
-### Short Term (Still Semantic)
-7. **Live Variable Analysis** - Completes the analysis suite
-8. **String Optimization** - String constant pooling
+7. ✅ **Live Variable Analysis** - DONE (Detects dead writes, foundational for register allocation)
+8. ✅ **String Constant Pooling** - DONE (Detects duplicate strings, suggests pooling)
 
 ### Long Term (Code Generation Required)
 9. **Peephole Optimization** - Foundation for codegen
@@ -688,6 +771,8 @@ These require actual code generation/transformation, not just analysis:
 - ✅ Branch optimization - **Standard** (constant condition evaluation, unreachable code)
 - ✅ Uninitialized variable detection - **Standard** (use-before-definition analysis)
 - ✅ Range analysis - **Standard** (value range propagation)
+- ✅ Live variable analysis - **Standard** (backward dataflow, dead write detection)
+- ✅ String constant pooling - **Standard** (duplicate string detection, memory optimization)
 
 ### What We're Missing (that modern compilers have)
 - ❌ SSA form - Not needed for BASIC's simplicity
@@ -711,11 +796,9 @@ We've implemented a **strong foundation** of compiler optimizations that are:
 3. **Complete for analysis** - Detection and transformation done
 4. **Modern-quality analysis** - Comparable to modern compilers' semantic phase
 
-**Current Status: 19 optimizations implemented!**
+**Current Status: 21 optimizations implemented!**
 
-**What's left for semantic analysis:**
-- Live variable analysis (optional)
-- String optimization (optional)
+**Semantic analysis phase:** ✅ COMPLETE
 
 **What needs code generation:**
 - Peephole optimization

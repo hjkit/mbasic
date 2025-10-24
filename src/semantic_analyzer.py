@@ -297,6 +297,34 @@ class RangeAnalysisInfo:
 
 
 @dataclass
+class LiveVariableInfo:
+    """Information from live variable analysis"""
+    line: int  # Line number
+    live_vars: Set[str] = field(default_factory=set)  # Variables live at this point
+    dead_writes: Set[str] = field(default_factory=set)  # Variables written but never read
+
+
+@dataclass
+class DeadWrite:
+    """Information about a write to a variable that is never read"""
+    line: int  # Line where variable is written
+    variable: str  # Variable name
+    reason: str  # Why it's considered dead (e.g., "never read", "overwritten before read")
+
+
+@dataclass
+class StringConstantPool:
+    """Information about a pooled string constant"""
+    value: str  # The string value
+    pool_id: str  # Suggested pool identifier (e.g., "STR1$")
+    occurrences: List[int] = field(default_factory=list)  # Lines where this string appears
+    size: int = 0  # Length of the string
+
+    def __post_init__(self):
+        self.size = len(self.value)
+
+
+@dataclass
 class InductionVariable:
     """Information about an induction variable in a loop"""
     variable: str  # Variable name (e.g., "I")
@@ -722,6 +750,14 @@ class SemanticAnalyzer:
         self.range_info: List[RangeAnalysisInfo] = []  # All range analysis results
         self.active_ranges: Dict[str, ValueRange] = {}  # var_name -> current known range
 
+        # Live variable analysis tracking
+        self.live_var_info: Dict[int, LiveVariableInfo] = {}  # line -> live variable info
+        self.dead_writes: List[DeadWrite] = []  # All detected dead writes
+
+        # String constant pooling tracking
+        self.string_pool: Dict[str, StringConstantPool] = {}  # string_value -> pool info
+        self.string_pool_counter = 0  # For generating unique pool IDs
+
     def analyze(self, program: ProgramNode) -> bool:
         """
         Analyze a program AST.
@@ -751,6 +787,12 @@ class SemanticAnalyzer:
 
             # Seventh pass: analyze forward substitution opportunities
             self._analyze_forward_substitution(program)
+
+            # Eighth pass: live variable analysis (backward dataflow)
+            self._analyze_live_variables(program)
+
+            # Ninth pass: string constant pooling
+            self._analyze_string_constants(program)
 
             # Generate warnings for required compilation switches
             self._check_compilation_switches()
@@ -3037,7 +3079,11 @@ class SemanticAnalyzer:
         for term in terms:
             val = self.evaluator.evaluate(term)
             if val is not None:
-                constants.append((term, val))
+                # Only reassociate numeric constants, not strings
+                if isinstance(val, (int, float)):
+                    constants.append((term, val))
+                else:
+                    non_constants.append(term)
             else:
                 non_constants.append(term)
 
@@ -3410,6 +3456,323 @@ class SemanticAnalyzer:
             return self._has_side_effects(expr.operand)
         return False
 
+    def _analyze_live_variables(self, program: ProgramNode):
+        """
+        Perform live variable analysis (backward dataflow analysis).
+
+        A variable is "live" at a point if its current value will be used later.
+        This analysis identifies:
+        1. Which variables are live at each program point
+        2. Dead writes (variables written but never read before being overwritten or program end)
+        """
+        # Build a mapping of line numbers to their statements
+        line_map: Dict[int, List[Any]] = {}
+        all_lines = []
+
+        for line in program.lines:
+            if line.line_number is not None:
+                line_map[line.line_number] = line.statements
+                all_lines.append(line.line_number)
+
+        if not all_lines:
+            return
+
+        # Sort lines (for backward iteration)
+        all_lines.sort()
+
+        # Live variables at each program point (after each line)
+        live_after: Dict[int, Set[str]] = {}
+
+        # Initialize: no variables live after the last line
+        for line_num in all_lines:
+            live_after[line_num] = set()
+
+        # Iterate backwards until fixpoint (variables don't change)
+        changed = True
+        max_iterations = 100  # Prevent infinite loops
+        iteration = 0
+
+        while changed and iteration < max_iterations:
+            changed = False
+            iteration += 1
+
+            # Process lines in reverse order
+            for i in range(len(all_lines) - 1, -1, -1):
+                line_num = all_lines[i]
+                statements = line_map[line_num]
+
+                # Start with live variables after this line
+                live = live_after[line_num].copy()
+
+                # Process statements in reverse order
+                for stmt in reversed(statements):
+                    # Update live set based on statement
+                    self._update_live_set_for_statement(stmt, live, line_num, all_lines)
+
+                # live now contains the live variables BEFORE this line
+                # Propagate to predecessors
+                for pred_line in self._get_predecessors(line_num, all_lines, line_map):
+                    old_live = live_after[pred_line].copy()
+                    live_after[pred_line] = live_after[pred_line].union(live)
+                    if live_after[pred_line] != old_live:
+                        changed = True
+
+        # Store results and detect dead writes
+        for line_num in all_lines:
+            self.live_var_info[line_num] = LiveVariableInfo(
+                line=line_num,
+                live_vars=live_after[line_num].copy()
+            )
+
+        # Detect dead writes: assignments where the variable is not live afterwards
+        for line_num in all_lines:
+            statements = line_map[line_num]
+            live_after_line = live_after[line_num]
+
+            for stmt in statements:
+                self._check_statement_for_dead_writes(stmt, line_num, live_after_line)
+
+    def _check_statement_for_dead_writes(self, stmt, line_num: int, live_after_line: Set[str]):
+        """Recursively check a statement for dead writes"""
+        if isinstance(stmt, LetStatementNode):
+            var_name = stmt.variable.name.upper()
+
+            # Skip array assignments (harder to analyze)
+            if stmt.variable.subscripts is not None:
+                return
+
+            # Check if this variable is live after the assignment
+            if var_name not in live_after_line:
+                # This is a dead write!
+                self.dead_writes.append(DeadWrite(
+                    line=line_num,
+                    variable=var_name,
+                    reason="Variable written but never read afterwards"
+                ))
+                # Add to the live var info for this line
+                if line_num in self.live_var_info:
+                    self.live_var_info[line_num].dead_writes.add(var_name)
+
+        elif isinstance(stmt, IfStatementNode):
+            # Check inline statements in THEN and ELSE branches
+            if stmt.then_statements:
+                for then_stmt in stmt.then_statements:
+                    self._check_statement_for_dead_writes(then_stmt, line_num, live_after_line)
+            if stmt.else_statements:
+                for else_stmt in stmt.else_statements:
+                    self._check_statement_for_dead_writes(else_stmt, line_num, live_after_line)
+
+    def _update_live_set_for_statement(self, stmt, live: Set[str], current_line: int, all_lines: List[int]):
+        """Update the live variable set when processing a statement backwards"""
+
+        if isinstance(stmt, LetStatementNode):
+            # Assignment: var = expr
+            var_name = stmt.variable.name.upper()
+
+            # Skip arrays (harder to track)
+            if stmt.variable.subscripts is None:
+                # Variable is defined here, so it's not live before this point
+                # (unless it's used in the RHS)
+                live.discard(var_name)
+
+            # Variables used in the RHS expression are live before this statement
+            self._add_expr_vars_to_live(stmt.expression, live)
+
+            # Variables used in array subscripts are live
+            if stmt.variable.subscripts:
+                for subscript in stmt.variable.subscripts:
+                    self._add_expr_vars_to_live(subscript, live)
+
+        elif isinstance(stmt, IfStatementNode):
+            # Variables in condition are live
+            self._add_expr_vars_to_live(stmt.condition, live)
+
+            # Process inline statements in THEN and ELSE branches
+            if stmt.then_statements:
+                for then_stmt in stmt.then_statements:
+                    self._update_live_set_for_statement(then_stmt, live, current_line, all_lines)
+            if stmt.else_statements:
+                for else_stmt in stmt.else_statements:
+                    self._update_live_set_for_statement(else_stmt, live, current_line, all_lines)
+
+        elif isinstance(stmt, ForStatementNode):
+            # Loop variable is defined by FOR
+            var_name = stmt.variable.name.upper()
+            # (Note: it's also used, so we don't remove it from live set)
+
+            # Variables in start, end, step expressions are live
+            self._add_expr_vars_to_live(stmt.start_expr, live)
+            self._add_expr_vars_to_live(stmt.end_expr, live)
+            if stmt.step_expr:
+                self._add_expr_vars_to_live(stmt.step_expr, live)
+
+        elif isinstance(stmt, PrintStatementNode):
+            # Variables in print expressions are live
+            for expr in stmt.expressions:
+                if expr is not None:
+                    self._add_expr_vars_to_live(expr, live)
+
+        elif isinstance(stmt, InputStatementNode):
+            # INPUT defines variables, so they're not live before this
+            for var in stmt.variables:
+                if isinstance(var, VariableNode) and var.subscripts is None:
+                    live.discard(var.name.upper())
+
+        elif isinstance(stmt, ReadStatementNode):
+            # READ defines variables
+            for var in stmt.variables:
+                if isinstance(var, VariableNode) and var.subscripts is None:
+                    live.discard(var.name.upper())
+
+        # Add more statement types as needed
+
+    def _add_expr_vars_to_live(self, expr, live: Set[str]):
+        """Add all variables used in an expression to the live set"""
+        if expr is None:
+            return
+
+        if isinstance(expr, VariableNode):
+            # Simple variable or array reference
+            live.add(expr.name.upper())
+            # Also process subscripts
+            if expr.subscripts:
+                for subscript in expr.subscripts:
+                    self._add_expr_vars_to_live(subscript, live)
+
+        elif isinstance(expr, BinaryOpNode):
+            self._add_expr_vars_to_live(expr.left, live)
+            self._add_expr_vars_to_live(expr.right, live)
+
+        elif isinstance(expr, UnaryOpNode):
+            self._add_expr_vars_to_live(expr.operand, live)
+
+        elif isinstance(expr, FunctionCallNode):
+            # Variables in function arguments are live
+            for arg in expr.arguments:
+                self._add_expr_vars_to_live(arg, live)
+
+        # Numbers, strings, etc. don't add variables
+
+    def _get_predecessors(self, line_num: int, all_lines: List[int],
+                          line_map: Dict[int, List[Any]]) -> List[int]:
+        """Get all lines that can transfer control to this line"""
+        predecessors = []
+
+        # Sequential predecessor (line just before this one)
+        idx = all_lines.index(line_num)
+        if idx > 0:
+            prev_line = all_lines[idx - 1]
+            # Check if previous line can fall through
+            statements = line_map[prev_line]
+            if statements:
+                last_stmt = statements[-1]
+                # If last statement is not an unconditional jump, can fall through
+                if not isinstance(last_stmt, (GotoStatementNode, EndStatementNode, StopStatementNode)):
+                    predecessors.append(prev_line)
+
+        # Find all GOTO/GOSUB/IF-GOTO that target this line
+        for other_line in all_lines:
+            statements = line_map[other_line]
+            for stmt in statements:
+                if isinstance(stmt, GotoStatementNode):
+                    if stmt.line_number == line_num:
+                        predecessors.append(other_line)
+                elif isinstance(stmt, IfStatementNode):
+                    if stmt.then_line_number == line_num or stmt.else_line_number == line_num:
+                        predecessors.append(other_line)
+                # For/Next also creates control flow, but we approximate here
+
+        return predecessors
+
+    def _analyze_string_constants(self, program: ProgramNode):
+        """
+        Analyze string constants for pooling opportunities.
+
+        Detects duplicate string constants and suggests storing each unique
+        string once for reuse throughout the program.
+        """
+        # Track all string constants and their locations
+        string_occurrences: Dict[str, List[int]] = {}
+
+        for line in program.lines:
+            if line.line_number is None:
+                continue
+
+            for stmt in line.statements:
+                self._collect_string_constants_from_statement(stmt, line.line_number, string_occurrences)
+
+        # Build string pool for strings that appear more than once
+        for string_value, lines in string_occurrences.items():
+            if len(lines) > 1:  # Only pool strings that appear multiple times
+                self.string_pool_counter += 1
+                pool_id = f"STR{self.string_pool_counter}$"
+
+                self.string_pool[string_value] = StringConstantPool(
+                    value=string_value,
+                    pool_id=pool_id,
+                    occurrences=lines
+                )
+
+    def _collect_string_constants_from_statement(self, stmt, line_num: int,
+                                                  string_occurrences: Dict[str, List[int]]):
+        """Recursively collect string constants from a statement"""
+        if isinstance(stmt, LetStatementNode):
+            self._collect_strings_from_expr(stmt.expression, line_num, string_occurrences)
+
+        elif isinstance(stmt, IfStatementNode):
+            self._collect_strings_from_expr(stmt.condition, line_num, string_occurrences)
+            # Process inline statements
+            if stmt.then_statements:
+                for then_stmt in stmt.then_statements:
+                    self._collect_string_constants_from_statement(then_stmt, line_num, string_occurrences)
+            if stmt.else_statements:
+                for else_stmt in stmt.else_statements:
+                    self._collect_string_constants_from_statement(else_stmt, line_num, string_occurrences)
+
+        elif isinstance(stmt, PrintStatementNode):
+            for expr in stmt.expressions:
+                if expr is not None:
+                    self._collect_strings_from_expr(expr, line_num, string_occurrences)
+
+        elif isinstance(stmt, ForStatementNode):
+            self._collect_strings_from_expr(stmt.start_expr, line_num, string_occurrences)
+            self._collect_strings_from_expr(stmt.end_expr, line_num, string_occurrences)
+            if stmt.step_expr:
+                self._collect_strings_from_expr(stmt.step_expr, line_num, string_occurrences)
+
+        elif isinstance(stmt, DataStatementNode):
+            # DATA statements contain expression nodes
+            for value_expr in stmt.values:
+                self._collect_strings_from_expr(value_expr, line_num, string_occurrences)
+
+    def _collect_strings_from_expr(self, expr, line_num: int, string_occurrences: Dict[str, List[int]]):
+        """Recursively collect string constants from an expression"""
+        if expr is None:
+            return
+
+        if isinstance(expr, StringNode):
+            string_value = expr.value
+            if string_value not in string_occurrences:
+                string_occurrences[string_value] = []
+            string_occurrences[string_value].append(line_num)
+
+        elif isinstance(expr, BinaryOpNode):
+            self._collect_strings_from_expr(expr.left, line_num, string_occurrences)
+            self._collect_strings_from_expr(expr.right, line_num, string_occurrences)
+
+        elif isinstance(expr, UnaryOpNode):
+            self._collect_strings_from_expr(expr.operand, line_num, string_occurrences)
+
+        elif isinstance(expr, FunctionCallNode):
+            for arg in expr.arguments:
+                self._collect_strings_from_expr(arg, line_num, string_occurrences)
+
+        elif isinstance(expr, VariableNode):
+            # Check subscripts
+            if expr.subscripts:
+                for subscript in expr.subscripts:
+                    self._collect_strings_from_expr(subscript, line_num, string_occurrences)
+
     def _check_compilation_switches(self):
         """Generate warnings for required compilation switches"""
         switches = self.flags.get_required_switches()
@@ -3644,6 +4007,60 @@ class SemanticAnalyzer:
                     lines.append(f"    Line {r.line}: {r.range} ({r.context})")
                     if r.enabled_optimization:
                         lines.append(f"      Enabled: {r.enabled_optimization}")
+                lines.append("")
+
+        # Live Variable Analysis
+        if self.dead_writes:
+            lines.append(f"\nLive Variable Analysis:")
+            lines.append(f"  Found {len(self.dead_writes)} dead write(s)")
+            lines.append("")
+
+            # Group by variable
+            dead_by_var = {}
+            for dw in self.dead_writes:
+                var_name = dw.variable
+                if var_name not in dead_by_var:
+                    dead_by_var[var_name] = []
+                dead_by_var[var_name].append(dw)
+
+            lines.append("  Dead Writes (variables written but never read):")
+            for var_name, dead_list in sorted(dead_by_var.items()):
+                lines.append(f"  Variable: {var_name}")
+                for dw in dead_list:
+                    lines.append(f"    Line {dw.line}: {dw.reason}")
+                lines.append(f"    Suggestion: Remove assignment or use the variable")
+                lines.append("")
+
+        # String Constant Pooling
+        if self.string_pool:
+            lines.append(f"\nString Constant Pooling:")
+            lines.append(f"  Found {len(self.string_pool)} duplicate string constant(s)")
+            lines.append("")
+
+            # Sort by number of occurrences (most frequent first)
+            sorted_strings = sorted(self.string_pool.values(),
+                                  key=lambda s: len(s.occurrences),
+                                  reverse=True)
+
+            total_bytes_saved = 0
+            for pool_entry in sorted_strings:
+                num_occurrences = len(pool_entry.occurrences)
+                bytes_per_copy = pool_entry.size
+                # Each duplicate saves the string bytes (keeping one copy)
+                bytes_saved = bytes_per_copy * (num_occurrences - 1)
+                total_bytes_saved += bytes_saved
+
+                lines.append(f"  String: \"{pool_entry.value}\"")
+                lines.append(f"    Appears {num_occurrences} times at lines: {', '.join(map(str, pool_entry.occurrences))}")
+                lines.append(f"    Size: {pool_entry.size} bytes")
+                lines.append(f"    Suggested pool ID: {pool_entry.pool_id}")
+                lines.append(f"    Savings: {bytes_saved} bytes (storing {num_occurrences} copies as 1)")
+                lines.append("")
+
+            if total_bytes_saved > 0:
+                lines.append(f"  Total potential memory savings: {total_bytes_saved} bytes")
+                lines.append(f"  Recommendation: Define pooled strings at program start")
+                lines.append(f"    Example: 10 {sorted_strings[0].pool_id} = \"{sorted_strings[0].value}\"")
                 lines.append("")
 
         # Common Subexpression Elimination (CSE)
