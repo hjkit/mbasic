@@ -31,6 +31,15 @@ class VarType(Enum):
     STRING = 4
 
 
+class IntegerSize(Enum):
+    """Size of integer variable (for optimization)"""
+    INT8_SIGNED = 1      # 8-bit signed: -128 to 127
+    INT8_UNSIGNED = 2    # 8-bit unsigned: 0 to 255
+    INT16_SIGNED = 3     # 16-bit signed: -32768 to 32767
+    INT16_UNSIGNED = 4   # 16-bit unsigned: 0 to 65535
+    INT32 = 5            # 32-bit: full range (conservative fallback)
+
+
 class SemanticError(Exception):
     """Semantic analysis error"""
     def __init__(self, message: str, line_num: Optional[int] = None):
@@ -413,6 +422,19 @@ class TypePromotion:
     reason: str  # Why promotion is needed
     expression: str = ""  # The expression causing promotion
     is_safe: bool = True  # Whether promotion preserves value (INT→DOUBLE is safe)
+
+
+@dataclass
+class IntegerRangeInfo:
+    """Range information for integer size inference"""
+    variable: str  # Variable name
+    integer_size: IntegerSize  # Inferred size (8/16/32-bit)
+    min_value: Optional[int] = None  # Minimum possible value
+    max_value: Optional[int] = None  # Maximum possible value
+    is_constant: bool = False  # Always the same value?
+    constant_value: Optional[int] = None  # If constant, what value?
+    reason: str = ""  # Why this size was chosen
+    line: int = 0  # Where determined
 
 
 @dataclass
@@ -877,6 +899,10 @@ class SemanticAnalyzer:
         self.variable_current_type: Dict[str, str] = {}  # var_name -> current type at each point
         self.promotion_points: Dict[str, List[int]] = {}  # var_name -> [lines where promoted]
 
+        # Integer size inference tracking (8/16/32-bit optimization)
+        self.integer_ranges: List[IntegerRangeInfo] = []  # All integer size inferences
+        self.variable_integer_size: Dict[str, IntegerRangeInfo] = {}  # var_name -> size info
+
         # Iterative optimization tracking
         self.optimization_iterations = 0  # Number of iterations performed
         self.optimization_converged = False  # Whether fixed point was reached
@@ -943,6 +969,7 @@ class SemanticAnalyzer:
                 self._analyze_available_expressions(program)
                 self._analyze_variable_type_bindings(program)
                 self._analyze_type_promotions(program)  # Phase 2: detect INT→DOUBLE promotions
+                self._analyze_integer_sizes(program)  # Integer size inference (8/16/32-bit)
 
                 # Count optimizations after this iteration
                 count_after = self._count_optimizations()
@@ -5230,6 +5257,156 @@ class SemanticAnalyzer:
         }
         return (from_type, to_type) in safe_promotions
 
+    # =================================================================
+    # INTEGER SIZE INFERENCE (8/16/32-bit optimization)
+    # =================================================================
+
+    def _analyze_integer_sizes(self, program):
+        """
+        Analyze integer sizes for optimization (8-bit, 16-bit, 32-bit).
+
+        Detects when variables can use smaller integer types:
+        - FOR I = 1 TO 10: I can be 8-bit unsigned (0-255)
+        - C = ASC(A$): C is 8-bit unsigned (0-255)
+        - FOR I = -50 TO 50: I is 8-bit signed (-128 to 127)
+        """
+        for line in program.lines:
+            for stmt in line.statements:
+                # Analyze FOR loops for counter size
+                if isinstance(stmt, ForStatementNode):
+                    self._analyze_for_loop_integer_size(stmt, line.line_number)
+
+                # Analyze assignments for function returns
+                elif isinstance(stmt, LetStatementNode):
+                    self._analyze_assignment_integer_size(stmt, line.line_number)
+
+    def _analyze_for_loop_integer_size(self, stmt: ForStatementNode, line: int):
+        """Determine optimal integer size for FOR loop counter"""
+        var_name = stmt.variable.name.upper()
+        if stmt.variable.type_suffix:
+            var_name += stmt.variable.type_suffix
+
+        # Try to evaluate loop bounds
+        start_val = self.evaluator.evaluate(stmt.start_expr)
+        end_val = self.evaluator.evaluate(stmt.end_expr)
+        step_val = self.evaluator.evaluate(stmt.step_expr) if stmt.step_expr else 1
+
+        if start_val is not None and end_val is not None and step_val is not None:
+            # Determine actual range
+            if step_val > 0:
+                min_val = start_val
+                max_val = end_val
+            elif step_val < 0:
+                min_val = end_val
+                max_val = start_val
+            else:
+                # Step is 0 - infinite loop, be conservative
+                min_val = min(start_val, end_val)
+                max_val = max(start_val, end_val)
+
+            # Infer size from range
+            integer_size = self._infer_size_from_range(min_val, max_val)
+
+            # Create range info
+            range_info = IntegerRangeInfo(
+                variable=var_name,
+                integer_size=integer_size,
+                min_value=min_val,
+                max_value=max_val,
+                is_constant=False,
+                reason=f"FOR loop with constant bounds ({min_val} to {max_val})",
+                line=line
+            )
+
+            self.integer_ranges.append(range_info)
+            self.variable_integer_size[var_name] = range_info
+
+    def _analyze_assignment_integer_size(self, stmt: LetStatementNode, line: int):
+        """Analyze assignment for integer size (especially function returns)"""
+        var_name = stmt.variable.name.upper()
+        if stmt.variable.type_suffix:
+            var_name += stmt.variable.type_suffix
+
+        # Check if RHS is a function call that returns known size
+        if isinstance(stmt.expression, FunctionCallNode):
+            func_name = stmt.expression.name.upper()
+            integer_size = self._get_function_return_size(func_name)
+
+            if integer_size != IntegerSize.INT32:  # Only record if we know something useful
+                # Get range for this size
+                min_val, max_val = self._get_range_for_size(integer_size)
+
+                range_info = IntegerRangeInfo(
+                    variable=var_name,
+                    integer_size=integer_size,
+                    min_value=min_val,
+                    max_value=max_val,
+                    is_constant=False,
+                    reason=f"Result of {func_name}() which returns {integer_size.name}",
+                    line=line
+                )
+
+                self.integer_ranges.append(range_info)
+                self.variable_integer_size[var_name] = range_info
+
+    def _get_function_return_size(self, func_name: str) -> IntegerSize:
+        """Determine integer size of function return value"""
+        func_upper = func_name.upper()
+
+        # String functions return UNSIGNED 8-bit (0-255)
+        if func_upper in {'LEN', 'ASC', 'PEEK', 'INP', 'INSTR'}:
+            return IntegerSize.INT8_UNSIGNED
+
+        # Small-range functions return SIGNED 8-bit or UNSIGNED 8-bit
+        if func_upper == 'POS':  # Cursor position 0-79
+            return IntegerSize.INT8_UNSIGNED
+        if func_upper == 'CSRLIN':  # Cursor line 0-24
+            return IntegerSize.INT8_UNSIGNED
+        if func_upper == 'SGN':  # Sign: -1, 0, or 1
+            return IntegerSize.INT8_SIGNED
+        if func_upper == 'EOF':  # 0 or -1
+            return IntegerSize.INT8_SIGNED
+
+        # 16-bit functions
+        if func_upper in {'LOF', 'FRE', 'VARPTR', 'CVI'}:
+            return IntegerSize.INT16_UNSIGNED
+
+        # Unknown - be conservative
+        return IntegerSize.INT32
+
+    def _infer_size_from_range(self, min_val: int, max_val: int) -> IntegerSize:
+        """Infer integer size from value range"""
+        # Check if negative (needs signed)
+        if min_val < 0:
+            # Signed range
+            if -128 <= min_val <= 127 and -128 <= max_val <= 127:
+                return IntegerSize.INT8_SIGNED
+            elif -32768 <= min_val <= 32767 and -32768 <= max_val <= 32767:
+                return IntegerSize.INT16_SIGNED
+            else:
+                return IntegerSize.INT32
+        else:
+            # Unsigned range (0 or positive)
+            if max_val <= 255:
+                return IntegerSize.INT8_UNSIGNED
+            elif max_val <= 65535:
+                return IntegerSize.INT16_UNSIGNED
+            else:
+                return IntegerSize.INT32
+
+    def _get_range_for_size(self, size: IntegerSize) -> Tuple[int, int]:
+        """Get min/max range for a given integer size"""
+        if size == IntegerSize.INT8_SIGNED:
+            return (-128, 127)
+        elif size == IntegerSize.INT8_UNSIGNED:
+            return (0, 255)
+        elif size == IntegerSize.INT16_SIGNED:
+            return (-32768, 32767)
+        elif size == IntegerSize.INT16_UNSIGNED:
+            return (0, 65535)
+        else:  # INT32
+            return (-2147483648, 2147483647)
+
     def _get_string_concat_impact(self, loop_info, estimated_allocations: int) -> str:
         """Determine the performance impact of string concatenation in a loop"""
         if loop_info.iteration_count:
@@ -5292,6 +5469,10 @@ class SemanticAnalyzer:
         self.variable_current_type.clear()
         self.promotion_points.clear()
 
+        # Integer size inference
+        self.integer_ranges.clear()
+        self.variable_integer_size.clear()
+
         # Strength reduction
         self.strength_reductions.clear()
 
@@ -5346,6 +5527,7 @@ class SemanticAnalyzer:
             len(self.dead_writes) +
             len(self.type_bindings) +
             len(self.type_promotions) +
+            len(self.integer_ranges) +
             len(self.strength_reductions) +
             len(self.expression_reassociations) +
             len(self.copy_propagations) +
@@ -5970,6 +6152,55 @@ class SemanticAnalyzer:
                     lines.append(f"      Reason: {promo.reason}")
                     if promo.expression:
                         lines.append(f"      Expression: {promo.expression}")
+                lines.append("")
+
+        # Integer Size Inference (8/16/32-bit optimization)
+        if self.integer_ranges:
+            lines.append(f"\nInteger Size Inference (8/16/32-bit optimization):")
+            lines.append(f"  Found {len(self.integer_ranges)} variable(s) with optimizable integer sizes")
+            lines.append("")
+
+            # Group by size
+            by_size: Dict[IntegerSize, List[IntegerRangeInfo]] = {}
+            for range_info in self.integer_ranges:
+                if range_info.integer_size not in by_size:
+                    by_size[range_info.integer_size] = []
+                by_size[range_info.integer_size].append(range_info)
+
+            # Show 8-bit unsigned (most common and important!)
+            if IntegerSize.INT8_UNSIGNED in by_size:
+                ranges = by_size[IntegerSize.INT8_UNSIGNED]
+                lines.append(f"  8-bit UNSIGNED (0-255): {len(ranges)} variable(s)")
+                for r in sorted(ranges, key=lambda x: x.variable):
+                    lines.append(f"    {r.variable}: range {r.min_value}-{r.max_value}")
+                    lines.append(f"      Line {r.line}: {r.reason}")
+                lines.append("")
+
+            # Show 8-bit signed
+            if IntegerSize.INT8_SIGNED in by_size:
+                ranges = by_size[IntegerSize.INT8_SIGNED]
+                lines.append(f"  8-bit SIGNED (-128 to 127): {len(ranges)} variable(s)")
+                for r in sorted(ranges, key=lambda x: x.variable):
+                    lines.append(f"    {r.variable}: range {r.min_value}-{r.max_value}")
+                    lines.append(f"      Line {r.line}: {r.reason}")
+                lines.append("")
+
+            # Show 16-bit unsigned
+            if IntegerSize.INT16_UNSIGNED in by_size:
+                ranges = by_size[IntegerSize.INT16_UNSIGNED]
+                lines.append(f"  16-bit UNSIGNED (0-65535): {len(ranges)} variable(s)")
+                for r in sorted(ranges, key=lambda x: x.variable):
+                    lines.append(f"    {r.variable}: range {r.min_value}-{r.max_value}")
+                    lines.append(f"      Line {r.line}: {r.reason}")
+                lines.append("")
+
+            # Show 16-bit signed
+            if IntegerSize.INT16_SIGNED in by_size:
+                ranges = by_size[IntegerSize.INT16_SIGNED]
+                lines.append(f"  16-bit SIGNED (-32768 to 32767): {len(ranges)} variable(s)")
+                for r in sorted(ranges, key=lambda x: x.variable):
+                    lines.append(f"    {r.variable}: range {r.min_value}-{r.max_value}")
+                    lines.append(f"      Line {r.line}: {r.reason}")
                 lines.append("")
 
         # Warnings
