@@ -1,0 +1,2 @@
+10 PRINT "Hello from MBASIC!"
+20 SYSTEM
