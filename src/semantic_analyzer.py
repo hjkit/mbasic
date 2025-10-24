@@ -225,6 +225,78 @@ class UninitializedVariableWarning:
 
 
 @dataclass
+class ValueRange:
+    """Represents a range of possible values for a variable"""
+    min_value: Optional[Union[int, float]] = None  # Minimum possible value (None = unbounded)
+    max_value: Optional[Union[int, float]] = None  # Maximum possible value (None = unbounded)
+    is_constant: bool = False  # True if min_value == max_value (known constant)
+
+    def __repr__(self):
+        if self.is_constant and self.min_value is not None:
+            return f"[{self.min_value}]"
+        elif self.min_value is not None and self.max_value is not None:
+            return f"[{self.min_value}, {self.max_value}]"
+        elif self.min_value is not None:
+            return f"[{self.min_value}, +∞)"
+        elif self.max_value is not None:
+            return f"(-∞, {self.max_value}]"
+        else:
+            return "(-∞, +∞)"
+
+    def intersect(self, other: 'ValueRange') -> 'ValueRange':
+        """Compute intersection of two ranges"""
+        new_min = None
+        new_max = None
+
+        # Compute min
+        if self.min_value is not None and other.min_value is not None:
+            new_min = max(self.min_value, other.min_value)
+        elif self.min_value is not None:
+            new_min = self.min_value
+        elif other.min_value is not None:
+            new_min = other.min_value
+
+        # Compute max
+        if self.max_value is not None and other.max_value is not None:
+            new_max = min(self.max_value, other.max_value)
+        elif self.max_value is not None:
+            new_max = self.max_value
+        elif other.max_value is not None:
+            new_max = other.max_value
+
+        is_const = (new_min is not None and new_max is not None and new_min == new_max)
+        return ValueRange(new_min, new_max, is_const)
+
+    def union(self, other: 'ValueRange') -> 'ValueRange':
+        """Compute union of two ranges (conservative merge)"""
+        new_min = None
+        new_max = None
+
+        # Compute min (take the minimum of both)
+        if self.min_value is not None and other.min_value is not None:
+            new_min = min(self.min_value, other.min_value)
+        # If either is unbounded below, result is unbounded below
+
+        # Compute max (take the maximum of both)
+        if self.max_value is not None and other.max_value is not None:
+            new_max = max(self.max_value, other.max_value)
+        # If either is unbounded above, result is unbounded above
+
+        is_const = (new_min is not None and new_max is not None and new_min == new_max)
+        return ValueRange(new_min, new_max, is_const)
+
+
+@dataclass
+class RangeAnalysisInfo:
+    """Information from range analysis"""
+    line: int  # Line where range was determined
+    variable: str  # Variable name
+    range: ValueRange  # The determined range
+    context: str  # Description (e.g., "after IF X > 0", "in THEN branch")
+    enabled_optimization: Optional[str] = None  # What optimization this enabled
+
+
+@dataclass
 class InductionVariable:
     """Information about an induction variable in a loop"""
     variable: str  # Variable name (e.g., "I")
@@ -645,6 +717,10 @@ class SemanticAnalyzer:
         # Induction variable tracking
         self.induction_variables: List[InductionVariable] = []  # All detected induction variables
         self.active_ivs: Dict[str, InductionVariable] = {}  # var_name -> IV (currently in a loop)
+
+        # Range analysis tracking
+        self.range_info: List[RangeAnalysisInfo] = []  # All range analysis results
+        self.active_ranges: Dict[str, ValueRange] = {}  # var_name -> current known range
 
     def analyze(self, program: ProgramNode) -> bool:
         """
@@ -1361,26 +1437,42 @@ class SemanticAnalyzer:
             # Save current state (both constants and available expressions)
             constants_before = self.evaluator.runtime_constants.copy()
             available_before = self.available_expressions.copy()
+            ranges_before = self.active_ranges.copy()
+
+            # Extract ranges from the condition for both branches
+            then_ranges = self._extract_range_from_condition(stmt.condition, then_branch=True)
+            else_ranges = self._extract_range_from_condition(stmt.condition, then_branch=False)
 
             # Analyze THEN branch
             then_constants = None
             then_available = None
+            then_final_ranges = None
             if stmt.then_statements:
+                # Apply THEN-specific ranges
+                self._apply_ranges(then_ranges, f"IF condition (THEN branch)")
+
                 for then_stmt in stmt.then_statements:
                     self._analyze_statement(then_stmt)
                 then_constants = self.evaluator.runtime_constants.copy()
                 then_available = self.available_expressions.copy()
+                then_final_ranges = self.active_ranges.copy()
 
             # Restore state and analyze ELSE branch
             self.evaluator.runtime_constants = constants_before.copy()
             self.available_expressions = available_before.copy()
+            self.active_ranges = ranges_before.copy()
             else_constants = None
             else_available = None
+            else_final_ranges = None
             if stmt.else_statements:
+                # Apply ELSE-specific ranges
+                self._apply_ranges(else_ranges, f"IF condition (ELSE branch)")
+
                 for else_stmt in stmt.else_statements:
                     self._analyze_statement(else_stmt)
                 else_constants = self.evaluator.runtime_constants.copy()
                 else_available = self.available_expressions.copy()
+                else_final_ranges = self.active_ranges.copy()
 
             # Merge runtime constants: a variable is only constant after the IF if it has the same
             # constant value in both branches (or only one branch exists)
@@ -1437,6 +1529,39 @@ class SemanticAnalyzer:
             else:
                 # No branches - restore original state
                 self.available_expressions = available_before
+
+            # Merge ranges: take the union of ranges from both branches
+            if then_final_ranges is not None and else_final_ranges is not None:
+                # Both branches exist - merge ranges conservatively
+                merged_ranges = {}
+
+                # Get all variables that have ranges in either branch
+                all_vars = set(then_final_ranges.keys()) | set(else_final_ranges.keys())
+
+                for var_name in all_vars:
+                    then_range = then_final_ranges.get(var_name)
+                    else_range = else_final_ranges.get(var_name)
+
+                    if then_range and else_range:
+                        # Variable has range in both branches - merge with union
+                        merged_ranges[var_name] = then_range.union(else_range)
+                    elif then_range:
+                        # Only in THEN branch - union with unbounded (from ELSE)
+                        merged_ranges[var_name] = then_range.union(ValueRange())
+                    elif else_range:
+                        # Only in ELSE branch - union with unbounded (from THEN)
+                        merged_ranges[var_name] = else_range.union(ValueRange())
+
+                self.active_ranges = merged_ranges
+            elif then_final_ranges is not None:
+                # Only THEN branch exists
+                self.active_ranges = then_final_ranges
+            elif else_final_ranges is not None:
+                # Only ELSE branch exists
+                self.active_ranges = else_final_ranges
+            else:
+                # No branches - restore original state
+                self.active_ranges = ranges_before
 
         # Analyze the condition expression itself for variable references
         # Don't track folding since we already evaluated it above
@@ -1639,6 +1764,9 @@ class SemanticAnalyzer:
 
         # Invalidate CSE: any expression using this variable is no longer available
         self._invalidate_expressions(var_name)
+
+        # Clear range information: variable is being reassigned
+        self._clear_range(var_name)
 
         # Track runtime constants: if this is a simple variable (not array) assignment
         # and the expression evaluates to a constant, track it
@@ -1881,6 +2009,167 @@ class SemanticAnalyzer:
                 self.current_loop = self.loop_analysis_stack.pop()
             else:
                 self.current_loop = None
+
+    def _extract_range_from_condition(self, condition, then_branch: bool) -> Dict[str, ValueRange]:
+        """
+        Extract value ranges from a conditional expression.
+
+        Args:
+            condition: The condition expression (e.g., X > 5)
+            then_branch: True if analyzing THEN branch, False for ELSE
+
+        Returns:
+            Dictionary mapping variable names to their ranges
+        """
+        ranges = {}
+
+        if not isinstance(condition, BinaryOpNode):
+            return ranges
+
+        # Handle relational operators
+        op = condition.operator
+        left = condition.left
+        right = condition.right
+
+        # Only handle simple cases: variable compared to constant
+        var_node = None
+        const_value = None
+
+        # Check if left is variable and right is constant
+        if isinstance(left, VariableNode) and left.subscripts is None:
+            const_value = self.evaluator.evaluate(right)
+            if const_value is not None:
+                var_node = left
+                left_is_var = True
+        # Check if right is variable and left is constant
+        elif isinstance(right, VariableNode) and right.subscripts is None:
+            const_value = self.evaluator.evaluate(left)
+            if const_value is not None:
+                var_node = right
+                left_is_var = False
+
+        if var_node is None or const_value is None:
+            return ranges
+
+        var_name = var_node.name.upper()
+
+        # Determine the range based on operator and branch
+        # For THEN branch, condition is true
+        # For ELSE branch, condition is false (invert it)
+
+        if left_is_var:
+            # Variable on left: X > 5, X >= 5, X < 5, X <= 5, X = 5, X <> 5
+            if op == TokenType.GREATER_THAN:
+                if then_branch:
+                    # X > const means X in (const, +∞)
+                    ranges[var_name] = ValueRange(min_value=const_value + (1 if isinstance(const_value, int) else 0.001))
+                else:
+                    # NOT(X > const) means X <= const
+                    ranges[var_name] = ValueRange(max_value=const_value)
+            elif op == TokenType.GREATER_EQUAL:
+                if then_branch:
+                    # X >= const
+                    ranges[var_name] = ValueRange(min_value=const_value)
+                else:
+                    # NOT(X >= const) means X < const
+                    ranges[var_name] = ValueRange(max_value=const_value - (1 if isinstance(const_value, int) else 0.001))
+            elif op == TokenType.LESS_THAN:
+                if then_branch:
+                    # X < const
+                    ranges[var_name] = ValueRange(max_value=const_value - (1 if isinstance(const_value, int) else 0.001))
+                else:
+                    # NOT(X < const) means X >= const
+                    ranges[var_name] = ValueRange(min_value=const_value)
+            elif op == TokenType.LESS_EQUAL:
+                if then_branch:
+                    # X <= const
+                    ranges[var_name] = ValueRange(max_value=const_value)
+                else:
+                    # NOT(X <= const) means X > const
+                    ranges[var_name] = ValueRange(min_value=const_value + (1 if isinstance(const_value, int) else 0.001))
+            elif op == TokenType.EQUAL:
+                if then_branch:
+                    # X = const
+                    ranges[var_name] = ValueRange(min_value=const_value, max_value=const_value, is_constant=True)
+                # For ELSE (X <> const), range is unbounded
+            elif op == TokenType.NOT_EQUAL:
+                if not then_branch:
+                    # NOT(X <> const) means X = const
+                    ranges[var_name] = ValueRange(min_value=const_value, max_value=const_value, is_constant=True)
+                # For THEN (X <> const), range is unbounded
+        else:
+            # Constant on left: 5 > X, 5 >= X, 5 < X, 5 <= X, 5 = X, 5 <> X
+            # Flip the operator
+            if op == TokenType.GREATER_THAN:
+                if then_branch:
+                    # const > X means X < const
+                    ranges[var_name] = ValueRange(max_value=const_value - (1 if isinstance(const_value, int) else 0.001))
+                else:
+                    # NOT(const > X) means X >= const
+                    ranges[var_name] = ValueRange(min_value=const_value)
+            elif op == TokenType.GREATER_EQUAL:
+                if then_branch:
+                    # const >= X means X <= const
+                    ranges[var_name] = ValueRange(max_value=const_value)
+                else:
+                    # NOT(const >= X) means X > const
+                    ranges[var_name] = ValueRange(min_value=const_value + (1 if isinstance(const_value, int) else 0.001))
+            elif op == TokenType.LESS_THAN:
+                if then_branch:
+                    # const < X means X > const
+                    ranges[var_name] = ValueRange(min_value=const_value + (1 if isinstance(const_value, int) else 0.001))
+                else:
+                    # NOT(const < X) means X <= const
+                    ranges[var_name] = ValueRange(max_value=const_value)
+            elif op == TokenType.LESS_EQUAL:
+                if then_branch:
+                    # const <= X means X >= const
+                    ranges[var_name] = ValueRange(min_value=const_value)
+                else:
+                    # NOT(const <= X) means X < const
+                    ranges[var_name] = ValueRange(max_value=const_value - (1 if isinstance(const_value, int) else 0.001))
+            elif op == TokenType.EQUAL:
+                if then_branch:
+                    # const = X means X = const
+                    ranges[var_name] = ValueRange(min_value=const_value, max_value=const_value, is_constant=True)
+            elif op == TokenType.NOT_EQUAL:
+                if not then_branch:
+                    # NOT(const <> X) means X = const
+                    ranges[var_name] = ValueRange(min_value=const_value, max_value=const_value, is_constant=True)
+
+        return ranges
+
+    def _apply_ranges(self, ranges: Dict[str, ValueRange], context: str):
+        """Apply ranges to active_ranges, intersecting with existing ranges"""
+        for var_name, new_range in ranges.items():
+            if var_name in self.active_ranges:
+                # Intersect with existing range
+                self.active_ranges[var_name] = self.active_ranges[var_name].intersect(new_range)
+            else:
+                # New range
+                self.active_ranges[var_name] = new_range
+
+            # Record this range analysis
+            self.range_info.append(RangeAnalysisInfo(
+                line=self.current_line or 0,
+                variable=var_name,
+                range=self.active_ranges[var_name],
+                context=context
+            ))
+
+            # Check if this range is a constant - if so, add to runtime constants!
+            if self.active_ranges[var_name].is_constant:
+                const_val = self.active_ranges[var_name].min_value
+                if const_val is not None:
+                    # Record that this enabled constant propagation
+                    self.range_info[-1].enabled_optimization = f"Constant propagation: {var_name} = {const_val}"
+                    self.evaluator.set_constant(var_name, const_val)
+
+    def _clear_range(self, var_name: str):
+        """Clear range information for a variable (when it's reassigned)"""
+        var_name_upper = var_name.upper()
+        if var_name_upper in self.active_ranges:
+            del self.active_ranges[var_name_upper]
 
     def _analyze_expression(self, expr, context: str = "expression", track_folding: bool = True, track_cse: bool = True):
         """
@@ -3333,6 +3622,28 @@ class SemanticAnalyzer:
                         lines.append(f"      Line {w.line}: {w.context}")
                 lines.append(f"    Note: BASIC defaults uninitialized variables to 0")
                 lines.append(f"    Suggestion: Explicitly initialize before use to avoid bugs")
+                lines.append("")
+
+        # Range Analysis
+        if self.range_info:
+            lines.append(f"\nRange Analysis:")
+            lines.append(f"  Found {len(self.range_info)} value range determination(s)")
+            lines.append("")
+
+            # Group by variable
+            ranges_by_var = {}
+            for range_info in self.range_info:
+                var_name = range_info.variable
+                if var_name not in ranges_by_var:
+                    ranges_by_var[var_name] = []
+                ranges_by_var[var_name].append(range_info)
+
+            for var_name, range_list in sorted(ranges_by_var.items()):
+                lines.append(f"  Variable: {var_name}")
+                for r in range_list:
+                    lines.append(f"    Line {r.line}: {r.range} ({r.context})")
+                    if r.enabled_optimization:
+                        lines.append(f"      Enabled: {r.enabled_optimization}")
                 lines.append("")
 
         # Common Subexpression Elimination (CSE)

@@ -390,33 +390,73 @@ This document tracks all optimizations implemented, planned, and possible for th
 
 ---
 
+### 19. Range Analysis
+**Status:** ✅ Complete (Detection)
+**Location:** `src/semantic_analyzer.py` - `_extract_range_from_condition()`, `_apply_ranges()`
+**What it does:**
+- Tracks possible value ranges of variables through conditional statements
+- Extracts ranges from relational operators in IF conditions
+- Example: `IF X > 5 THEN...` means X ∈ (5, +∞) in THEN branch
+- Intersects ranges from nested conditions
+- Merges ranges conservatively at branch join points
+- Clears ranges when variables are reassigned
+
+**Range Extraction:**
+- From THEN branch: X > 5 → X ∈ (6, +∞), X >= 5 → X ∈ [5, +∞), X < 5 → X ∈ (-∞, 4), X <= 5 → X ∈ (-∞, 5]
+- From ELSE branch: Inverts the condition (NOT(X > 5) means X <= 5)
+- Handles both orientations: X > 5 and 5 < X
+- Equality: X = 5 creates constant range [5, 5]
+
+**Enables Constant Propagation:**
+- When range becomes constant (min = max), automatically promotes to runtime constant
+- Example: `IF X = 10 THEN Y = X + 5` → X is known to be 10, so Y = 15
+
+**Examples:**
+```basic
+10 INPUT X
+20 IF X > 5 THEN
+30   PRINT X        ' X ∈ (5, +∞)
+40 ELSE
+50   PRINT X        ' X ∈ (-∞, 5]
+60 END IF
+
+10 INPUT X
+20 IF X = 10 THEN
+30   Y = X + 5      ' X = 10 (constant!), Y = 15 via constant propagation
+40 END IF
+
+10 INPUT X
+20 IF X > 10 THEN IF X < 20 THEN
+30   PRINT X        ' X ∈ (10, 20) via range intersection
+40 END IF
+```
+
+**Benefits:**
+- Enables more aggressive constant propagation
+- Improves dead code detection (unreachable branches)
+- Provides better program understanding
+- Helps catch logic errors (impossible conditions)
+- Foundation for array bounds checking
+
+**TODO:** Actual dead code elimination (needs code generation phase)
+
+---
+
 ## 📋 READY TO IMPLEMENT NOW (Semantic Analysis Phase)
 
 These optimizations can be implemented in the semantic analyzer without requiring code generation:
 
-### 7. Range Analysis
+### Live Variable Analysis
 **Complexity:** Medium
 **What it does:**
-- Track possible value ranges of variables
-- Example: `IF X > 0 THEN...` means X > 0 in that branch
-- Enables more constant propagation and dead code detection
+- Track which variables are "live" (will be used later)
+- Detect variables that are written but never read
+- Complement to dead code detection
 
 **Implementation:**
-- Extend IF analysis
-- Track value ranges per code path
-- More aggressive constant propagation
-
-### 8. Branch Optimization
-**Complexity:** Medium
-**What it does:**
-- Compile-time IF evaluation (already partially done)
-- Detect always-true/always-false conditions
-- Eliminate impossible branches
-
-**Implementation:**
-- Extend IF analysis
-- Track value ranges
-- More aggressive constant propagation into conditions
+- Backward dataflow analysis
+- Track variable usage
+- Identify write-only variables
 
 ---
 
@@ -616,7 +656,7 @@ These require actual code generation/transformation, not just analysis:
 3. ✅ **Forward Substitution** - DONE (Detects single-use temporaries and dead stores)
 4. ✅ **Branch Optimization** - DONE (Constant condition detection, unreachable branch identification)
 5. ✅ **Uninitialized Variable Detection** - DONE (Warns about use-before-assignment)
-6. **Range Analysis** - Improves dead code detection
+6. ✅ **Range Analysis** - DONE (Tracks value ranges, enables constant propagation)
 
 ### Short Term (Still Semantic)
 7. **Live Variable Analysis** - Completes the analysis suite
@@ -647,6 +687,7 @@ These require actual code generation/transformation, not just analysis:
 - ✅ Forward substitution - **Standard** (temporary elimination, dead store detection)
 - ✅ Branch optimization - **Standard** (constant condition evaluation, unreachable code)
 - ✅ Uninitialized variable detection - **Standard** (use-before-definition analysis)
+- ✅ Range analysis - **Standard** (value range propagation)
 
 ### What We're Missing (that modern compilers have)
 - ❌ SSA form - Not needed for BASIC's simplicity
@@ -670,11 +711,11 @@ We've implemented a **strong foundation** of compiler optimizations that are:
 3. **Complete for analysis** - Detection and transformation done
 4. **Modern-quality analysis** - Comparable to modern compilers' semantic phase
 
-**Current Status: 18 optimizations implemented!**
+**Current Status: 19 optimizations implemented!**
 
 **What's left for semantic analysis:**
-- Range analysis
-- Live variable analysis
+- Live variable analysis (optional)
+- String optimization (optional)
 
 **What needs code generation:**
 - Peephole optimization
