@@ -184,29 +184,38 @@ This document tracks all optimizations implemented, planned, and possible for th
 - Enables further optimizations
 - Identifies dead code (unused copies)
 
+### 12. Algebraic Simplification
+**Status:** ✅ Complete
+**Location:** `src/semantic_analyzer.py` - `_apply_strength_reduction()`, `_apply_algebraic_simplification()`
+**What it does:**
+- Boolean identities: `X AND 0` → `0`, `X AND -1` → `X`, `X OR 0` → `X`, `X OR -1` → `-1`
+- Boolean self-operations: `X AND X` → `X`, `X OR X` → `X`, `X XOR X` → `0`
+- XOR identities: `X XOR 0` → `X`
+- Double negation: `NOT(NOT X)` → `X`, `-(-X)` → `X`
+- NOT constants: `NOT 0` → `-1`, `NOT -1` → `0`
+- Negation of zero: `-(0)` → `0`
+- Arithmetic identities (from Strength Reduction): `X * 1`, `X + 0`, `X - 0`, `X / 1`, etc.
+
+**Example:**
+```basic
+10 X = A AND -1   ' → X = A (eliminate AND)
+20 Y = NOT(NOT B) ' → Y = B (eliminate double NOT)
+30 Z = C OR 0     ' → Z = C (eliminate OR)
+```
+
+**Benefits:**
+- Simplifies Boolean logic
+- Eliminates redundant operations
+- Constant folding for Boolean values
+- Cleaner generated code
+
 ---
 
 ## 📋 READY TO IMPLEMENT NOW (Semantic Analysis Phase)
 
 These optimizations can be implemented in the semantic analyzer without requiring code generation:
 
-### 1. Algebraic Simplification
-**Complexity:** Medium
-**Status:** ⚠️ Partially done via Strength Reduction
-**What still needs to be done:**
-- Boolean: `X AND TRUE` → `X`, `X OR FALSE` → `X`, `X AND FALSE` → `FALSE`, `X OR TRUE` → `TRUE`
-- `0 - X` → `-X`
-- Additional patterns
-
-**Already implemented (via Strength Reduction):**
-- ✅ `X * 1` → `X`
-- ✅ `X * 0` → `0`
-- ✅ `X + 0` → `X`
-- ✅ `X - 0` → `X`
-- ✅ `X - X` → `0`
-- ✅ `X / 1` → `X`
-
-### 2. Induction Variable Optimization
+### 1. Induction Variable Optimization
 **Complexity:** Medium-Hard
 **What it does:**
 - Detect induction variables in loops (e.g., `I = I + 1`)
@@ -434,9 +443,9 @@ These require actual code generation/transformation, not just analysis:
 ### High Value, Low Effort (Do First)
 1. ✅ Constant Folding - DONE
 2. ✅ CSE - DONE
-3. ✅ Strength Reduction - DONE (includes most algebraic simplification)
+3. ✅ Strength Reduction - DONE
 4. ✅ Copy Propagation - DONE
-5. Boolean Simplification - Easy pattern matching
+5. ✅ Algebraic Simplification - DONE (Boolean + arithmetic identities)
 
 ### High Value, High Effort
 1. ✅ Loop-Invariant Detection - DONE (transformation needs codegen)
@@ -458,15 +467,15 @@ These require actual code generation/transformation, not just analysis:
 ## 🎯 RECOMMENDED NEXT STEPS
 
 ### Immediate (Semantic Analysis)
-1. **Boolean Simplification** - Complete algebraic simplification
-2. **Range Analysis** - Improves dead code detection
-3. **Induction Variable Optimization** - Critical for array loops
-4. **Forward Substitution** - Eliminate single-use temporaries
+1. **Range Analysis** - Improves dead code detection
+2. **Induction Variable Optimization** - Critical for array loops
+3. **Forward Substitution** - Eliminate single-use temporaries
+4. **Expression Reassociation** - Exposes constant folding
 
 ### Short Term (Still Semantic)
-5. **Expression Reassociation** - Exposes constant folding
-6. **Live Variable Analysis** - Completes the analysis suite
-7. **Forward Substitution** - Eliminates temps
+5. **Live Variable Analysis** - Completes the analysis suite
+6. **Branch Optimization** - Constant condition detection
+7. **String Optimization** - String constant pooling
 
 ### Long Term (Code Generation Required)
 8. **Peephole Optimization** - Foundation for codegen
@@ -486,6 +495,7 @@ These require actual code generation/transformation, not just analysis:
 - ✅ Subroutine analysis - **Standard** (interprocedural)
 - ✅ Strength reduction - **Standard** (critical optimization)
 - ✅ Copy propagation - **Standard** (dataflow analysis)
+- ✅ Algebraic simplification - **Standard** (Boolean + arithmetic)
 
 ### What We're Missing (that modern compilers have)
 - ❌ SSA form - Not needed for BASIC's simplicity
@@ -509,14 +519,14 @@ We've implemented a **strong foundation** of compiler optimizations that are:
 3. **Complete for analysis** - Detection and transformation done
 4. **Modern-quality analysis** - Comparable to modern compilers' semantic phase
 
-**Current Status: 11 optimizations implemented!**
+**Current Status: 12 optimizations implemented!**
 
 **What's left for semantic analysis:**
-- Boolean simplification (complete algebraic simplification)
 - Range analysis
 - Induction variable optimization
 - Expression reassociation
 - Forward substitution
+- Live variable analysis
 
 **What needs code generation:**
 - Peephole optimization

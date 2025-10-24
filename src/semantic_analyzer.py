@@ -1596,7 +1596,20 @@ class SemanticAnalyzer:
                     pass
 
         elif isinstance(expr, UnaryOpNode):
+            # First analyze the operand
             self._analyze_expression(expr.operand, "unary operation", track_folding=False, track_cse=True)
+
+            # Apply algebraic simplification if possible
+            reduced = self._apply_algebraic_simplification(expr)
+            if reduced is not None:
+                # Replace the expression node's internals with the reduced version
+                if isinstance(reduced, UnaryOpNode):
+                    expr.operator = reduced.operator
+                    expr.operand = reduced.operand
+                elif isinstance(reduced, NumberNode):
+                    # Can't change type, but note it's been reduced
+                    pass
+                # else it's some other expression type (e.g., VariableNode from double NOT)
 
         elif isinstance(expr, FunctionCallNode):
             # Check if it's a DEF FN function
@@ -1836,6 +1849,70 @@ class SemanticAnalyzer:
         else:
             return "expression"
 
+    def _apply_algebraic_simplification(self, expr) -> Optional[Any]:
+        """
+        Apply algebraic simplifications to unary operations (NOT, negation).
+
+        Returns the transformed expression node, or None if no reduction applies.
+        """
+        if not isinstance(expr, UnaryOpNode):
+            return None
+
+        from tokens import TokenType
+
+        original_desc = self._describe_expression(expr)
+        reduction_type = None
+        savings = None
+        new_expr = None
+
+        # NOT optimizations
+        if expr.operator == TokenType.NOT:
+            # NOT(NOT X) -> X (double negation elimination)
+            if isinstance(expr.operand, UnaryOpNode) and expr.operand.operator == TokenType.NOT:
+                new_expr = expr.operand.operand
+                reduction_type = "double NOT -> identity"
+                savings = "Eliminate double negation"
+
+            # NOT(0) -> -1, NOT(-1) -> 0
+            operand_val = self.evaluator.evaluate(expr.operand)
+            if operand_val is not None:
+                if operand_val == 0:
+                    new_expr = NumberNode(value=-1.0, literal="-1")
+                    reduction_type = "NOT FALSE -> TRUE"
+                    savings = "Constant folding"
+                elif operand_val == -1:
+                    new_expr = NumberNode(value=0.0, literal="0")
+                    reduction_type = "NOT TRUE -> FALSE"
+                    savings = "Constant folding"
+
+        # Negation optimizations
+        elif expr.operator == TokenType.MINUS:
+            # -(-X) -> X (double negation)
+            if isinstance(expr.operand, UnaryOpNode) and expr.operand.operator == TokenType.MINUS:
+                new_expr = expr.operand.operand
+                reduction_type = "double negation -> identity"
+                savings = "Eliminate double negation"
+
+            # -(0) -> 0
+            operand_val = self.evaluator.evaluate(expr.operand)
+            if operand_val == 0:
+                new_expr = NumberNode(value=0.0, literal="0")
+                reduction_type = "negate 0 -> 0"
+                savings = "Constant folding"
+
+        # Record the simplification if found
+        if reduction_type and self.current_line is not None:
+            reduced_desc = self._describe_expression(new_expr) if new_expr else original_desc
+            self.strength_reductions.append(StrengthReduction(
+                line=self.current_line,
+                original_expr=original_desc,
+                reduced_expr=reduced_desc,
+                reduction_type=reduction_type,
+                savings=savings or ""
+            ))
+
+        return new_expr
+
     def _apply_strength_reduction(self, expr) -> Optional[Any]:
         """
         Apply strength reduction to transform expensive operations into cheaper ones.
@@ -1851,6 +1928,7 @@ class SemanticAnalyzer:
         6. X - 0 -> X
         7. X ^ 2 -> X * X
         8. X ^ small_int -> repeated multiplication
+        9. Boolean: X AND TRUE -> X, X OR FALSE -> X, etc.
         """
         if not isinstance(expr, BinaryOpNode):
             return None
@@ -2014,6 +2092,82 @@ class SemanticAnalyzer:
                 new_expr = result
                 reduction_type = f"power of {int(right_val)} -> repeated multiplication"
                 savings = f"Replace POW with {int(right_val)-1} MUL operations"
+
+        # Boolean/Logical optimizations (BASIC uses -1 for TRUE, 0 for FALSE)
+        elif expr.operator == TokenType.AND:
+            # X AND 0 -> 0 (FALSE)
+            if right_val == 0:
+                new_expr = NumberNode(value=0.0, literal="0")
+                reduction_type = "AND with FALSE -> FALSE"
+                savings = "Eliminate AND, replace with 0"
+            elif left_val == 0:
+                new_expr = NumberNode(value=0.0, literal="0")
+                reduction_type = "AND with FALSE -> FALSE"
+                savings = "Eliminate AND, replace with 0"
+            # X AND -1 -> X (TRUE in BASIC is -1)
+            elif right_val == -1:
+                new_expr = expr.left
+                reduction_type = "AND with TRUE -> identity"
+                savings = "Eliminate AND"
+            elif left_val == -1:
+                new_expr = expr.right
+                reduction_type = "AND with TRUE -> identity"
+                savings = "Eliminate AND"
+            # X AND X -> X
+            elif (isinstance(expr.left, VariableNode) and
+                  isinstance(expr.right, VariableNode) and
+                  expr.left.name.upper() == expr.right.name.upper() and
+                  expr.left.subscripts is None and expr.right.subscripts is None):
+                new_expr = expr.left
+                reduction_type = "AND with self -> identity"
+                savings = "Eliminate AND"
+
+        elif expr.operator == TokenType.OR:
+            # X OR -1 -> -1 (TRUE)
+            if right_val == -1:
+                new_expr = NumberNode(value=-1.0, literal="-1")
+                reduction_type = "OR with TRUE -> TRUE"
+                savings = "Eliminate OR, replace with -1"
+            elif left_val == -1:
+                new_expr = NumberNode(value=-1.0, literal="-1")
+                reduction_type = "OR with TRUE -> TRUE"
+                savings = "Eliminate OR, replace with -1"
+            # X OR 0 -> X (FALSE)
+            elif right_val == 0:
+                new_expr = expr.left
+                reduction_type = "OR with FALSE -> identity"
+                savings = "Eliminate OR"
+            elif left_val == 0:
+                new_expr = expr.right
+                reduction_type = "OR with FALSE -> identity"
+                savings = "Eliminate OR"
+            # X OR X -> X
+            elif (isinstance(expr.left, VariableNode) and
+                  isinstance(expr.right, VariableNode) and
+                  expr.left.name.upper() == expr.right.name.upper() and
+                  expr.left.subscripts is None and expr.right.subscripts is None):
+                new_expr = expr.left
+                reduction_type = "OR with self -> identity"
+                savings = "Eliminate OR"
+
+        elif expr.operator == TokenType.XOR:
+            # X XOR 0 -> X
+            if right_val == 0:
+                new_expr = expr.left
+                reduction_type = "XOR with 0 -> identity"
+                savings = "Eliminate XOR"
+            elif left_val == 0:
+                new_expr = expr.right
+                reduction_type = "XOR with 0 -> identity"
+                savings = "Eliminate XOR"
+            # X XOR X -> 0
+            elif (isinstance(expr.left, VariableNode) and
+                  isinstance(expr.right, VariableNode) and
+                  expr.left.name.upper() == expr.right.name.upper() and
+                  expr.left.subscripts is None and expr.right.subscripts is None):
+                new_expr = NumberNode(value=0.0, literal="0")
+                reduction_type = "XOR with self -> 0"
+                savings = "Eliminate XOR, replace with 0"
 
         # If we found a reduction, record it
         if reduction_type and self.current_line is not None:

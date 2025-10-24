@@ -40,6 +40,9 @@ This directory contains tests for the semantic analyzer's advanced optimization 
 ### Copy Propagation
 - **test_copy_propagation.py** - Copy propagation detection and tracking (10 tests)
 
+### Algebraic Simplification
+- **test_algebraic_simplification.py** - Boolean and algebraic simplification (10 tests)
+
 ### Comprehensive Tests
 - **test_optimization_report.py** - Full optimization report generation
 - **test_comprehensive_analysis.py** - All features together
@@ -97,6 +100,12 @@ done
     - Smart invalidation on modification
     - Detects dead copies (never used)
     - Suggests optimization opportunities
+14. **Algebraic Simplification** - Boolean and arithmetic simplification:
+    - Boolean AND/OR/XOR/NOT identities
+    - Double negation elimination
+    - Constant folding for Boolean values
+    - Self-operation simplification (`X AND X` → `X`)
+    - Combines with strength reduction for complete coverage
 
 ## Expected Results
 
