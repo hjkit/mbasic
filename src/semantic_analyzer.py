@@ -231,7 +231,112 @@ class ConstantEvaluator:
             elif op == 'NOT':
                 return ~int(operand)
 
-        # Cannot evaluate - contains variables or function calls
+        # Try to evaluate function calls (for deterministic math functions)
+        if isinstance(expr, FunctionCallNode):
+            return self._evaluate_function(expr)
+
+        # Cannot evaluate - contains variables or unknown expressions
+        return None
+
+    def _evaluate_function(self, func_call: FunctionCallNode) -> Optional[Union[int, float, str]]:
+        """
+        Evaluate deterministic math functions at compile time.
+
+        Only pure mathematical functions can be evaluated - functions whose result
+        depends ONLY on their input arguments and not on any external state.
+
+        EXCLUDED (Non-Deterministic) Functions:
+        - RND: Random number generator - different value each call
+        - TIMER: System timer - changes with time
+        - EOF, LOC, LOF: File I/O - depend on file state at runtime
+        - INPUT$, INKEY$: Input functions - depend on user/keyboard input
+        - PEEK, INP: Memory/port access - depend on runtime memory/hardware state
+        - FRE: Free memory - changes during program execution
+        - POS, CSRLIN: Cursor position - changes with output
+        - VARPTR: Variable pointer - depends on runtime memory layout
+
+        INCLUDED (Deterministic) Functions:
+        - ABS, SQR, INT, FIX, SGN: Basic math
+        - SIN, COS, TAN, ATN: Trigonometry
+        - EXP, LOG: Exponential/logarithm
+        - CINT, CSNG, CDBL: Type conversions
+        """
+        import math
+
+        func_name = func_call.name.upper()
+
+        # Non-deterministic functions - cannot evaluate at compile time
+        # Random/Time functions
+        if func_name in ('RND', 'TIMER'):
+            return None
+
+        # File I/O functions (depend on runtime file state)
+        if func_name in ('EOF', 'LOC', 'LOF', 'INPUT$', 'INKEY$'):
+            return None
+
+        # System functions (depend on runtime state)
+        if func_name in ('PEEK', 'INP', 'FRE', 'POS', 'CSRLIN', 'VARPTR'):
+            return None
+
+        # Evaluate all arguments first
+        args = []
+        if func_call.arguments:
+            for arg in func_call.arguments:
+                arg_val = self.evaluate(arg)
+                if arg_val is None:
+                    return None  # Cannot evaluate if any argument is non-constant
+                args.append(arg_val)
+
+        try:
+            # Single-argument functions
+            if len(args) == 1:
+                x = args[0]
+
+                if func_name == 'ABS':
+                    return abs(x)
+                elif func_name == 'SQR':
+                    return math.sqrt(x)
+                elif func_name == 'SIN':
+                    return math.sin(x)
+                elif func_name == 'COS':
+                    return math.cos(x)
+                elif func_name == 'TAN':
+                    return math.tan(x)
+                elif func_name == 'ATN':
+                    return math.atan(x)
+                elif func_name == 'EXP':
+                    return math.exp(x)
+                elif func_name == 'LOG':
+                    return math.log(x)
+                elif func_name == 'INT':
+                    return int(x)
+                elif func_name == 'FIX':
+                    return int(x) if x >= 0 else -int(-x)
+                elif func_name == 'SGN':
+                    return -1 if x < 0 else (1 if x > 0 else 0)
+                elif func_name == 'CINT':
+                    return round(x)
+                elif func_name == 'CSNG':
+                    return float(x)
+                elif func_name == 'CDBL':
+                    return float(x)
+
+            # Two-argument functions (none in standard BASIC, but prepared for extensions)
+            elif len(args) == 2:
+                # Could add MAX, MIN, etc. if they exist
+                pass
+
+            # Zero-argument functions
+            elif len(args) == 0:
+                if func_name == 'PI':
+                    return math.pi
+                # RND() is explicitly excluded above
+
+        except (ValueError, ZeroDivisionError, OverflowError):
+            # Math error - cannot evaluate
+            return None
+
+        # Unknown function or cannot evaluate
         return None
 
     def evaluate_to_int(self, expr) -> Optional[int]:

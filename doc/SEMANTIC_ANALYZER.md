@@ -52,6 +52,11 @@ Evaluates expressions at compile time when all operands are constants or known-c
 - Relational: `=`, `<>`, `<`, `>`, `<=`, `>=` (return -1 for true, 0 for false)
 - Logical: `AND`, `OR`, `XOR`, `EQV`, `IMP`
 - Unary: `-`, `+`, `NOT`
+- **Math Functions**: `ABS`, `SQR`, `SIN`, `COS`, `TAN`, `ATN`, `EXP`, `LOG`, `INT`, `FIX`, `SGN`, `CINT`, `CSNG`, `CDBL`
+  - **Excluded (non-deterministic)**:
+    - Random/Time: `RND`, `TIMER`
+    - File I/O: `EOF`, `LOC`, `LOF`, `INPUT$`, `INKEY$`
+    - System: `PEEK`, `INP`, `FRE`, `POS`, `CSRLIN`, `VARPTR`
 
 **Examples**:
 ```basic
@@ -60,6 +65,8 @@ DIM B(10*2+5)          ' Evaluates to B(25)
 DIM C(100\3)           ' Evaluates to C(33)
 N% = 5
 DIM D(N%*4)            ' Evaluates to D(20)
+DIM E(INT(SQR(100)))   ' Evaluates to E(10)
+DIM F(ABS(-25))        ' Evaluates to F(25)
 ```
 
 ### 3. Compile-Time IF/THEN/ELSE Evaluation
@@ -355,7 +362,54 @@ The evaluator recursively evaluates expressions:
 - Unary ops → evaluate operand, apply operation
 - Cannot evaluate → return None
 
-### Example 7: Compile-Time Configuration
+### Example 7: Compile-Time Math Functions
+
+```basic
+10 REM Math function evaluation at compile time
+20 RADIUS = 10
+30 PI = 3.14159
+40 REM Trigonometric calculations
+50 ANGLE = 0
+60 SINE = INT(SIN(ANGLE) * 100)
+70 COSINE = INT(COS(ANGLE) * 100)
+80 REM Square root calculations
+90 PERFECT = 144
+100 SIDE = INT(SQR(PERFECT))
+110 REM Absolute value and sign
+120 NEG = -50
+130 POSITIVE = ABS(NEG)
+140 SIGN = SGN(NEG)
+150 REM Create arrays with computed sizes
+160 DIM TRIG(SINE + COSINE), GEOM(SIDE), VALUES(POSITIVE)
+```
+
+**Analysis**:
+- Line 60: `SIN(0) * 100 = 0` (evaluated at compile time)
+- Line 70: `COS(0) * 100 = 100` (evaluated at compile time)
+- Line 100: `SQR(144) = 12` (evaluated at compile time)
+- Line 130: `ABS(-50) = 50` (evaluated at compile time)
+- Line 140: `SGN(-50) = -1` (evaluated at compile time)
+- Line 160: Creates `TRIG(100)`, `GEOM(12)`, `VALUES(50)`
+
+**Note**: Non-deterministic functions are NOT evaluated at compile time:
+```basic
+10 N = INT(RND(1) * 10)
+20 DIM A(N)              ' ERROR - RND cannot be evaluated at compile time
+
+10 OPEN "DATA" FOR INPUT AS 1
+20 N = LOC(1)
+30 DIM A(N)              ' ERROR - LOC depends on runtime file state
+
+10 N = PEEK(1000)
+20 DIM A(N)              ' ERROR - PEEK depends on runtime memory state
+```
+
+These functions are excluded because their values:
+- Cannot be known until the program runs (file position, memory contents, random values)
+- May change during program execution (timer, file position)
+- Depend on external state (files, hardware ports, system memory)
+
+### Example 8: Compile-Time Configuration
 
 ```basic
 10 REM Compile-time configuration
