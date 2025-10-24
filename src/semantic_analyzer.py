@@ -571,18 +571,21 @@ class SemanticAnalyzer:
         return len(self.errors) == 0
 
     def _collect_symbols(self, program: ProgramNode):
-        """First pass: collect line numbers, DEF FN definitions, and GOSUB targets"""
+        """First pass: collect line numbers, DEF FN definitions, GOSUB targets, and OPTION BASE"""
         for line in program.lines:
             if line.line_number is not None:
                 self.symbols.line_numbers.add(line.line_number)
 
-            # Look for DEF FN statements and GOSUB targets
+            # Look for DEF FN statements, GOSUB targets, and OPTION BASE
             for stmt in line.statements:
                 if isinstance(stmt, DefFnStatementNode):
                     self._register_function(stmt, line.line_number)
                 elif isinstance(stmt, GosubStatementNode):
                     # Record this as a GOSUB target (potential subroutine)
                     self.gosub_targets.add(stmt.line_number)
+                elif isinstance(stmt, OptionBaseStatementNode):
+                    # Collect OPTION BASE declarations (global, compile-time)
+                    self._collect_option_base(stmt, line.line_number)
 
     def _register_function(self, stmt: DefFnStatementNode, line_num: Optional[int]):
         """Register a DEF FN function"""
@@ -607,6 +610,34 @@ class SemanticAnalyzer:
             definition_line=line_num or 0,
             body_expr=stmt.expression
         )
+
+    def _collect_option_base(self, stmt: OptionBaseStatementNode, line_num: Optional[int]):
+        """
+        Collect OPTION BASE declarations (first pass).
+
+        OPTION BASE is global and compile-time:
+        - Multiple OPTION BASE statements are allowed but must all be the same value
+        - The value applies to the entire program regardless of where it appears
+        """
+        if stmt.base not in (0, 1):
+            raise SemanticError(
+                f"OPTION BASE must be 0 or 1, got {stmt.base}",
+                line_num
+            )
+
+        # Check for conflicts with previously seen OPTION BASE
+        if hasattr(self, '_first_option_base_value'):
+            if self._first_option_base_value != stmt.base:
+                raise SemanticError(
+                    f"Conflicting OPTION BASE: line {self._first_option_base_line} set to {self._first_option_base_value}, "
+                    f"but line {line_num} set to {stmt.base}. OPTION BASE must be consistent throughout the program.",
+                    line_num
+                )
+        else:
+            # First OPTION BASE seen
+            self._first_option_base_value = stmt.base
+            self._first_option_base_line = line_num
+            self.array_base = stmt.base
 
     def _analyze_subroutines(self, program: ProgramNode):
         """
@@ -1119,22 +1150,16 @@ class SemanticAnalyzer:
         return result
 
     def _analyze_option_base(self, stmt: OptionBaseStatementNode):
-        """Analyze OPTION BASE statement - set array index base"""
-        if stmt.base not in (0, 1):
-            raise SemanticError(
-                f"OPTION BASE must be 0 or 1, got {stmt.base}",
-                self.current_line
-            )
+        """
+        Analyze OPTION BASE statement (third pass).
 
-        # Check if any arrays have already been dimensioned
-        for var_name, var_info in self.symbols.variables.items():
-            if var_info.is_array:
-                raise SemanticError(
-                    f"OPTION BASE must appear before any array declarations (found {var_name})",
-                    self.current_line
-                )
-
-        self.array_base = stmt.base
+        Note: OPTION BASE is already processed in the first pass (_collect_option_base)
+        because it's a global compile-time declaration. This method is called during
+        statement analysis but doesn't need to do anything since the global array_base
+        is already set.
+        """
+        # Nothing to do - already handled in first pass
+        pass
 
     def _analyze_dim(self, stmt: DimStatementNode):
         """Analyze DIM statement - evaluate subscripts as constants"""

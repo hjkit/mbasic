@@ -29,6 +29,7 @@ This directory contains tests for the semantic analyzer's advanced optimization 
 ### Array Flattening
 - **test_array_flattening.py** - Multi-dimensional array flattening (4 tests)
 - **test_array_flattening_benefits.py** - Demonstration of optimization benefits
+- **test_option_base.py** - OPTION BASE global behavior (4 tests)
 
 ### Dead Code Detection
 - **test_dead_code.py** - Reachability analysis and dead code detection (8 tests)
