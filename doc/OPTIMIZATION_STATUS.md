@@ -292,23 +292,56 @@ This document tracks all optimizations implemented, planned, and possible for th
 - More efficient conditional evaluation
 - Cleaner generated code
 
+### 16. Forward Substitution
+**Status:** ✅ Complete (Detection)
+**Location:** `src/semantic_analyzer.py` - `_analyze_forward_substitution()`, `_count_variable_uses_in_expr()`, `_has_side_effects()`
+**What it does:**
+- Analyzes variable assignments and usage patterns
+- Identifies single-use temporary variables
+- Detects dead stores (variables assigned but never used)
+- Checks for side effects (function calls)
+- Suggests eliminating temporaries by substituting expressions directly
+
+**Example:**
+```basic
+10 A = 10
+20 B = 20
+30 TEMP = A + B    ' TEMP used only once
+40 PRINT TEMP      ' → Can substitute: PRINT A + B
+```
+
+**Criteria for substitution:**
+1. Variable assigned a non-trivial expression
+2. Variable used exactly once after assignment
+3. No side effects in expression (no function calls)
+4. Not a simple constant or variable copy
+
+**Benefits:**
+- Reduces register pressure
+- Eliminates unnecessary temporary variables
+- Simplifies code
+- Detects dead stores (unused assignments)
+- Enables further optimizations
+
+**TODO:** Actual code transformation (needs code generation phase)
+
 ---
 
 ## 📋 READY TO IMPLEMENT NOW (Semantic Analysis Phase)
 
 These optimizations can be implemented in the semantic analyzer without requiring code generation:
 
-### 7. Forward Substitution
+### 7. Range Analysis
 **Complexity:** Medium
 **What it does:**
-- If `X = expression` and X is used once, substitute expression
-- Eliminates temporary variables
-- Can expose more optimizations
+- Track possible value ranges of variables
+- Example: `IF X > 0 THEN...` means X > 0 in that branch
+- Enables more constant propagation and dead code detection
 
 **Implementation:**
-- Track variable usage counts
-- Substitute single-use variables
-- Watch for side effects
+- Extend IF analysis
+- Track value ranges per code path
+- More aggressive constant propagation
 
 ### 8. Branch Optimization
 **Complexity:** Medium
@@ -517,7 +550,7 @@ These require actual code generation/transformation, not just analysis:
 ### Immediate (Semantic Analysis)
 1. ✅ **Expression Reassociation** - DONE (Exposes constant folding)
 2. ✅ **Boolean Simplification** - DONE (NOT inversion, De Morgan, absorption)
-3. **Forward Substitution** - Eliminate single-use temporaries
+3. ✅ **Forward Substitution** - DONE (Detects single-use temporaries and dead stores)
 4. **Range Analysis** - Improves dead code detection
 
 ### Short Term (Still Semantic)
@@ -547,6 +580,7 @@ These require actual code generation/transformation, not just analysis:
 - ✅ Induction variable optimization - **Standard** (IV detection and SR opportunities)
 - ✅ Expression reassociation - **Standard** (enables constant folding)
 - ✅ Boolean simplification - **Standard** (relational inversion, De Morgan, absorption)
+- ✅ Forward substitution - **Standard** (temporary elimination, dead store detection)
 
 ### What We're Missing (that modern compilers have)
 - ❌ SSA form - Not needed for BASIC's simplicity
@@ -570,10 +604,9 @@ We've implemented a **strong foundation** of compiler optimizations that are:
 3. **Complete for analysis** - Detection and transformation done
 4. **Modern-quality analysis** - Comparable to modern compilers' semantic phase
 
-**Current Status: 15 optimizations implemented!**
+**Current Status: 16 optimizations implemented!**
 
 **What's left for semantic analysis:**
-- Forward substitution
 - Range analysis
 - Live variable analysis
 - Branch optimization (constant condition detection)

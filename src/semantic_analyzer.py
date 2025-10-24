@@ -190,6 +190,19 @@ class CopyPropagation:
 
 
 @dataclass
+class ForwardSubstitution:
+    """Information about a forward substitution opportunity"""
+    line: int  # Line number where variable is assigned
+    variable: str  # Variable being assigned
+    expression: str  # Expression being assigned (for display)
+    expression_node: Any  # The actual expression AST node
+    use_line: Optional[int] = None  # Line where variable is used (if single-use)
+    use_count: int = 0  # Number of times variable is used
+    can_substitute: bool = False  # Whether substitution is safe
+    reason: str = ""  # Why substitution can/cannot be done
+
+
+@dataclass
 class InductionVariable:
     """Information about an induction variable in a loop"""
     variable: str  # Variable name (e.g., "I")
@@ -594,6 +607,12 @@ class SemanticAnalyzer:
         self.copy_propagations: List[CopyPropagation] = []
         self.active_copies: Dict[str, str] = {}  # copy_var -> source_var (currently active copies)
 
+        # Forward substitution tracking
+        self.forward_substitutions: List[ForwardSubstitution] = []
+        self.variable_assignments: Dict[str, Tuple[int, Any, str]] = {}  # var_name -> (line, expr_node, expr_desc)
+        self.variable_usage_count: Dict[str, int] = {}  # var_name -> count
+        self.variable_usage_lines: Dict[str, List[int]] = {}  # var_name -> [line1, line2, ...]
+
         # Induction variable tracking
         self.induction_variables: List[InductionVariable] = []  # All detected induction variables
         self.active_ivs: Dict[str, InductionVariable] = {}  # var_name -> IV (currently in a loop)
@@ -624,6 +643,9 @@ class SemanticAnalyzer:
 
             # Sixth pass: perform reachability analysis and detect dead code
             self._analyze_reachability(program)
+
+            # Seventh pass: analyze forward substitution opportunities
+            self._analyze_forward_substitution(program)
 
             # Generate warnings for required compilation switches
             self._check_compilation_switches()
@@ -1559,6 +1581,11 @@ class SemanticAnalyzer:
             # Pattern: J = I * constant or J = I + constant (where I is primary IV)
             if self.current_loop:
                 self._detect_derived_induction_variable(var_name, stmt.expression)
+
+            # Forward substitution tracking: Record this assignment
+            # We'll analyze usage counts later in a second pass
+            expr_desc = self._describe_expression(stmt.expression)
+            self.variable_assignments[var_name] = (self.current_line, stmt.expression, expr_desc)
         else:
             # Array assignment, invalidate copy if it was one
             if var_name in self.active_copies:
@@ -2862,6 +2889,128 @@ class SemanticAnalyzer:
             if stmt.else_line_number is not None:
                 self.reachability.goto_targets.add(stmt.else_line_number)
 
+    def _analyze_forward_substitution(self, program: ProgramNode):
+        """
+        Analyze forward substitution opportunities.
+
+        Identifies variables that are:
+        1. Assigned a non-trivial expression
+        2. Used exactly once after assignment
+        3. Not modified between assignment and use
+        4. Safe to substitute (no side effects)
+        """
+        # Count variable usages in expressions (not assignments)
+        usage_counts: Dict[str, int] = {}
+        usage_lines: Dict[str, List[int]] = {}
+
+        for line in program.lines:
+            if line.line_number is None:
+                continue
+
+            for stmt in line.statements:
+                # Count uses in expressions (but not the LHS of assignments)
+                if isinstance(stmt, LetStatementNode):
+                    # Count uses in the RHS expression
+                    self._count_variable_uses_in_expr(stmt.expression, usage_counts, usage_lines, line.line_number)
+                elif isinstance(stmt, IfStatementNode):
+                    self._count_variable_uses_in_expr(stmt.condition, usage_counts, usage_lines, line.line_number)
+                elif isinstance(stmt, PrintStatementNode):
+                    for expr in stmt.expressions:
+                        self._count_variable_uses_in_expr(expr, usage_counts, usage_lines, line.line_number)
+                elif isinstance(stmt, ForStatementNode):
+                    self._count_variable_uses_in_expr(stmt.start_expr, usage_counts, usage_lines, line.line_number)
+                    self._count_variable_uses_in_expr(stmt.end_expr, usage_counts, usage_lines, line.line_number)
+                    if stmt.step_expr:
+                        self._count_variable_uses_in_expr(stmt.step_expr, usage_counts, usage_lines, line.line_number)
+                # Add more statement types as needed
+
+        # Analyze each assignment for substitution opportunities
+        for var_name, (assign_line, expr_node, expr_desc) in self.variable_assignments.items():
+            use_count = usage_counts.get(var_name, 0)
+
+            # Create substitution record
+            subst = ForwardSubstitution(
+                line=assign_line,
+                variable=var_name,
+                expression=expr_desc,
+                expression_node=expr_node,
+                use_count=use_count
+            )
+
+            # Determine if substitution is viable
+            if use_count == 0:
+                subst.can_substitute = False
+                subst.reason = "Variable never used (dead store)"
+            elif use_count == 1:
+                # Single use - candidate for substitution
+                use_line = usage_lines[var_name][0]
+                subst.use_line = use_line
+
+                # Check if expression is complex enough to warrant tracking
+                # Skip trivial assignments like X = 5 or X = Y
+                if isinstance(expr_node, (NumberNode, StringNode)):
+                    subst.can_substitute = False
+                    subst.reason = "Expression is a simple constant (already optimized)"
+                elif isinstance(expr_node, VariableNode) and expr_node.subscripts is None:
+                    subst.can_substitute = False
+                    subst.reason = "Expression is a simple variable (use copy propagation)"
+                elif use_line <= assign_line:
+                    subst.can_substitute = False
+                    subst.reason = "Variable used before assignment"
+                else:
+                    # Check for potential issues
+                    if self._has_side_effects(expr_node):
+                        subst.can_substitute = False
+                        subst.reason = "Expression has side effects (function calls)"
+                    else:
+                        subst.can_substitute = True
+                        subst.reason = f"Single use at line {use_line}, safe to substitute"
+            else:
+                # Multiple uses
+                subst.can_substitute = False
+                subst.reason = f"Variable used {use_count} times (would duplicate computation)"
+
+            self.forward_substitutions.append(subst)
+
+    def _count_variable_uses_in_expr(self, expr, usage_counts: Dict[str, int],
+                                     usage_lines: Dict[str, List[int]], line_num: int):
+        """Recursively count variable uses in an expression"""
+        if expr is None:
+            return
+
+        if isinstance(expr, VariableNode):
+            var_name = expr.name.upper()
+            # Only count simple variable reads, not array accesses
+            if expr.subscripts is None:
+                if var_name not in usage_counts:
+                    usage_counts[var_name] = 0
+                    usage_lines[var_name] = []
+                usage_counts[var_name] += 1
+                usage_lines[var_name].append(line_num)
+            else:
+                # Count uses in array subscripts
+                for sub in expr.subscripts:
+                    self._count_variable_uses_in_expr(sub, usage_counts, usage_lines, line_num)
+        elif isinstance(expr, BinaryOpNode):
+            self._count_variable_uses_in_expr(expr.left, usage_counts, usage_lines, line_num)
+            self._count_variable_uses_in_expr(expr.right, usage_counts, usage_lines, line_num)
+        elif isinstance(expr, UnaryOpNode):
+            self._count_variable_uses_in_expr(expr.operand, usage_counts, usage_lines, line_num)
+        elif isinstance(expr, FunctionCallNode):
+            if expr.arguments:
+                for arg in expr.arguments:
+                    self._count_variable_uses_in_expr(arg, usage_counts, usage_lines, line_num)
+
+    def _has_side_effects(self, expr) -> bool:
+        """Check if an expression has side effects (function calls, etc.)"""
+        if isinstance(expr, FunctionCallNode):
+            return True  # Function calls may have side effects
+        elif isinstance(expr, BinaryOpNode):
+            return self._has_side_effects(expr.left) or self._has_side_effects(expr.right)
+        elif isinstance(expr, UnaryOpNode):
+            return self._has_side_effects(expr.operand)
+        return False
+
     def _check_compilation_switches(self):
         """Generate warnings for required compilation switches"""
         switches = self.flags.get_required_switches()
@@ -2970,6 +3119,43 @@ class SemanticAnalyzer:
                 lines.append(f"  Copies with no propagation opportunities:")
                 for cp in non_propagatable:
                     lines.append(f"    Line {cp.line}: {cp.copy_var} = {cp.source_var} (not used)")
+                lines.append("")
+
+        # Forward Substitution Optimizations
+        if self.forward_substitutions:
+            lines.append(f"\nForward Substitution Optimizations:")
+            lines.append(f"  Found {len(self.forward_substitutions)} assignment(s) analyzed")
+            lines.append("")
+
+            # Separate by substitutability
+            substitutable = [fs for fs in self.forward_substitutions if fs.can_substitute]
+            dead_stores = [fs for fs in self.forward_substitutions if fs.use_count == 0]
+            multi_use = [fs for fs in self.forward_substitutions if fs.use_count > 1 and not fs.can_substitute]
+
+            if substitutable:
+                lines.append(f"  Variables with single-use substitution opportunities:")
+                for fs in substitutable:
+                    lines.append(f"    Line {fs.line}: {fs.variable} = {fs.expression}")
+                    lines.append(f"      Used once at line {fs.use_line}")
+                    lines.append(f"      Suggestion: Substitute expression directly at use site")
+                    lines.append(f"      Eliminates temporary variable")
+                    lines.append("")
+
+            if dead_stores:
+                lines.append(f"  Variables that are never used (dead stores):")
+                for fs in dead_stores:
+                    lines.append(f"    Line {fs.line}: {fs.variable} = {fs.expression}")
+                    lines.append(f"      Variable assigned but never read")
+                    lines.append(f"      Suggestion: Remove assignment")
+                    lines.append("")
+
+            if multi_use:
+                lines.append(f"  Variables used multiple times (substitution not beneficial):")
+                for fs in multi_use[:5]:  # Limit to first 5
+                    lines.append(f"    Line {fs.line}: {fs.variable} = {fs.expression}")
+                    lines.append(f"      Used {fs.use_count} times")
+                if len(multi_use) > 5:
+                    lines.append(f"    ... and {len(multi_use) - 5} more")
                 lines.append("")
 
         # Common Subexpression Elimination (CSE)
