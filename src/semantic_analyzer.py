@@ -159,6 +159,16 @@ class ReachabilityInfo:
     terminating_lines: Set[int] = field(default_factory=set)  # Lines with END, STOP, etc.
 
 
+@dataclass
+class StrengthReduction:
+    """Information about a strength reduction optimization"""
+    line: int  # Line number where reduction was applied
+    original_expr: str  # Original expression (e.g., "X * 2")
+    reduced_expr: str  # Reduced expression (e.g., "X + X")
+    reduction_type: str  # Type of reduction (e.g., "multiply by 2 -> add", "X^2 -> X*X")
+    savings: str  # Description of savings (e.g., "Replace MUL with ADD")
+
+
 class CompilerFlags:
     """Flags for features requiring compilation switches"""
     def __init__(self):
@@ -534,6 +544,9 @@ class SemanticAnalyzer:
 
         # Reachability analysis
         self.reachability = ReachabilityInfo()
+
+        # Strength reduction tracking
+        self.strength_reductions: List[StrengthReduction] = []
 
     def analyze(self, program: ProgramNode) -> bool:
         """
@@ -1515,8 +1528,25 @@ class SemanticAnalyzer:
                         expr.subscripts = [flattened]
 
         elif isinstance(expr, BinaryOpNode):
+            # First analyze child expressions
             self._analyze_expression(expr.left, "binary operation", track_folding=False, track_cse=True)
             self._analyze_expression(expr.right, "binary operation", track_folding=False, track_cse=True)
+
+            # Apply strength reduction if possible
+            reduced = self._apply_strength_reduction(expr)
+            if reduced is not None:
+                # Replace the expression node's internals with the reduced version
+                # This allows the transformation to propagate up the tree
+                if isinstance(reduced, BinaryOpNode):
+                    expr.left = reduced.left
+                    expr.operator = reduced.operator
+                    expr.right = reduced.right
+                elif isinstance(reduced, NumberNode):
+                    # Can't change type, but note it's been reduced
+                    pass
+                elif isinstance(reduced, VariableNode):
+                    # Can't change type, but note it's been reduced
+                    pass
 
         elif isinstance(expr, UnaryOpNode):
             self._analyze_expression(expr.operand, "unary operation", track_folding=False, track_cse=True)
@@ -1744,6 +1774,198 @@ class SemanticAnalyzer:
         else:
             return "expression"
 
+    def _apply_strength_reduction(self, expr) -> Optional[Any]:
+        """
+        Apply strength reduction to transform expensive operations into cheaper ones.
+
+        Returns the transformed expression node, or None if no reduction applies.
+
+        Transformations:
+        1. X * 2^n -> X << n (or X + X for n=1)
+        2. X / 2^n -> X >> n
+        3. X * 1 -> X
+        4. X * 0 -> 0
+        5. X + 0 -> X
+        6. X - 0 -> X
+        7. X ^ 2 -> X * X
+        8. X ^ small_int -> repeated multiplication
+        """
+        if not isinstance(expr, BinaryOpNode):
+            return None
+
+        from tokens import TokenType
+        import math
+
+        original_desc = self._describe_expression(expr)
+        reduction_type = None
+        savings = None
+        new_expr = None
+
+        # Get values for constant operands
+        left_val = self.evaluator.evaluate(expr.left)
+        right_val = self.evaluator.evaluate(expr.right)
+
+        # Multiplication by power of 2 -> bit shift or addition
+        if expr.operator == TokenType.MULTIPLY:
+            # X * 2 -> X + X (replace MUL with ADD)
+            if right_val == 2:
+                new_expr = BinaryOpNode(
+                    left=expr.left,
+                    operator=TokenType.PLUS,
+                    right=expr.left
+                )
+                reduction_type = "multiply by 2 -> addition"
+                savings = "Replace MUL with ADD"
+            elif left_val == 2:
+                new_expr = BinaryOpNode(
+                    left=expr.right,
+                    operator=TokenType.PLUS,
+                    right=expr.right
+                )
+                reduction_type = "multiply by 2 -> addition"
+                savings = "Replace MUL with ADD"
+
+            # X * 1 -> X
+            elif right_val == 1:
+                new_expr = expr.left
+                reduction_type = "multiply by 1 -> identity"
+                savings = "Eliminate MUL"
+            elif left_val == 1:
+                new_expr = expr.right
+                reduction_type = "multiply by 1 -> identity"
+                savings = "Eliminate MUL"
+
+            # X * 0 -> 0
+            elif right_val == 0:
+                new_expr = NumberNode(value=0.0, literal="0")
+                reduction_type = "multiply by 0 -> constant"
+                savings = "Eliminate MUL, replace with 0"
+            elif left_val == 0:
+                new_expr = NumberNode(value=0.0, literal="0")
+                reduction_type = "multiply by 0 -> constant"
+                savings = "Eliminate MUL, replace with 0"
+
+            # X * 4 -> (X + X) + (X + X) or X * 2^n for larger powers
+            elif right_val is not None and right_val > 0:
+                # Check if it's an integer value (might be stored as float)
+                if right_val == int(right_val):
+                    int_val = int(right_val)
+                    # Check if power of 2
+                    if int_val > 2 and (int_val & (int_val - 1)) == 0:
+                        # Power of 2 > 2 - suggest shift (note: BASIC doesn't have << but good to track)
+                        shift_amount = int(math.log2(int_val))
+                        reduction_type = f"multiply by {int_val} -> shift left {shift_amount}"
+                        savings = f"Replace MUL with shift/repeated addition"
+                        # Don't actually transform since BASIC doesn't have <<
+                        # But track the opportunity
+            elif left_val is not None and left_val > 0:
+                if left_val == int(left_val):
+                    int_val = int(left_val)
+                    if int_val > 2 and (int_val & (int_val - 1)) == 0:
+                        shift_amount = int(math.log2(int_val))
+                        reduction_type = f"multiply by {int_val} -> shift left {shift_amount}"
+                        savings = f"Replace MUL with shift/repeated addition"
+
+        # Division by power of 2 -> bit shift (for integers)
+        elif expr.operator == TokenType.BACKSLASH:  # Integer division in BASIC
+            if right_val is not None and right_val > 0:
+                if right_val == int(right_val):
+                    int_val = int(right_val)
+                    if int_val > 0 and (int_val & (int_val - 1)) == 0:
+                        shift_amount = int(math.log2(int_val))
+                        reduction_type = f"integer division by {int_val} -> shift right {shift_amount}"
+                        savings = "Replace DIV with shift"
+                        # Don't transform, just track
+            # X \ 1 -> X
+            elif right_val == 1:
+                new_expr = expr.left
+                reduction_type = "divide by 1 -> identity"
+                savings = "Eliminate DIV"
+
+        # Regular division optimizations
+        elif expr.operator == TokenType.DIVIDE:
+            # X / 1 -> X
+            if right_val == 1:
+                new_expr = expr.left
+                reduction_type = "divide by 1 -> identity"
+                savings = "Eliminate DIV"
+
+        # Addition optimizations
+        elif expr.operator == TokenType.PLUS:
+            # X + 0 -> X
+            if right_val == 0:
+                new_expr = expr.left
+                reduction_type = "add 0 -> identity"
+                savings = "Eliminate ADD"
+            elif left_val == 0:
+                new_expr = expr.right
+                reduction_type = "add 0 -> identity"
+                savings = "Eliminate ADD"
+
+        # Subtraction optimizations
+        elif expr.operator == TokenType.MINUS:
+            # X - 0 -> X
+            if right_val == 0:
+                new_expr = expr.left
+                reduction_type = "subtract 0 -> identity"
+                savings = "Eliminate SUB"
+            # X - X -> 0 (if same variable)
+            elif (isinstance(expr.left, VariableNode) and
+                  isinstance(expr.right, VariableNode) and
+                  expr.left.name.upper() == expr.right.name.upper() and
+                  expr.left.subscripts is None and expr.right.subscripts is None):
+                new_expr = NumberNode(value=0.0, literal="0")
+                reduction_type = "subtract self -> constant"
+                savings = "Eliminate SUB, replace with 0"
+
+        # Exponentiation optimizations
+        elif expr.operator == TokenType.POWER:
+            # X ^ 2 -> X * X
+            if right_val == 2:
+                new_expr = BinaryOpNode(
+                    left=expr.left,
+                    operator=TokenType.MULTIPLY,
+                    right=expr.left
+                )
+                reduction_type = "power of 2 -> multiplication"
+                savings = "Replace POW with MUL"
+            # X ^ 1 -> X
+            elif right_val == 1:
+                new_expr = expr.left
+                reduction_type = "power of 1 -> identity"
+                savings = "Eliminate POW"
+            # X ^ 0 -> 1
+            elif right_val == 0:
+                new_expr = NumberNode(value=1.0, literal="1")
+                reduction_type = "power of 0 -> constant"
+                savings = "Eliminate POW, replace with 1"
+            # X ^ 3 -> X * X * X (for small integers)
+            elif right_val in [3, 4]:
+                # Build repeated multiplication
+                result = expr.left
+                for _ in range(int(right_val) - 1):
+                    result = BinaryOpNode(
+                        left=result,
+                        operator=TokenType.MULTIPLY,
+                        right=expr.left
+                    )
+                new_expr = result
+                reduction_type = f"power of {int(right_val)} -> repeated multiplication"
+                savings = f"Replace POW with {int(right_val)-1} MUL operations"
+
+        # If we found a reduction, record it
+        if reduction_type and self.current_line is not None:
+            reduced_desc = self._describe_expression(new_expr) if new_expr else original_desc
+            self.strength_reductions.append(StrengthReduction(
+                line=self.current_line,
+                original_expr=original_desc,
+                reduced_expr=reduced_desc,
+                reduction_type=reduction_type,
+                savings=savings or ""
+            ))
+
+        return new_expr
+
     def _validate_line_references(self, program: ProgramNode):
         """Validate all GOTO/GOSUB/ON...GOTO references"""
         for line in program.lines:
@@ -1966,6 +2188,17 @@ class SemanticAnalyzer:
                 else:
                     value_str = str(value)
                 lines.append(f"  Line {line_num}: {expr_desc} → {value_str}")
+
+        # Strength Reduction Optimizations
+        if self.strength_reductions:
+            lines.append(f"\nStrength Reduction Optimizations:")
+            lines.append(f"  Found {len(self.strength_reductions)} strength reduction(s)")
+            lines.append("")
+            for sr in self.strength_reductions:
+                lines.append(f"  Line {sr.line}: {sr.original_expr} → {sr.reduced_expr}")
+                lines.append(f"    Type: {sr.reduction_type}")
+                lines.append(f"    Savings: {sr.savings}")
+                lines.append("")
 
         # Common Subexpression Elimination (CSE)
         if self.common_subexpressions:
