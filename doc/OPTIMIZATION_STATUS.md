@@ -2,6 +2,8 @@
 
 This document tracks all optimizations implemented, planned, and possible for the MBASIC compiler.
 
+**Summary: 27 optimizations implemented** (all in semantic analysis phase)
+
 ## ✅ IMPLEMENTED OPTIMIZATIONS
 
 ### 1. Constant Folding (Compile-Time Evaluation)
@@ -927,6 +929,104 @@ In a loop with N iterations:
 - Detects concatenation on either side (S$ + X or X + S$)
 
 **TODO:** Suggest specific STRING$() or array-based alternatives (needs code generation phase)
+
+---
+
+### 27. Type Rebinding Analysis (Phase 1)
+**Status:** ✅ Complete (Detection)
+**Location:** `src/semantic_analyzer.py` - `_analyze_variable_type_bindings()`, `TypeBinding`
+**What it does:**
+- Detects variables that can change type at different program points
+- Identifies FOR loop variables that can re-bind from DOUBLE to INTEGER
+- Detects sequential independent assignments that can use different types
+- Tracks data dependencies to determine safe re-binding opportunities
+- Enables fast INTEGER arithmetic in loops even if variable was DOUBLE before
+
+**Algorithm:**
+- Analyzes each assignment (LET, FOR) to infer expression type
+- Uses `_is_integer_valued_expression()` to detect INTEGER vs DOUBLE
+- Checks for integer literals (10 vs 10.0)
+- Checks for INTEGER operations (+, -, *, \, MOD, bitwise)
+- Detects FOR loops with integer bounds (re-binds loop variable)
+- Tracks data dependencies (X = X + 1 depends on previous X)
+- Marks bindings as "can rebind" if no dependency on previous value
+
+**Key Example (from doc/TYPE_REBINDING_STRATEGY.md):**
+```basic
+100 I=22.1                ' I is DOUBLE
+110 FOR I=0 TO 10         ' I re-binds as INTEGER (fast!)
+120   J=J+I               ' INTEGER + INTEGER (fast!)
+130 NEXT I
+```
+
+**Analysis Output:**
+```
+Type Rebinding Analysis (Phase 1):
+  Found 2 variable(s) with type bindings
+
+  Variables that can be re-bound (1):
+    I!:
+      Line 100: DOUBLE - Assignment from DOUBLE expression
+      Line 110: INTEGER - FOR loop with INTEGER bounds
+      Type sequence: DOUBLE → INTEGER
+      ✓ Can optimize with type re-binding
+```
+
+**Benefits:**
+- **Fast loop arithmetic**: Loop variables with integer bounds compile as INTEGER
+  - On 8080: INTEGER is 10-50 cycles, DOUBLE is 8000-15000 cycles (500-800x faster!)
+  - On modern CPUs: Still benefits from smaller data size and integer ALU
+- **Memory efficient**: INTEGER uses 2 bytes vs 8 bytes for DOUBLE (4x savings)
+- **Flexible**: Same variable can be DOUBLE before loop, INTEGER in loop
+- **No programmer burden**: Automatic detection, no type annotations required
+
+**Detection Rules:**
+
+1. **Integer Literal**: `10` is INTEGER, `10.0` is DOUBLE (checks literal field)
+2. **Integer Operations**: `A + B` is INTEGER if A and B are both INTEGER
+3. **FOR Loop Bounds**: `FOR I=1 TO 100` → I is INTEGER (bounds are integer)
+4. **Built-in Functions**: `LEN()`, `ASC()`, `INT()`, `FIX()` return INTEGER
+5. **Array Subscripts**: Variables used as subscripts are typically INTEGER
+6. **Comparison Results**: `X < Y` returns INTEGER (-1 or 0 in BASIC)
+
+**Phase 1 Limitations:**
+- FOR loops and sequential assignments only (no complex control flow)
+- Doesn't handle subroutines with multiple call sites yet
+- Doesn't handle IF-THEN-ELSE branches (would need SSA/phi nodes)
+- Detection only (code generation not implemented yet)
+
+**Current Capabilities:**
+- ✅ FOR loop variable re-binding (I=22.1 then FOR I=0 TO 10)
+- ✅ Sequential independent assignments (X=10; PRINT X; X=10.5)
+- ✅ Dependency tracking (X=X+1 cannot rebind because depends on previous X)
+- ✅ Integer detection distinguishes `10` from `10.0`
+- ❌ Subroutine specialization (too complex for Phase 1)
+- ❌ Control flow merges (too complex for Phase 1)
+
+**Future Phases:**
+
+**Phase 2**: Simple promotion analysis
+- Allow re-binding with INT→DOUBLE promotion
+- Example: `X=10; Y=X+1; X=10.5` (promote Y to DOUBLE for `X+Y`)
+
+**Phase 3**: Subroutine analysis (optional)
+- Detect if subroutine needs specialization
+- Generate multiple versions for different type combinations
+- Trade-off: code size vs performance
+
+**Related Documents:**
+- `doc/DYNAMIC_TYPE_CHANGE_PROBLEM.md` - Problem analysis
+- `doc/COMPILATION_STRATEGIES_COMPARISON.md` - Strategy comparison
+- `doc/INTEGER_INFERENCE_STRATEGY.md` - Pure inference approach
+- `doc/TYPE_INFERENCE_WITH_ERRORS.md` - Error-based approach
+- `doc/TYPE_REBINDING_STRATEGY.md` - **Current implementation** (Phase 1)
+
+**Note:**
+This optimization addresses the fundamental challenge of compiling BASIC's dynamic typing:
+- Interpreter can change variable types at runtime (C=1 then C=1.1)
+- Compiler must choose types at compile time
+- This analysis finds "safe rebinding points" where types can change
+- Enables performance optimization (fast INTEGER loops) without breaking semantics
 
 ---
 

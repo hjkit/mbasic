@@ -391,6 +391,17 @@ class IntegerInferenceAnalysis:
 
 
 @dataclass
+class TypeBinding:
+    """Represents a type binding for a variable at a specific program point"""
+    variable: str  # Variable name (without suffix)
+    line: int  # Line number where this binding occurs
+    type_name: str  # "INTEGER", "SINGLE", "DOUBLE", "STRING"
+    reason: str  # Why this type was assigned
+    depends_on_previous: bool = False  # Does this assignment depend on previous value?
+    can_rebind: bool = True  # Can we safely re-bind to a different type?
+
+
+@dataclass
 class InductionVariable:
     """Information about an induction variable in a loop"""
     variable: str  # Variable name (e.g., "I")
@@ -842,6 +853,11 @@ class SemanticAnalyzer:
         # String concatenation in loops tracking
         self.string_concat_in_loops: List[StringConcatInLoop] = []  # All detected string concatenations in loops
 
+        # Type rebinding tracking (Phase 1: FOR loops and sequential assignments)
+        self.type_bindings: List[TypeBinding] = []  # All type bindings discovered
+        self.variable_type_versions: Dict[str, List[TypeBinding]] = {}  # var_name -> [binding1, binding2, ...]
+        self.can_rebind_variable: Dict[str, bool] = {}  # var_name -> can safely rebind?
+
     def analyze(self, program: ProgramNode) -> bool:
         """
         Analyze a program AST.
@@ -892,6 +908,9 @@ class SemanticAnalyzer:
 
             # Fourteenth pass: string concatenation in loops
             self._analyze_string_concat_in_loops(program)
+
+            # Fifteenth pass: variable type rebinding analysis
+            self._analyze_variable_type_bindings(program)
 
             # Generate warnings for required compilation switches
             self._check_compilation_switches()
@@ -4766,6 +4785,267 @@ class SemanticAnalyzer:
 
         return False
 
+    def _analyze_variable_type_bindings(self, program: ProgramNode):
+        """
+        Analyze variable type bindings to detect type re-binding opportunities.
+        Phase 1: FOR loops and sequential independent assignments.
+        """
+        self.type_bindings.clear()
+        self.variable_type_versions.clear()
+        self.can_rebind_variable.clear()
+
+        # Process each line in order
+        for line in program.lines:
+            for stmt in line.statements:
+                self._analyze_stmt_for_type_binding(stmt, line.line_number)
+
+        # Now analyze which variables can be re-bound
+        for var_name, bindings in self.variable_type_versions.items():
+            if len(bindings) <= 1:
+                # Only one binding, no re-binding needed
+                self.can_rebind_variable[var_name] = False
+                continue
+
+            # Check if all bindings have different types
+            types = [b.type_name for b in bindings]
+            if len(set(types)) == 1:
+                # All same type, no re-binding needed
+                self.can_rebind_variable[var_name] = False
+                continue
+
+            # Check if all bindings can be re-bound
+            all_can_rebind = all(b.can_rebind for b in bindings)
+            self.can_rebind_variable[var_name] = all_can_rebind
+
+    def _analyze_stmt_for_type_binding(self, stmt, line_num: int):
+        """Analyze a statement to detect type bindings"""
+        if stmt is None:
+            return
+
+        from parser import (LetStatementNode, ForStatementNode, InputStatementNode,
+                           ReadStatementNode, VariableNode)
+
+        # LET statement
+        if isinstance(stmt, LetStatementNode):
+            if isinstance(stmt.variable, VariableNode):
+                var_name = stmt.variable.name.upper()
+                if stmt.variable.type_suffix:
+                    var_name += stmt.variable.type_suffix
+
+                # Skip string variables for now
+                if var_name.endswith('$'):
+                    return
+
+                # Infer type from expression
+                type_name = self._infer_expression_type(stmt.expression)
+                depends_on_previous = self._expr_contains_variable(stmt.expression, var_name)
+
+                binding = TypeBinding(
+                    variable=var_name,
+                    line=line_num,
+                    type_name=type_name,
+                    reason=f"Assignment from {type_name} expression",
+                    depends_on_previous=depends_on_previous,
+                    can_rebind=not depends_on_previous  # Can rebind if no dependency
+                )
+
+                self.type_bindings.append(binding)
+                if var_name not in self.variable_type_versions:
+                    self.variable_type_versions[var_name] = []
+                self.variable_type_versions[var_name].append(binding)
+
+        # FOR statement
+        elif isinstance(stmt, ForStatementNode):
+            if isinstance(stmt.variable, VariableNode):
+                var_name = stmt.variable.name.upper()
+                if stmt.variable.type_suffix:
+                    var_name += stmt.variable.type_suffix
+
+                # Check if loop bounds are INTEGER
+                start_int = self._is_integer_valued_expression(stmt.start_expr)
+                end_int = self._is_integer_valued_expression(stmt.end_expr)
+                step_int = True
+                if stmt.step_expr:
+                    step_int = self._is_integer_valued_expression(stmt.step_expr)
+
+                if start_int and end_int and step_int:
+                    type_name = "INTEGER"
+                    reason = "FOR loop with INTEGER bounds"
+                else:
+                    type_name = "DOUBLE"
+                    reason = "FOR loop with DOUBLE bounds"
+
+                # FOR loop always overwrites, so can rebind
+                binding = TypeBinding(
+                    variable=var_name,
+                    line=line_num,
+                    type_name=type_name,
+                    reason=reason,
+                    depends_on_previous=False,  # FOR overwrites completely
+                    can_rebind=True  # Can always rebind for FOR loops
+                )
+
+                self.type_bindings.append(binding)
+                if var_name not in self.variable_type_versions:
+                    self.variable_type_versions[var_name] = []
+                self.variable_type_versions[var_name].append(binding)
+
+        # INPUT/READ (ambiguous types - would need explicit type)
+        elif isinstance(stmt, (InputStatementNode, ReadStatementNode)):
+            # For now, skip INPUT/READ as they're ambiguous
+            pass
+
+    def _infer_expression_type(self, expr) -> str:
+        """Infer the type of an expression"""
+        if self._is_integer_valued_expression(expr):
+            return "INTEGER"
+        # For now, default to DOUBLE for anything not provably INTEGER
+        return "DOUBLE"
+
+    def _is_integer_valued_expression(self, expr) -> bool:
+        """
+        Check if an expression produces an INTEGER value.
+        Used for type rebinding analysis.
+        """
+        if expr is None:
+            return False
+
+        from parser import (NumberNode, VariableNode, BinaryOpNode, UnaryOpNode,
+                           FunctionCallNode, ForStatementNode)
+        from tokens import TokenType
+
+        # Integer literal
+        if isinstance(expr, NumberNode):
+            # Check if it's an integer (no decimal point, no exponent)
+            if isinstance(expr.value, int):
+                return True
+            # Check if the literal field (original source) is an integer
+            if hasattr(expr, 'literal'):
+                # If literal is an int, it's an integer (e.g., 10)
+                if isinstance(expr.literal, int):
+                    return True
+                # If literal is a float, it had a decimal point (e.g., 10.0)
+                if isinstance(expr.literal, float):
+                    return False  # Even if it's a whole number, it had a decimal point
+                # Check if literal is a string without decimal point
+                if isinstance(expr.literal, str) and '.' not in expr.literal and 'e' not in expr.literal.lower():
+                    return True
+            # Fallback: if value is a whole number but we don't have literal info
+            # This shouldn't happen but be conservative
+            return False
+
+        # Variable reference - check if variable has INTEGER type
+        if isinstance(expr, VariableNode):
+            var_name = expr.name.upper()
+            if expr.type_suffix:
+                var_name += expr.type_suffix
+                # Explicit INTEGER suffix
+                if expr.type_suffix == '%':
+                    return True
+
+            # Check if we've already inferred this variable's type
+            if var_name in self.variable_type_versions:
+                bindings = self.variable_type_versions[var_name]
+                if bindings and bindings[-1].type_name == "INTEGER":
+                    return True
+
+            # If we have an explicit DOUBLE or STRING suffix and no INTEGER inference, it's not INTEGER
+            if expr.type_suffix in ('#', '$'):
+                return False
+
+            # Default: not integer (includes '!' suffix without INTEGER inference)
+            return False
+
+        # Binary operation
+        if isinstance(expr, BinaryOpNode):
+            left_int = self._is_integer_valued_expression(expr.left)
+            right_int = self._is_integer_valued_expression(expr.right)
+
+            # Both operands must be INTEGER for result to be INTEGER
+            if not (left_int and right_int):
+                return False
+
+            # Check operator
+            op_map = {
+                TokenType.PLUS: '+',
+                TokenType.MINUS: '-',
+                TokenType.MULTIPLY: '*',
+                TokenType.DIVIDE: '/',
+                TokenType.BACKSLASH: '\\',
+                TokenType.POWER: '^',
+                TokenType.MOD: 'MOD',
+                TokenType.AND: 'AND',
+                TokenType.OR: 'OR',
+                TokenType.XOR: 'XOR',
+                TokenType.NOT: 'NOT',
+                TokenType.EQV: 'EQV',
+                TokenType.IMP: 'IMP',
+                TokenType.EQUAL: '=',
+                TokenType.NOT_EQUAL: '<>',
+                TokenType.LESS_THAN: '<',
+                TokenType.GREATER_THAN: '>',
+                TokenType.LESS_EQUAL: '<=',
+                TokenType.GREATER_EQUAL: '>=',
+            }
+            op_str = op_map.get(expr.operator, str(expr.operator))
+            op = op_str.upper() if isinstance(op_str, str) else str(op_str)
+
+            # INTEGER operations
+            if op in ('+', '-', '*', '\\', 'MOD', 'AND', 'OR', 'XOR', 'NOT', 'EQV', 'IMP'):
+                return True
+
+            # Comparison operations return INTEGER (-1 or 0)
+            if op in ('=', '<>', '<', '>', '<=', '>='):
+                return True
+
+            # Floating-point division always produces float
+            if op == '/':
+                return False
+
+            # Exponentiation might produce float
+            if op == '^':
+                return False  # Conservative
+
+            return False
+
+        # Unary operation
+        if isinstance(expr, UnaryOpNode):
+            op_map = {
+                TokenType.MINUS: '-',
+                TokenType.PLUS: '+',
+                TokenType.NOT: 'NOT',
+            }
+            op_str = op_map.get(expr.operator, str(expr.operator))
+            op = op_str.upper() if isinstance(op_str, str) else str(op_str)
+
+            operand_int = self._is_integer_valued_expression(expr.operand)
+
+            # Unary minus/plus preserves type
+            if op in ('-', '+'):
+                return operand_int
+
+            # NOT is always integer
+            if op == 'NOT':
+                return True
+
+            return False
+
+        # Function call - check if it returns INTEGER
+        if isinstance(expr, FunctionCallNode):
+            func_name = expr.name.upper()
+            # Functions that return INTEGER
+            integer_functions = {
+                'LEN', 'ASC', 'INSTR', 'FIX', 'INT', 'CINT',
+                'POS', 'EOF', 'LOC', 'LOF', 'CSRLIN', 'PEEK',
+                'INP', 'SGN', 'ABS',  # ABS might return INTEGER if arg is INTEGER
+            }
+            if func_name in integer_functions:
+                return True
+
+            return False
+
+        return False
+
     def _get_string_concat_impact(self, loop_info, estimated_allocations: int) -> str:
         """Determine the performance impact of string concatenation in a loop"""
         if loop_info.iteration_count:
@@ -5329,6 +5609,44 @@ class SemanticAnalyzer:
                     lines.append(f"      Error: Index {violation.subscript_value} exceeds upper bound {violation.upper_bound}")
 
                 lines.append(f"      Impact: Will cause runtime error (Subscript out of range)")
+                lines.append("")
+
+        # Type Rebinding Analysis
+        if self.type_bindings:
+            lines.append(f"\nType Rebinding Analysis (Phase 1):")
+            lines.append(f"  Found {len(self.variable_type_versions)} variable(s) with type bindings")
+            lines.append("")
+
+            # Find variables that can be re-bound
+            rebindable_vars = [var for var, can_rebind in self.can_rebind_variable.items() if can_rebind]
+
+            if rebindable_vars:
+                lines.append(f"  Variables that can be re-bound ({len(rebindable_vars)}):")
+                for var_name in sorted(rebindable_vars):
+                    bindings = self.variable_type_versions[var_name]
+                    types = [b.type_name for b in bindings]
+                    if len(set(types)) > 1:  # Only show if types actually change
+                        lines.append(f"    {var_name}:")
+                        for binding in bindings:
+                            depends = " (depends on previous)" if binding.depends_on_previous else ""
+                            lines.append(f"      Line {binding.line}: {binding.type_name} - {binding.reason}{depends}")
+
+                        # Show the type sequence
+                        type_seq = " → ".join(types)
+                        lines.append(f"      Type sequence: {type_seq}")
+                        lines.append(f"      ✓ Can optimize with type re-binding")
+                        lines.append("")
+
+            # Show variables with type conflicts (cannot rebind)
+            non_rebindable = [var for var, can_rebind in self.can_rebind_variable.items()
+                            if not can_rebind and len(self.variable_type_versions[var]) > 1]
+            if non_rebindable:
+                lines.append(f"  Variables with dependencies (cannot re-bind): {len(non_rebindable)}")
+                for var_name in sorted(non_rebindable)[:5]:  # Limit to first 5
+                    bindings = self.variable_type_versions[var_name]
+                    lines.append(f"    {var_name}: {len(bindings)} assignments, has data dependencies")
+                if len(non_rebindable) > 5:
+                    lines.append(f"    ... and {len(non_rebindable) - 5} more")
                 lines.append("")
 
         # Warnings
