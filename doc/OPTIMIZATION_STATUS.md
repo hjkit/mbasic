@@ -263,23 +263,40 @@ This document tracks all optimizations implemented, planned, and possible for th
 - Handles both addition and multiplication
 - Enables further optimizations downstream
 
+### 15. Boolean Simplification
+**Status:** ✅ Complete
+**Location:** `src/semantic_analyzer.py` - `_apply_algebraic_simplification()`, `_apply_strength_reduction()`
+**What it does:**
+- **Relational operator inversion**: Eliminates NOT by inverting comparison
+  - `NOT(A > B)` → `A <= B`
+  - `NOT(A < B)` → `A >= B`
+  - `NOT(A >= B)` → `A < B`
+  - `NOT(A <= B)` → `A > B`
+  - `NOT(A = B)` → `A <> B`
+  - `NOT(A <> B)` → `A = B`
+- **De Morgan's laws**: Distributes NOT over Boolean operators
+  - `NOT(A AND B)` → `(NOT A) OR (NOT B)`
+  - `NOT(A OR B)` → `(NOT A) AND (NOT B)`
+- **Absorption laws**: Eliminates redundant Boolean operations
+  - `(A AND B) OR A` → `A`
+  - `A OR (A AND B)` → `A`
+  - `(A OR B) AND A` → `A`
+  - `A AND (A OR B)` → `A`
+- **Double negation**: Already covered in algebraic simplification
+  - `NOT(NOT X)` → `X`
+
+**Benefits:**
+- Eliminates NOT operations when possible
+- Simplifies conditional expressions
+- Reduces Boolean operation overhead
+- More efficient conditional evaluation
+- Cleaner generated code
+
 ---
 
 ## 📋 READY TO IMPLEMENT NOW (Semantic Analysis Phase)
 
 These optimizations can be implemented in the semantic analyzer without requiring code generation:
-
-### 6. Boolean Simplification
-**Complexity:** Medium
-**What it does:**
-- `NOT(NOT X)` → `X`
-- `NOT(A > B)` → `A <= B`
-- `(A OR B) AND A` → `A`
-- De Morgan's laws
-
-**Implementation:**
-- Pattern matching in expression analyzer
-- Apply logical equivalence rules
 
 ### 7. Forward Substitution
 **Complexity:** Medium
@@ -476,6 +493,7 @@ These require actual code generation/transformation, not just analysis:
 4. ✅ Copy Propagation - DONE
 5. ✅ Algebraic Simplification - DONE (Boolean + arithmetic identities)
 6. ✅ Expression Reassociation - DONE
+7. ✅ Boolean Simplification - DONE (relational inversion, De Morgan, absorption)
 
 ### High Value, High Effort
 1. ✅ Loop-Invariant Detection - DONE (transformation needs codegen)
@@ -498,8 +516,9 @@ These require actual code generation/transformation, not just analysis:
 
 ### Immediate (Semantic Analysis)
 1. ✅ **Expression Reassociation** - DONE (Exposes constant folding)
-2. **Range Analysis** - Improves dead code detection
+2. ✅ **Boolean Simplification** - DONE (NOT inversion, De Morgan, absorption)
 3. **Forward Substitution** - Eliminate single-use temporaries
+4. **Range Analysis** - Improves dead code detection
 
 ### Short Term (Still Semantic)
 5. **Live Variable Analysis** - Completes the analysis suite
@@ -527,6 +546,7 @@ These require actual code generation/transformation, not just analysis:
 - ✅ Algebraic simplification - **Standard** (Boolean + arithmetic)
 - ✅ Induction variable optimization - **Standard** (IV detection and SR opportunities)
 - ✅ Expression reassociation - **Standard** (enables constant folding)
+- ✅ Boolean simplification - **Standard** (relational inversion, De Morgan, absorption)
 
 ### What We're Missing (that modern compilers have)
 - ❌ SSA form - Not needed for BASIC's simplicity
@@ -550,13 +570,13 @@ We've implemented a **strong foundation** of compiler optimizations that are:
 3. **Complete for analysis** - Detection and transformation done
 4. **Modern-quality analysis** - Comparable to modern compilers' semantic phase
 
-**Current Status: 14 optimizations implemented!**
+**Current Status: 15 optimizations implemented!**
 
 **What's left for semantic analysis:**
-- Range analysis
 - Forward substitution
+- Range analysis
 - Live variable analysis
-- Boolean simplification (NOT(A > B) → A <= B, etc.)
+- Branch optimization (constant condition detection)
 
 **What needs code generation:**
 - Peephole optimization

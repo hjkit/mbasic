@@ -2141,17 +2141,71 @@ class SemanticAnalyzer:
                 reduction_type = "double NOT -> identity"
                 savings = "Eliminate double negation"
 
+            # Relational operator inversion: NOT(A op B) -> A op' B
+            elif isinstance(expr.operand, BinaryOpNode):
+                op = expr.operand.operator
+                inverted_op = None
+
+                # Map each relational operator to its inverse
+                if op == TokenType.GREATER_THAN:
+                    inverted_op = TokenType.LESS_EQUAL
+                    reduction_type = "NOT(A > B) -> A <= B"
+                elif op == TokenType.LESS_THAN:
+                    inverted_op = TokenType.GREATER_EQUAL
+                    reduction_type = "NOT(A < B) -> A >= B"
+                elif op == TokenType.GREATER_EQUAL:
+                    inverted_op = TokenType.LESS_THAN
+                    reduction_type = "NOT(A >= B) -> A < B"
+                elif op == TokenType.LESS_EQUAL:
+                    inverted_op = TokenType.GREATER_THAN
+                    reduction_type = "NOT(A <= B) -> A > B"
+                elif op == TokenType.EQUAL:
+                    inverted_op = TokenType.NOT_EQUAL
+                    reduction_type = "NOT(A = B) -> A <> B"
+                elif op == TokenType.NOT_EQUAL:
+                    inverted_op = TokenType.EQUAL
+                    reduction_type = "NOT(A <> B) -> A = B"
+                # De Morgan's laws
+                elif op == TokenType.AND:
+                    # NOT(A AND B) -> (NOT A) OR (NOT B)
+                    new_expr = BinaryOpNode(
+                        left=UnaryOpNode(operator=TokenType.NOT, operand=expr.operand.left),
+                        operator=TokenType.OR,
+                        right=UnaryOpNode(operator=TokenType.NOT, operand=expr.operand.right)
+                    )
+                    reduction_type = "De Morgan: NOT(A AND B) -> (NOT A) OR (NOT B)"
+                    savings = "Apply De Morgan's law"
+                elif op == TokenType.OR:
+                    # NOT(A OR B) -> (NOT A) AND (NOT B)
+                    new_expr = BinaryOpNode(
+                        left=UnaryOpNode(operator=TokenType.NOT, operand=expr.operand.left),
+                        operator=TokenType.AND,
+                        right=UnaryOpNode(operator=TokenType.NOT, operand=expr.operand.right)
+                    )
+                    reduction_type = "De Morgan: NOT(A OR B) -> (NOT A) AND (NOT B)"
+                    savings = "Apply De Morgan's law"
+
+                # If we found an inverted operator, create the new expression
+                if inverted_op is not None:
+                    new_expr = BinaryOpNode(
+                        left=expr.operand.left,
+                        operator=inverted_op,
+                        right=expr.operand.right
+                    )
+                    savings = "Eliminate NOT by inverting relational operator"
+
             # NOT(0) -> -1, NOT(-1) -> 0
-            operand_val = self.evaluator.evaluate(expr.operand)
-            if operand_val is not None:
-                if operand_val == 0:
-                    new_expr = NumberNode(value=-1.0, literal="-1")
-                    reduction_type = "NOT FALSE -> TRUE"
-                    savings = "Constant folding"
-                elif operand_val == -1:
-                    new_expr = NumberNode(value=0.0, literal="0")
-                    reduction_type = "NOT TRUE -> FALSE"
-                    savings = "Constant folding"
+            if new_expr is None:
+                operand_val = self.evaluator.evaluate(expr.operand)
+                if operand_val is not None:
+                    if operand_val == 0:
+                        new_expr = NumberNode(value=-1.0, literal="-1")
+                        reduction_type = "NOT FALSE -> TRUE"
+                        savings = "Constant folding"
+                    elif operand_val == -1:
+                        new_expr = NumberNode(value=0.0, literal="0")
+                        reduction_type = "NOT TRUE -> FALSE"
+                        savings = "Constant folding"
 
         # Negation optimizations
         elif expr.operator == TokenType.MINUS:
@@ -2389,6 +2443,40 @@ class SemanticAnalyzer:
                 new_expr = expr.left
                 reduction_type = "AND with self -> identity"
                 savings = "Eliminate AND"
+            # Absorption law: (A OR B) AND A -> A
+            elif (isinstance(expr.left, BinaryOpNode) and
+                  expr.left.operator == TokenType.OR and
+                  isinstance(expr.right, VariableNode)):
+                # Check if right operand matches either side of OR
+                if (isinstance(expr.left.left, VariableNode) and
+                    expr.left.left.name.upper() == expr.right.name.upper() and
+                    expr.left.left.subscripts is None and expr.right.subscripts is None):
+                    new_expr = expr.right
+                    reduction_type = "Absorption: (A OR B) AND A -> A"
+                    savings = "Eliminate redundant AND and OR"
+                elif (isinstance(expr.left.right, VariableNode) and
+                      expr.left.right.name.upper() == expr.right.name.upper() and
+                      expr.left.right.subscripts is None and expr.right.subscripts is None):
+                    new_expr = expr.right
+                    reduction_type = "Absorption: (B OR A) AND A -> A"
+                    savings = "Eliminate redundant AND and OR"
+            # Absorption law: A AND (A OR B) -> A
+            elif (isinstance(expr.right, BinaryOpNode) and
+                  expr.right.operator == TokenType.OR and
+                  isinstance(expr.left, VariableNode)):
+                # Check if left operand matches either side of OR
+                if (isinstance(expr.right.left, VariableNode) and
+                    expr.right.left.name.upper() == expr.left.name.upper() and
+                    expr.right.left.subscripts is None and expr.left.subscripts is None):
+                    new_expr = expr.left
+                    reduction_type = "Absorption: A AND (A OR B) -> A"
+                    savings = "Eliminate redundant AND and OR"
+                elif (isinstance(expr.right.right, VariableNode) and
+                      expr.right.right.name.upper() == expr.left.name.upper() and
+                      expr.right.right.subscripts is None and expr.left.subscripts is None):
+                    new_expr = expr.left
+                    reduction_type = "Absorption: A AND (B OR A) -> A"
+                    savings = "Eliminate redundant AND and OR"
 
         elif expr.operator == TokenType.OR:
             # X OR -1 -> -1 (TRUE)
@@ -2417,6 +2505,40 @@ class SemanticAnalyzer:
                 new_expr = expr.left
                 reduction_type = "OR with self -> identity"
                 savings = "Eliminate OR"
+            # Absorption law: (A AND B) OR A -> A
+            elif (isinstance(expr.left, BinaryOpNode) and
+                  expr.left.operator == TokenType.AND and
+                  isinstance(expr.right, VariableNode)):
+                # Check if right operand matches either side of AND
+                if (isinstance(expr.left.left, VariableNode) and
+                    expr.left.left.name.upper() == expr.right.name.upper() and
+                    expr.left.left.subscripts is None and expr.right.subscripts is None):
+                    new_expr = expr.right
+                    reduction_type = "Absorption: (A AND B) OR A -> A"
+                    savings = "Eliminate redundant OR and AND"
+                elif (isinstance(expr.left.right, VariableNode) and
+                      expr.left.right.name.upper() == expr.right.name.upper() and
+                      expr.left.right.subscripts is None and expr.right.subscripts is None):
+                    new_expr = expr.right
+                    reduction_type = "Absorption: (B AND A) OR A -> A"
+                    savings = "Eliminate redundant OR and AND"
+            # Absorption law: A OR (A AND B) -> A
+            elif (isinstance(expr.right, BinaryOpNode) and
+                  expr.right.operator == TokenType.AND and
+                  isinstance(expr.left, VariableNode)):
+                # Check if left operand matches either side of AND
+                if (isinstance(expr.right.left, VariableNode) and
+                    expr.right.left.name.upper() == expr.left.name.upper() and
+                    expr.right.left.subscripts is None and expr.left.subscripts is None):
+                    new_expr = expr.left
+                    reduction_type = "Absorption: A OR (A AND B) -> A"
+                    savings = "Eliminate redundant OR and AND"
+                elif (isinstance(expr.right.right, VariableNode) and
+                      expr.right.right.name.upper() == expr.left.name.upper() and
+                      expr.right.right.subscripts is None and expr.left.subscripts is None):
+                    new_expr = expr.left
+                    reduction_type = "Absorption: A OR (B AND A) -> A"
+                    savings = "Eliminate redundant OR and AND"
 
         elif expr.operator == TokenType.XOR:
             # X XOR 0 -> X
