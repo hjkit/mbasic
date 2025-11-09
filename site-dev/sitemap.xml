@@ -2,558 +2,114 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://avwohl.github.io/mbasic/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/PROJECT_STATUS/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
+    </url>
+    <url>
+         <loc>https://avwohl.github.io/mbasic/dev/IMPORT_CONSISTENCY_FIX/</loc>
+         <lastmod>2025-11-09</lastmod>
+    </url>
+    <url>
+         <loc>https://avwohl.github.io/mbasic/dev/KEYBINDING_SYSTEMS/</loc>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/dev/REDIS_PER_SESSION_SETTINGS/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/dev/REDIS_SESSION_STORAGE_SETUP/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/dev/REDIS_STORAGE_BUG_FIX/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/100_PERCENT_UI_TEST_COVERAGE_ACHIEVED/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/ARRAY_ELEMENT_SELECTOR_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/BROKEN_LINKS_REPORT_2024-10-26/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/CALLSTACK_UI_PC_ENHANCEMENT_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/CASE_PRESERVING_VARIABLES_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/CHAIN_ERROR_HANDLING_FIXES_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/COMPILER_DESIGN/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/COMPILER_VS_INTERPRETER_DIFFERENCES/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/CURRENT_FAILURE_ANALYSIS/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/CURSES_BACKEND_COMPLETE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/CURSES_UI_INPUT_CHECK_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/DE_NONEIFY_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/DIRECTORY_STRUCTURE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/DOC_REORGANIZATION_COMPLETE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/DOC_REORGANIZATION_PLAN/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/EDIT_AT_BREAKPOINT_VALIDATION_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/ERROR_ANALYSIS/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/ERROR_HANDLING_PC_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/FAILURE_CATEGORIZATION/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/FAILURE_CATEGORIZATION_CURRENT/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/FILEIO_MODULE_ARCHITECTURE_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/FINAL_RESULTS/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/FIXED_documentation_inconsistencies_2025_11_03/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/FIX_MKDOCS_STRICT_MODE_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/FOR_LOOP_STACK_FIX_2025-10-27/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/IMPLEMENTATION_COMPLETE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/INCONSISTENCIES_FIXES_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/INPUT_SANITIZATION_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/INTERACTIVE_MODE_2025-10-22/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/INTERPRETER_COMPILER_ARCHITECTURE_2025-10-22/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/INTERPRETER_IMPLEMENTATION_2025-10-22/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/KEYWORD_CASE_HANDLING_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/LANGUAGE_CHANGES/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/LANGUAGE_DOCUMENTATION_COMPLETION_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/LANGUAGE_TESTING_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/LEXER_CLEANUP_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/LEXER_FAILURE_ANALYSIS/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/LEXER_ISSUES/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/LIBRARY_BROWSER_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/MATH_PRECISION_ANALYSIS/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/MBASIC_HISTORY/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/MISSING_OPERATORS_DONE_2025-10-31/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/PARSER_SUMMARY/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/PARSER_TEST_RESULTS/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/PARSE_TREE_STRUCTURE_2025-10-22/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/PC_OLD_EXECUTION_METHODS_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/PHASE1_IO_ABSTRACTION_PROGRESS/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/PHASE2_PROGRAM_MANAGEMENT_PROGRESS/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/PHASE3_UI_ABSTRACTION_PROGRESS/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/PHASE4_DYNAMIC_LOADING_PROGRESS/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/PLUGGABLE_STORAGE_BACKENDS_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/PRESERVE_ORIGINAL_SPACING_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/REFACTORING_COMPLETE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/SEMANTIC_ANALYSIS_FOR_BASIC_2025-10-22/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/SESSION_2025-10-29_IMPROVEMENTS/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/SESSION_2025-10-29_PC_REFACTORING/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/SESSION_2025_10_28_HELP_SEARCH_IMPROVEMENTS/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/SESSION_2025_10_28_KEYWORD_CASE_INTEGRATION/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/SESSION_2025_10_28_SETTINGS_AND_CASE_HANDLING/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/SETTINGS_IMPLEMENTATION_PLAN_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/SETTINGS_SYSTEM_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/SIMPLIFY_EXECUTION_STATE_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/SINGLE_SOURCE_OF_TRUTH_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/STRING_GARBAGE_COLLECTION_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/TESTING_SYSTEM_ORGANIZATION_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/TEST_RESULTS/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/TIMELINE_NOV_01/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/TIMELINE_OCT_23-25/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/TIMELINE_OCT_27-28/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/TIMELINE_OCT_28-31/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/TK_UI_INPUT_DIALOG_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/TOKEN_LIST_VERIFICATION_2025-10-22/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/TOKEN_USAGE_SUMMARY_2025-10-22/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/TRUE_100_PERCENT_UI_TEST_COVERAGE_ACHIEVED/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/TYPE_INFERENCE_WITH_ERRORS/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/UI_STATUS_FIELD_REMOVAL_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/VARIABLE_SORT_REFACTORING_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/VISUAL_BACKENDS_CURSES_TK/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/VISUAL_UI_REFACTORING_PLAN/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/WEB_MULTI_USER_SESSION_ISOLATION_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/WEB_UI_DOUBLECLICK_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/WEB_UI_INPUT_UX_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/WEB_UI_MISSING_FEATURES_OLD/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/WEB_UI_OUTPUT_IMPROVEMENTS_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/WEB_UI_PARITY_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/WEB_UI_WINDOWS_EOL_DONE/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/code-global-v13/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/code-v14/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/docs-v14/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/docs_todo-v12/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/documentation_fixes_100_percent_complete/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/documentation_fixes_2025_11_03/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/documentation_fixes_final_report/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/documentation_fixes_session2_report/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/documentation_fixes_session3_report/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/documentation_fixes_session4_report/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/documentation_fixes_session5_report/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/documentation_fixes_session6_report/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/fixed_issues_analysis/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/session_2025-10-25_help_system_keybindings/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/session_2025-10-27_error_handling_continue_button/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/session_keybinding_system_implementation/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/session_web_ui_implementation/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/planning/PHASE1_IMPROVEMENTS_2025-10-22/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/planning/PHASE2_IMPROVEMENTS_2025-10-22/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/planning/PHASE3_IMPROVEMENTS_2025-10-22/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/planning/PHASE4_IMPROVEMENTS_2025-10-22/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/sessions/FINAL_SESSION_SUMMARY/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/sessions/SESSION_2025-10-22_SUMMARY/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/sessions/SESSION_FINAL_SUMMARY_2025-10-22/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/snapshots/PARSER_STATUS_2025-10-22/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/snapshots/PARSER_TEST_REPORT_2025-10-22/</loc>
-         <lastmod>2025-11-08</lastmod>
-    </url>
-    <url>
-         <loc>https://avwohl.github.io/mbasic/history/snapshots/PARSE_ERROR_CATEGORIES_2025-10-22/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/library/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/library/business/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/library/data_management/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/library/demos/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/library/education/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/library/electronics/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/library/games/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/library/ham_radio/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/library/telecommunications/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/library/utilities/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/user/CASE_HANDLING_GUIDE/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/user/CHOOSING_YOUR_UI/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/user/FILE_FORMAT_COMPATIBILITY/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/user/INSTALL/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/user/INSTALLATION/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/user/QUICK_REFERENCE/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/user/SETTINGS_AND_CONFIGURATION/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/user/TK_UI_QUICK_START/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/user/UI_FEATURE_COMPARISON/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/user/keyboard-shortcuts/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
     <url>
          <loc>https://avwohl.github.io/mbasic/user/sequential-files/</loc>
-         <lastmod>2025-11-08</lastmod>
+         <lastmod>2025-11-09</lastmod>
     </url>
 </urlset>
