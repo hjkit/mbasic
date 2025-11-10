@@ -2171,11 +2171,11 @@
 - True to original MBASIC</p>
 <p><strong>Limitations:</strong>
 - Line-by-line editing only
-- No visual debugging (text commands only)
+- No visual debugging interface (uses text commands instead)
 - No mouse support
 - No Save without filename</p>
 <blockquote>
-<p><strong>Note:</strong> CLI has full debugging capabilities through commands (BREAK, STEP, STACK), but lacks the visual debugging interface (Variables Window, clickable breakpoints, etc.) found in Curses, Tk, and Web UIs.</p>
+<p><strong>Note:</strong> CLI has full debugging capabilities through text commands (BREAK, STEP, STACK), but lacks the visual debugging interface (Variables Window, clickable breakpoints, etc.) found in Curses, Tk, and Web UIs.</p>
 </blockquote>
 <h3 id="curses-terminal-ui">📟 Curses (Terminal UI)<a class="headerlink" href="#curses-terminal-ui" title="Permanent link">&para;</a></h3>
 <p><strong>Choose Curses when you:</strong>
@@ -2357,19 +2357,22 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>python3<span class="w"> </span>mbasic<span class="w"> </span>--ui<span class="w"> </span>web<span class="w"> </span>--open
 </code></pre></div></p>
 <h2 id="performance-comparison">Performance Comparison<a class="headerlink" href="#performance-comparison" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><strong>Note:</strong> These measurements are approximate, taken on typical development hardware (modern CPU, 8GB+ RAM, Python 3.9+). Actual performance varies based on your system. Startup times are "cold start" measurements. Memory usage shown is Python process only; Web UI browser memory not included.</p>
+</blockquote>
 <h3 id="startup-time">Startup Time<a class="headerlink" href="#startup-time" title="Permanent link">&para;</a></h3>
 <ol>
 <li><strong>CLI</strong>: ~0.1s (fastest)</li>
 <li><strong>Curses</strong>: ~0.3s</li>
 <li><strong>Tk</strong>: ~0.8s</li>
-<li><strong>Web</strong>: ~2s (browser launch)</li>
+<li><strong>Web</strong>: ~2s (includes browser launch time)</li>
 </ol>
 <h3 id="memory-usage-approximate">Memory Usage (approximate)<a class="headerlink" href="#memory-usage-approximate" title="Permanent link">&para;</a></h3>
 <ol>
 <li><strong>CLI</strong>: 20MB (lowest)</li>
 <li><strong>Curses</strong>: 25MB</li>
 <li><strong>Tk</strong>: 40MB</li>
-<li><strong>Web</strong>: 50MB+ (plus browser)</li>
+<li><strong>Web</strong>: 50MB+ (Python process only; browser adds 100MB+)</li>
 </ol>
 <h3 id="large-file-handling">Large File Handling<a class="headerlink" href="#large-file-handling" title="Permanent link">&para;</a></h3>
 <ol>

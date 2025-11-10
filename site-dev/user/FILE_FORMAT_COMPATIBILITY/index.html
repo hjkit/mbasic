@@ -1508,17 +1508,17 @@
 
 <h1 id="file-format-compatibility">File Format Compatibility<a class="headerlink" href="#file-format-compatibility" title="Permanent link">&para;</a></h1>
 <h2 id="line-endings-newlines">Line Endings (Newlines)<a class="headerlink" href="#line-endings-newlines" title="Permanent link">&para;</a></h2>
-<p>MBASIC saves all program files using <strong>Unix-style line endings</strong> (<code>\n</code>, also called LF).</p>
+<p>MBASIC saves all program files using <strong>LF line endings</strong> (Line Feed, <code>\n</code>, Unix-style).</p>
 <h3 id="what-this-means">What This Means<a class="headerlink" href="#what-this-means" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Loading files</strong>: MBASIC automatically handles files with any line ending style:</li>
-<li>Unix (<code>\n</code> / LF)</li>
-<li>Windows (<code>\r\n</code> / CRLF)</li>
+<li>LF (<code>\n</code>, Unix/Linux/Mac)</li>
+<li>CRLF (<code>\r\n</code>, Windows/CP/M)</li>
 <li>
-<p>Classic Mac (<code>\r</code> / CR)</p>
+<p>CR (<code>\r</code>, Classic Mac)</p>
 </li>
 <li>
-<p><strong>Saving files</strong>: MBASIC always saves with Unix line endings (<code>\n</code>)</p>
+<p><strong>Saving files</strong>: MBASIC always saves with LF line endings (<code>\n</code>)</p>
 </li>
 </ul>
 <h3 id="why-unix-line-endings">Why Unix Line Endings?<a class="headerlink" href="#why-unix-line-endings" title="Permanent link">&para;</a></h3>
