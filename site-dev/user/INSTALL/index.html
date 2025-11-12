@@ -862,6 +862,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#quick-install-from-pypi-beta" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Install from PyPI (Beta)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#python-package-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       Python Package Dependencies
@@ -1552,6 +1561,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#quick-install-from-pypi-beta" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Install from PyPI (Beta)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#python-package-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       Python Package Dependencies
@@ -1795,6 +1813,24 @@ This is <strong>required</strong> to use virtual environments (recommended). Wit
 </code></pre></div>
 Only needed if you want to use the Tkinter GUI backend. Skip this if you only need CLI/Curses/Web UIs.</p>
 <p><strong>On other systems</strong> (Fedora, macOS, Windows), virtual environment support and tkinter are usually included with Python.</p>
+<h2 id="quick-install-from-pypi-beta">Quick Install from PyPI (Beta)<a class="headerlink" href="#quick-install-from-pypi-beta" title="Permanent link">&para;</a></h2>
+<p><strong>If you just want to install and use MBASIC</strong>, the easiest method is via PyPI:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Install the beta version (requires --pre flag)</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>pip<span class="w"> </span>install<span class="w"> </span>--pre<span class="w"> </span>mbasic
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Or with full-screen terminal UI support</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>pip<span class="w"> </span>install<span class="w"> </span>--pre<span class="w"> </span>mbasic<span class="o">[</span>curses<span class="o">]</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Or with all UI backends</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>pip<span class="w"> </span>install<span class="w"> </span>--pre<span class="w"> </span>mbasic<span class="o">[</span>all<span class="o">]</span>
+</code></pre></div>
+<blockquote>
+<p><strong>Beta Note</strong>: We're currently in BETA (version 1.0.0b1) and gathering feedback. The <code>--pre</code> flag is required to install beta releases. Once we release stable 1.0.0, the <code>--pre</code> flag will no longer be necessary.</p>
+</blockquote>
+<p>After installation, run:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mbasic
+</code></pre></div></p>
+<p><strong>If you prefer to install from source</strong>, continue reading the sections below.</p>
 <h2 id="python-package-dependencies">Python Package Dependencies<a class="headerlink" href="#python-package-dependencies" title="Permanent link">&para;</a></h2>
 <p>MBASIC's Python dependencies depend on which UI mode you plan to use:</p>
 <table>
@@ -1829,34 +1865,34 @@ Only needed if you want to use the Tkinter GUI backend. Skip this if you only ne
 <h3 id="method-1-using-virtual-environment-recommended">Method 1: Using Virtual Environment (Recommended)<a class="headerlink" href="#method-1-using-virtual-environment-recommended" title="Permanent link">&para;</a></h3>
 <p>A virtual environment keeps this project's dependencies separate from your system Python. This is the recommended approach for Python projects.</p>
 <h4 id="step-1-download-the-project">Step 1: Download the project<a class="headerlink" href="#step-1-download-the-project" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Clone the repository (if using git)</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/avwohl/mbasic.git
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nb">cd</span><span class="w"> </span>mbasic
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1"># OR download and extract the ZIP file, then:</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="nb">cd</span><span class="w"> </span>mbasic
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Clone the repository (if using git)</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/avwohl/mbasic.git
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nb">cd</span><span class="w"> </span>mbasic
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="c1"># OR download and extract the ZIP file, then:</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="nb">cd</span><span class="w"> </span>mbasic
 </code></pre></div>
 <h4 id="step-2-create-a-virtual-environment">Step 2: Create a virtual environment<a class="headerlink" href="#step-2-create-a-virtual-environment" title="Permanent link">&para;</a></h4>
 <p><strong>On Linux/Mac:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
 </code></pre></div></p>
 <p><strong>On Windows:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python -m venv venv
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python -m venv venv
 </code></pre></div></p>
 <p>This creates a new directory called <code>venv</code> containing an isolated Python environment.</p>
 <h4 id="step-3-activate-the-virtual-environment">Step 3: Activate the virtual environment<a class="headerlink" href="#step-3-activate-the-virtual-environment" title="Permanent link">&para;</a></h4>
 <p><strong>On Linux/Mac:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate
 </code></pre></div></p>
 <p><strong>On Windows (Command Prompt):</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>venv\Scripts\activate.bat
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>venv\Scripts\activate.bat
 </code></pre></div></p>
 <p><strong>On Windows (PowerShell):</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">Activate</span><span class="p">.</span><span class="n">ps1</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">Activate</span><span class="p">.</span><span class="n">ps1</span>
 </code></pre></div></p>
 <p>You should see <code>(venv)</code> appear at the beginning of your command prompt, indicating the virtual environment is active.</p>
 <h4 id="step-4-install-dependencies">Step 4: Install dependencies<a class="headerlink" href="#step-4-install-dependencies" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </code></pre></div>
 <p>This installs optional dependencies for specific UIs:
 - <strong>CLI mode</strong>: No dependencies needed (Python standard library only)
@@ -1865,80 +1901,80 @@ Only needed if you want to use the Tkinter GUI backend. Skip this if you only ne
 - <strong>Web mode</strong>: Requires <code>nicegui</code> for browser-based UI</p>
 <p>If you only plan to use CLI mode, you can skip this step.</p>
 <h4 id="step-5-run-the-interpreter">Step 5: Run the interpreter<a class="headerlink" href="#step-5-run-the-interpreter" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>python3<span class="w"> </span>mbasic
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>python3<span class="w"> </span>mbasic
 </code></pre></div>
 <p>Or run a BASIC program:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python3<span class="w"> </span>mbasic<span class="w"> </span>basic/bas_tests1/hello.bas
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>python3<span class="w"> </span>mbasic<span class="w"> </span>basic/bas_tests1/hello.bas
 </code></pre></div>
 <h4 id="deactivating-the-virtual-environment">Deactivating the virtual environment<a class="headerlink" href="#deactivating-the-virtual-environment" title="Permanent link">&para;</a></h4>
 <p>When you're done, you can deactivate the virtual environment:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>deactivate
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>deactivate
 </code></pre></div>
 <h3 id="method-2-direct-installation-simple">Method 2: Direct Installation (Simple)<a class="headerlink" href="#method-2-direct-installation-simple" title="Permanent link">&para;</a></h3>
 <p>If you don't want to use a virtual environment, you can run the interpreter directly:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Navigate to the project directory</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="nb">cd</span><span class="w"> </span>mbasic
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># Run the interpreter (CLI mode - no dependencies required)</span>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>python3<span class="w"> </span>mbasic
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Navigate to the project directory</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nb">cd</span><span class="w"> </span>mbasic
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c1"># Run the interpreter (CLI mode - no dependencies required)</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>python3<span class="w"> </span>mbasic
 </code></pre></div>
 <p><strong>Note</strong>: CLI mode uses only Python's standard library and requires no external dependencies. For other UIs (Curses, Tk, Web), you'll need to install their dependencies via <code>pip install -r requirements.txt</code>.</p>
 <h3 id="method-3-install-as-a-python-package">Method 3: Install as a Python Package<a class="headerlink" href="#method-3-install-as-a-python-package" title="Permanent link">&para;</a></h3>
 <p>For system-wide installation:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nb">cd</span><span class="w"> </span>mbasic
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nb">cd</span><span class="w"> </span>mbasic
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </code></pre></div>
 <p>After this, you can run <code>mbasic</code> from anywhere on your system.</p>
 <h2 id="verifying-the-installation">Verifying the Installation<a class="headerlink" href="#verifying-the-installation" title="Permanent link">&para;</a></h2>
 <h3 id="test-interactive-mode">Test Interactive Mode<a class="headerlink" href="#test-interactive-mode" title="Permanent link">&para;</a></h3>
 <p>Run the interpreter without arguments:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>python3<span class="w"> </span>mbasic
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>python3<span class="w"> </span>mbasic
 </code></pre></div>
 <p>You should see:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>MBASIC-2025 - Modern MBASIC 5.21 Interpreter
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>Ready
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>Ok
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>MBASIC-2025 - Modern MBASIC 5.21 Interpreter
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>Ready
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>Ok
 </code></pre></div>
 <p>Try entering:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kr">PRINT</span><span class="w"> </span><span class="s2">&quot;Hello, World!&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kr">PRINT</span><span class="w"> </span><span class="s2">&quot;Hello, World!&quot;</span>
 </code></pre></div>
 <p>You should see the output immediately.</p>
 <h3 id="test-file-execution">Test File Execution<a class="headerlink" href="#test-file-execution" title="Permanent link">&para;</a></h3>
 <p>Run one of the included test programs:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>python3<span class="w"> </span>mbasic<span class="w"> </span>basic/tests_with_results/test_operator_precedence.bas
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>python3<span class="w"> </span>mbasic<span class="w"> </span>basic/tests_with_results/test_operator_precedence.bas
 </code></pre></div>
 <p>You should see:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>All 20 tests PASS
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>All 20 tests PASS
 </code></pre></div>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <h3 id="python3-command-not-found">"python3: command not found"<a class="headerlink" href="#python3-command-not-found" title="Permanent link">&para;</a></h3>
 <p>On some systems, Python 3 is available as <code>python</code> instead of <code>python3</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>python<span class="w"> </span>--version
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>python<span class="w"> </span>--version
 </code></pre></div>
 <p>If this shows Python 3.8 or later, you can use <code>python</code> instead of <code>python3</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>python<span class="w"> </span>mbasic
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>python<span class="w"> </span>mbasic
 </code></pre></div>
 <h3 id="permission-denied-on-linuxmac">Permission Denied on Linux/Mac<a class="headerlink" href="#permission-denied-on-linuxmac" title="Permanent link">&para;</a></h3>
 <p>Make sure the script is executable:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>chmod<span class="w"> </span>+x<span class="w"> </span>mbasic
-<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>./mbasic
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>chmod<span class="w"> </span>+x<span class="w"> </span>mbasic
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>./mbasic
 </code></pre></div>
 <h3 id="virtual-environment-not-activating-on-windows">Virtual Environment Not Activating on Windows<a class="headerlink" href="#virtual-environment-not-activating-on-windows" title="Permanent link">&para;</a></h3>
 <p>If you get an error about execution policies in PowerShell, you may need to allow scripts:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nb">Set-ExecutionPolicy</span> <span class="n">-ExecutionPolicy</span> <span class="n">RemoteSigned</span> <span class="n">-Scope</span> <span class="n">CurrentUser</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="nb">Set-ExecutionPolicy</span> <span class="n">-ExecutionPolicy</span> <span class="n">RemoteSigned</span> <span class="n">-Scope</span> <span class="n">CurrentUser</span>
 </code></pre></div>
 <p>Then try activating again.</p>
 <h3 id="module-not-found-errors">"Module not found" errors<a class="headerlink" href="#module-not-found-errors" title="Permanent link">&para;</a></h3>
 <p>Make sure you're in the correct directory (the <code>mbasic</code> folder containing <code>mbasic</code>).</p>
 <h3 id="ensurepip-is-not-available-when-creating-venv">"ensurepip is not available" when creating venv<a class="headerlink" href="#ensurepip-is-not-available-when-creating-venv" title="Permanent link">&para;</a></h3>
 <p><strong>On Debian/Ubuntu/Linux Mint</strong>, if you get this error:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>The virtual environment was not created successfully because ensurepip is not available.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>The virtual environment was not created successfully because ensurepip is not available.
 </code></pre></div></p>
 <p>You need to install the <code>python3-venv</code> package:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-venv
-<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="c1"># OR for specific Python version:</span>
-<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3.12-venv
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-venv
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="c1"># OR for specific Python version:</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3.12-venv
 </code></pre></div></p>
 <p>This is a required system package for creating virtual environments on Debian-based systems.</p>
 <h2 id="feature-status">Feature Status<a class="headerlink" href="#feature-status" title="Permanent link">&para;</a></h2>
@@ -1984,7 +2020,7 @@ Only needed if you want to use the Tkinter GUI backend. Skip this if you only ne
 <li>Check that you're using Python 3.8 or later</li>
 <li>Make sure you're in the project directory</li>
 <li>Try running with <code>DEBUG=1</code> for more detailed error messages:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="nv">DEBUG</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python3<span class="w"> </span>mbasic<span class="w"> </span>yourprogram.bas
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="nv">DEBUG</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python3<span class="w"> </span>mbasic<span class="w"> </span>yourprogram.bas
 </code></pre></div></li>
 </ol>
 <p>Happy BASIC programming!</p>

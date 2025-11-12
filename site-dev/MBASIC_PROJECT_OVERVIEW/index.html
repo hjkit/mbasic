@@ -1604,7 +1604,7 @@
 - Modern debugging features (BREAK, STEP, WATCH, STACK)
 - Four UI options: CLI (classic), Curses (full-screen), Tk (GUI), Web (browser-based)</p>
 <p><strong>Native Code Compiler (100% Complete)</strong>
-- Generates real CP/M executables for Z80 processors
+- Generates real CP/M executables for 8080 or Z80 processors
 - <strong>Every</strong> compilable MBASIC 5.21 feature implemented
 - Hardware access features that work: PEEK/POKE/INP/OUT/WAIT
 - Machine language integration: CALL/USR/VARPTR
@@ -1636,7 +1636,7 @@
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nl">70</span><span class="w"> </span><span class="vg">ADDR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">VARPTR</span><span class="p">(</span><span class="vg">A</span><span class="p">)</span><span class="w">     </span><span class="c1">&#39; Get variable address</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nl">80</span><span class="w"> </span><span class="vg">RESULT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="vg">USR</span><span class="p">(</span><span class="il">16384</span><span class="p">)</span><span class="w">  </span><span class="c1">&#39; Call ML function</span>
 </code></pre></div></p>
-<p>These don't just parse - they generate <strong>real Z80 machine code</strong> that works on actual hardware or emulators!</p>
+<p>These don't just parse - they generate <strong>real 8080/Z80 machine code</strong> that works on actual hardware or emulators!</p>
 <p><strong>Efficient Runtime Library</strong>
 - Custom string system with smart garbage collection
 - Only 1 malloc in the entire system (pool initialization)
@@ -1750,7 +1750,7 @@
 <p><strong>Building a CP/M system?</strong> MBASIC-2025's compiler generates real CP/M executables:
 - Write in comfortable modern editor
 - Compile to .COM files
-- Run on real Z80 hardware or emulators
+- Run on 8080 or Z80 hardware or emulators
 - Access hardware directly (ports, memory)</p>
 <h3 id="education-and-training">Education and Training<a class="headerlink" href="#education-and-training" title="Permanent link">&para;</a></h3>
 <p><strong>Teaching programming?</strong> MBASIC-2025 makes it easy:
@@ -1760,9 +1760,9 @@
 - Progress from interpreter to compiler
 - Understand low-level hardware access</p>
 <h3 id="embedded-systems-development">Embedded Systems Development<a class="headerlink" href="#embedded-systems-development" title="Permanent link">&para;</a></h3>
-<p><strong>Need a simple language for Z80 projects?</strong>
+<p><strong>Need a simple language for 8080 or Z80 projects?</strong>
 - Write in BASIC (easier than assembly)
-- Compile to efficient Z80 code
+- Compile to efficient 8080/Z80 code
 - Direct hardware access (PEEK/POKE/INP/OUT)
 - Call assembly routines when needed
 - Small runtime footprint</p>
@@ -1779,7 +1779,7 @@
 <li>Complete semantic analysis phase</li>
 <li>Type checking and optimization</li>
 <li>C code generation (portable target)</li>
-<li>Z80-specific optimizations via z88dk</li>
+<li>8080/Z80-specific optimizations via z88dk</li>
 <li>Sophisticated string management</li>
 </ul>
 <h3 id="runtime-library">Runtime Library<a class="headerlink" href="#runtime-library" title="Permanent link">&para;</a></h3>
@@ -1856,7 +1856,7 @@
 - Development tools</p>
 <p>See <a href="../dev/LINUX_MINT_DEVELOPER_SETUP/">docs/dev/LINUX_MINT_DEVELOPER_SETUP.md</a></p>
 <h3 id="for-compiler-users">For Compiler Users<a class="headerlink" href="#for-compiler-users" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Install z88dk (Z80 C compiler)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Install z88dk (8080/Z80 C compiler)</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sudo<span class="w"> </span>snap<span class="w"> </span>install<span class="w"> </span>z88dk<span class="w"> </span>--beta
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Compile BASIC to CP/M</span>

@@ -12,7 +12,7 @@
         <meta name="author" content="MBASIC Project Contributors">
       
       
-        <link rel="canonical" href="https://avwohl.github.io/mbasic/dev/COMPILER_STATUS_SUMMARY/">
+        <link rel="canonical" href="https://avwohl.github.io/mbasic/dev/KUBERNETES_DEPLOYMENT_SETUP/">
       
       
       
@@ -22,7 +22,7 @@
     
     
       
-        <title>MBASIC Compiler - Actual Status (2025-11-11) - MBASIC 5.21 Documentation (Full)</title>
+        <title>Kubernetes Deployment Setup Log - MBASIC 5.21 Documentation (Full)</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#mbasic-compiler-actual-status-2025-11-11" class="md-skip">
+        <a href="#kubernetes-deployment-setup-log" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              MBASIC Compiler - Actual Status (2025-11-11)
+              Kubernetes Deployment Setup Log
             
           </span>
         </div>
@@ -1192,91 +1192,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#executive-summary" class="md-nav__link">
+  <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
-      Executive Summary
+      Prerequisites
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#implemented-and-working" class="md-nav__link">
-    <span class="md-ellipsis">
-      ✅ IMPLEMENTED AND WORKING
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="✅ IMPLEMENTED AND WORKING">
+    <nav class="md-nav" aria-label="Prerequisites">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#core-language-100" class="md-nav__link">
+  <a href="#install-docker-if-needed" class="md-nav__link">
     <span class="md-ellipsis">
-      Core Language (100%)
+      Install Docker (if needed)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#functions-100" class="md-nav__link">
+  <a href="#configure-doctl-for-docker-registry" class="md-nav__link">
     <span class="md-ellipsis">
-      Functions (100%)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#string-operations-100" class="md-nav__link">
-    <span class="md-ellipsis">
-      String Operations (100%)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#io-operations-100" class="md-nav__link">
-    <span class="md-ellipsis">
-      I/O Operations (100%)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#sequential-file-io-100" class="md-nav__link">
-    <span class="md-ellipsis">
-      Sequential File I/O (100%)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#error-handling-100" class="md-nav__link">
-    <span class="md-ellipsis">
-      Error Handling (100%)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#system-operations-100" class="md-nav__link">
-    <span class="md-ellipsis">
-      System Operations (100%)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#memory-optimizations-recent-2025-11-11" class="md-nav__link">
-    <span class="md-ellipsis">
-      Memory Optimizations (Recent: 2025-11-11)
+      Configure doctl for Docker registry
     </span>
   </a>
   
@@ -1288,19 +1225,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#fully-implemented-2025-11-11" class="md-nav__link">
+  <a href="#container-registry-setup" class="md-nav__link">
     <span class="md-ellipsis">
-      ✅ FULLY IMPLEMENTED (2025-11-11)
+      Container Registry Setup
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="✅ FULLY IMPLEMENTED (2025-11-11)">
+    <nav class="md-nav" aria-label="Container Registry Setup">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#random-file-io-100-just-completed" class="md-nav__link">
+  <a href="#1-create-digitalocean-container-registry" class="md-nav__link">
     <span class="md-ellipsis">
-      Random File I/O (100% - Just Completed!)
+      1. Create DigitalOcean Container Registry
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-configure-docker-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Configure Docker Authentication
     </span>
   </a>
   
@@ -1312,55 +1258,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#newly-implemented-2025-11-11" class="md-nav__link">
+  <a href="#kubernetes-configuration" class="md-nav__link">
     <span class="md-ellipsis">
-      ✅ NEWLY IMPLEMENTED (2025-11-11)
+      Kubernetes Configuration
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="✅ NEWLY IMPLEMENTED (2025-11-11)">
+    <nav class="md-nav" aria-label="Kubernetes Configuration">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#system-and-hardware-access" class="md-nav__link">
+  <a href="#3-create-kubernetes-secrets" class="md-nav__link">
     <span class="md-ellipsis">
-      System and Hardware Access
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#file-management" class="md-nav__link">
-    <span class="md-ellipsis">
-      File Management
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#display-and-printer" class="md-nav__link">
-    <span class="md-ellipsis">
-      Display and Printer
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#program-chaining" class="md-nav__link">
-    <span class="md-ellipsis">
-      Program Chaining
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#interpreter-only-features-not-applicable" class="md-nav__link">
-    <span class="md-ellipsis">
-      Interpreter-Only Features (Not Applicable)
+      3. Create Kubernetes Secrets
     </span>
   </a>
   
@@ -1372,28 +1282,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#implementation-status-by-category" class="md-nav__link">
+  <a href="#docker-image-build-and-push" class="md-nav__link">
     <span class="md-ellipsis">
-      Implementation Status by Category
+      Docker Image Build and Push
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Docker Image Build and Push">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4-build-docker-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Build Docker Image
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-actually-left" class="md-nav__link">
-    <span class="md-ellipsis">
-      What's Actually Left?
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="What&#39;s Actually Left?">
-      <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#nothing-left-100-complete" class="md-nav__link">
+  <a href="#5-push-to-registry" class="md-nav__link">
     <span class="md-ellipsis">
-      Nothing Left! 100% Complete!
+      5. Push to Registry
     </span>
   </a>
   
@@ -1405,64 +1315,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#surprise-discovery" class="md-nav__link">
+  <a href="#deployment" class="md-nav__link">
     <span class="md-ellipsis">
-      Surprise Discovery
+      Deployment
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#bottom-line" class="md-nav__link">
-    <span class="md-ellipsis">
-      Bottom Line
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#recent-work-2025-11-11" class="md-nav__link">
-    <span class="md-ellipsis">
-      Recent Work (2025-11-11)
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Recent Work (2025-11-11)">
+    <nav class="md-nav" aria-label="Deployment">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#random-file-io-implementation-completed" class="md-nav__link">
+  <a href="#6-apply-kubernetes-manifests" class="md-nav__link">
     <span class="md-ellipsis">
-      Random File I/O Implementation - COMPLETED! 🎉
+      6. Apply Kubernetes Manifests
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#final-feature-batch-completed" class="md-nav__link">
+  <a href="#7-verify-deployment" class="md-nav__link">
     <span class="md-ellipsis">
-      Final Feature Batch - COMPLETED! 🎉
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#memory-optimizations-earlier-today" class="md-nav__link">
-    <span class="md-ellipsis">
-      Memory Optimizations (Earlier today)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#printf-investigation-earlier-today" class="md-nav__link">
-    <span class="md-ellipsis">
-      Printf Investigation (Earlier today)
+      7. Verify Deployment
     </span>
   </a>
   
@@ -1474,9 +1348,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-works-now" class="md-nav__link">
+  <a href="#configuration-summary" class="md-nav__link">
     <span class="md-ellipsis">
-      What Works Now
+      Configuration Summary
     </span>
   </a>
   
@@ -1498,7 +1372,7 @@
 
 
   
-    <a href="https://github.com/avwohl/mbasic/edit/main/docs/dev/COMPILER_STATUS_SUMMARY.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/avwohl/mbasic/edit/main/docs/dev/KUBERNETES_DEPLOYMENT_SETUP.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1506,379 +1380,112 @@
   
 
 
-<h1 id="mbasic-compiler-actual-status-2025-11-11">MBASIC Compiler - Actual Status (2025-11-11)<a class="headerlink" href="#mbasic-compiler-actual-status-2025-11-11" title="Permanent link">&para;</a></h1>
-<h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
-<p><strong>THE COMPILER IS 100% COMPLETE!</strong> 🎉</p>
-<p>All features of Microsoft BASIC Compiler (BASCOM) are now implemented! Final implementations on 2025-11-11:
-- PEEK/POKE, INP/OUT, WAIT (hardware access)
-- CALL, USR, VARPTR (machine language interface)
-- RESET, NAME, FILES, WIDTH, LPRINT, CLEAR (system operations)
-- <strong>CHAIN</strong> - Program chaining using CP/M warm boot (implemented today!)</p>
-<h2 id="implemented-and-working">✅ IMPLEMENTED AND WORKING<a class="headerlink" href="#implemented-and-working" title="Permanent link">&para;</a></h2>
-<h3 id="core-language-100">Core Language (100%)<a class="headerlink" href="#core-language-100" title="Permanent link">&para;</a></h3>
+<h1 id="kubernetes-deployment-setup-log">Kubernetes Deployment Setup Log<a class="headerlink" href="#kubernetes-deployment-setup-log" title="Permanent link">&para;</a></h1>
+<p>This document tracks all commands needed to set up the MBASIC web application for deployment on DigitalOcean Kubernetes.</p>
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Variables, arrays, expressions, control flow</li>
-<li>All data types (INTEGER, SINGLE, DOUBLE, STRING)</li>
-<li>FOR/NEXT, WHILE/WEND, IF/THEN/ELSE</li>
-<li>GOTO/GOSUB/RETURN, ON...GOTO/ON...GOSUB</li>
+<li><code>doctl</code> CLI installed and authenticated</li>
+<li><code>kubectl</code> configured to connect to your Kubernetes cluster</li>
+<li>Docker installed locally</li>
 </ul>
-<h3 id="functions-100">Functions (100%)<a class="headerlink" href="#functions-100" title="Permanent link">&para;</a></h3>
+<h3 id="install-docker-if-needed">Install Docker (if needed)<a class="headerlink" href="#install-docker-if-needed" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Install Docker from Ubuntu repository</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>docker.io
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># Add user to docker group (requires logout/login or newgrp to take effect)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>sudo<span class="w"> </span>usermod<span class="w"> </span>-aG<span class="w"> </span>docker<span class="w"> </span><span class="nv">$USER</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># Start and enable Docker service</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>docker
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>docker
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1"># After running above, logout/login OR run: newgrp docker</span>
+</code></pre></div>
+<h3 id="configure-doctl-for-docker-registry">Configure doctl for Docker registry<a class="headerlink" href="#configure-doctl-for-docker-registry" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Give doctl snap permission to access Docker</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sudo<span class="w"> </span>snap<span class="w"> </span>connect<span class="w"> </span>doctl:dot-docker
+</code></pre></div>
+<h2 id="container-registry-setup">Container Registry Setup<a class="headerlink" href="#container-registry-setup" title="Permanent link">&para;</a></h2>
+<h3 id="1-create-digitalocean-container-registry">1. Create DigitalOcean Container Registry<a class="headerlink" href="#1-create-digitalocean-container-registry" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Create the registry with starter tier (free)</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>doctl<span class="w"> </span>registry<span class="w"> </span>create<span class="w"> </span>awohl-mbasic<span class="w"> </span>--subscription-tier<span class="w"> </span>starter<span class="w"> </span>--region<span class="w"> </span>nyc3
+</code></pre></div>
+<h3 id="2-configure-docker-authentication">2. Configure Docker Authentication<a class="headerlink" href="#2-configure-docker-authentication" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Login to the registry</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>doctl<span class="w"> </span>registry<span class="w"> </span>login
+</code></pre></div>
+<h2 id="kubernetes-configuration">Kubernetes Configuration<a class="headerlink" href="#kubernetes-configuration" title="Permanent link">&para;</a></h2>
+<h3 id="3-create-kubernetes-secrets">3. Create Kubernetes Secrets<a class="headerlink" href="#3-create-kubernetes-secrets" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># First create the namespace</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deployment/k8s_templates/namespace.yaml
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Create the secrets with MySQL and hCaptcha credentials</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>kubectl<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>mbasic-secrets<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span>--namespace<span class="o">=</span>mbasic<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span>--from-literal<span class="o">=</span><span class="nv">MYSQL_HOST</span><span class="o">=</span><span class="m">10</span>.136.0.2<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span>--from-literal<span class="o">=</span><span class="nv">MYSQL_USER</span><span class="o">=</span>mbasic<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span>--from-literal<span class="o">=</span><span class="nv">MYSQL_PASSWORD</span><span class="o">=</span><span class="s1">&#39;[REDACTED]&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span>--from-literal<span class="o">=</span><span class="nv">HCAPTCHA_SITE_KEY</span><span class="o">=[</span>REDACTED<span class="o">]</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span>--from-literal<span class="o">=</span><span class="nv">HCAPTCHA_SECRET_KEY</span><span class="o">=[</span>REDACTED<span class="o">]</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="c1"># Note: Using private network IP (10.136.0.2) for MySQL connection</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="c1"># Both awohl4 droplet and k8s cluster are in same VPC (b3756118-dc84-11e8-8650-3cfdfea9f8c8)</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="c1"># No SSL is used for MySQL connection (firewall-based security on private network)</span>
+</code></pre></div>
+<h2 id="docker-image-build-and-push">Docker Image Build and Push<a class="headerlink" href="#docker-image-build-and-push" title="Permanent link">&para;</a></h2>
+<h3 id="4-build-docker-image">4. Build Docker Image<a class="headerlink" href="#4-build-docker-image" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Build the Docker image</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>registry.digitalocean.com/awohl-mbasic/mbasic-web:latest<span class="w"> </span>.
+</code></pre></div>
+<h3 id="5-push-to-registry">5. Push to Registry<a class="headerlink" href="#5-push-to-registry" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Push the image to DigitalOcean registry</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>docker<span class="w"> </span>push<span class="w"> </span>registry.digitalocean.com/awohl-mbasic/mbasic-web:latest
+</code></pre></div>
+<h2 id="deployment">Deployment<a class="headerlink" href="#deployment" title="Permanent link">&para;</a></h2>
+<h3 id="6-apply-kubernetes-manifests">6. Apply Kubernetes Manifests<a class="headerlink" href="#6-apply-kubernetes-manifests" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Deploy Redis (session storage)</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deployment/k8s_templates/redis-deployment.yaml
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Deploy ConfigMap (multiuser.json config)</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deployment/k8s_templates/mbasic-configmap.yaml
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="c1"># Deploy landing page</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deployment/k8s_templates/landing-page-deployment.yaml
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="c1"># Deploy MBASIC web application</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deployment/k8s_templates/mbasic-deployment.yaml
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="c1"># Deploy ingress (routes traffic, TLS/SSL)</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deployment/k8s_templates/ingress.yaml
+</code></pre></div>
+<h3 id="7-verify-deployment">7. Verify Deployment<a class="headerlink" href="#7-verify-deployment" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Check pod status</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-n<span class="w"> </span>mbasic
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Check services</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>-n<span class="w"> </span>mbasic
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># Check ingress</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>kubectl<span class="w"> </span>get<span class="w"> </span>ingress<span class="w"> </span>-n<span class="w"> </span>mbasic
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># View logs from a pod</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>kubectl<span class="w"> </span>logs<span class="w"> </span>-n<span class="w"> </span>mbasic<span class="w"> </span>-l<span class="w"> </span><span class="nv">app</span><span class="o">=</span>mbasic-web<span class="w"> </span>--tail<span class="o">=</span><span class="m">50</span>
+</code></pre></div>
+<h2 id="configuration-summary">Configuration Summary<a class="headerlink" href="#configuration-summary" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Math</strong>: ABS, SGN, INT, FIX, SIN, COS, TAN, ATN, EXP, LOG, SQR, RND</li>
-<li><strong>String</strong>: LEFT<span class="arithmatex"><span class="MathJax_Preview">, RIGHT</span><script type="math/tex">, RIGHT</script></span>, MID<span class="arithmatex"><span class="MathJax_Preview">, CHR</span><script type="math/tex">, CHR</script></span>, STR<span class="arithmatex"><span class="MathJax_Preview">, SPACE</span><script type="math/tex">, SPACE</script></span>, STRING<span class="arithmatex"><span class="MathJax_Preview">, HEX</span><script type="math/tex">, HEX</script></span>, OCT$</li>
-<li><strong>Analysis</strong>: LEN, ASC, VAL, INSTR</li>
-<li><strong>Conversion</strong>: CINT, CSNG, CDBL, CVI, CVS, CVD, MKI<span class="arithmatex"><span class="MathJax_Preview">, MKS</span><script type="math/tex">, MKS</script></span>, MKD$</li>
-<li><strong>Memory</strong>: FRE() - returns free memory/string pool, VARPTR() - get variable address</li>
-<li><strong>Hardware</strong>: PEEK() - read memory byte, INP() - read I/O port</li>
-<li><strong>Machine Language</strong>: USR() - call user function</li>
-<li><strong>User-defined</strong>: DEF FN</li>
+<li><strong>Registry:</strong> <code>registry.digitalocean.com/awohl-mbasic</code></li>
+<li><strong>Image:</strong> <code>registry.digitalocean.com/awohl-mbasic/mbasic-web:latest</code></li>
+<li><strong>Domain:</strong> <code>mbasic.awohl.com</code></li>
+<li><strong>MySQL Host:</strong> <code>10.136.0.2</code> (private network, no SSL)</li>
+<li><strong>MySQL User:</strong> <code>mbasic</code></li>
+<li><strong>MySQL Database:</strong> <code>mbasic_logs</code></li>
+<li><strong>VPC:</strong> <code>b3756118-dc84-11e8-8650-3cfdfea9f8c8</code> (shared between awohl4 droplet and k8s cluster)</li>
+<li><strong>Let's Encrypt Email:</strong> <code>xlets@awohl.com</code></li>
+<li><strong>hCaptcha Site Key:</strong> <code>849ee574-ddc4-468c-b8be-bdb2936cd808</code></li>
 </ul>
-<h3 id="string-operations-100">String Operations (100%)<a class="headerlink" href="#string-operations-100" title="Permanent link">&para;</a></h3>
-<ul>
-<li>All string functions</li>
-<li>MID$ statement (substring replacement)</li>
-</ul>
-<h3 id="io-operations-100">I/O Operations (100%)<a class="headerlink" href="#io-operations-100" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>PRINT</strong> - Console and file output ✅</li>
-<li><strong>PRINT USING</strong> - Formatted output ✅</li>
-<li><strong>INPUT</strong> - Keyboard and file input ✅</li>
-<li><strong>WRITE</strong> - Comma-delimited output ✅</li>
-<li><strong>TAB(n)</strong> - Tab to column ✅</li>
-<li><strong>SPC(n)</strong> - Output spaces ✅</li>
-</ul>
-<h3 id="sequential-file-io-100">Sequential File I/O (100%)<a class="headerlink" href="#sequential-file-io-100" title="Permanent link">&para;</a></h3>
-<ul>
-<li>OPEN (modes: I, O, A, R)</li>
-<li>CLOSE, INPUT #, LINE INPUT #, PRINT #, WRITE #</li>
-<li>KILL, EOF(), LOC(), LOF()</li>
-</ul>
-<h3 id="error-handling-100">Error Handling (100%)<a class="headerlink" href="#error-handling-100" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>ON ERROR GOTO</strong> - Set error trap ✅</li>
-<li><strong>RESUME</strong> - Retry error statement ✅</li>
-<li><strong>RESUME NEXT</strong> - Continue after error ✅</li>
-<li><strong>RESUME line</strong> - Jump to line ✅</li>
-<li><strong>ERROR</strong> - Trigger error ✅</li>
-<li><strong>ERR, ERL</strong> - Error code and line ✅</li>
-</ul>
-<h3 id="system-operations-100">System Operations (100%)<a class="headerlink" href="#system-operations-100" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Control</strong>: RANDOMIZE, SWAP</li>
-<li><strong>Data</strong>: DATA/READ/RESTORE</li>
-<li><strong>Hardware</strong>: POKE, OUT, WAIT</li>
-<li><strong>Machine Language</strong>: CALL</li>
-<li><strong>File Management</strong>: RESET, NAME</li>
-<li><strong>Display</strong>: LPRINT, WIDTH (generates warning)</li>
-<li><strong>Memory</strong>: CLEAR (closes files only)</li>
-</ul>
-<h3 id="memory-optimizations-recent-2025-11-11">Memory Optimizations (Recent: 2025-11-11)<a class="headerlink" href="#memory-optimizations-recent-2025-11-11" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Only 1 malloc (string pool initialization)</li>
-<li>GC uses in-place memmove (no temp buffer)</li>
-<li>C string temps use pool (no malloc)</li>
-<li>putchar loops instead of printf (16% code savings)</li>
-<li>-DAMALLOC for runtime heap detection</li>
-</ul>
-<h2 id="fully-implemented-2025-11-11">✅ FULLY IMPLEMENTED (2025-11-11)<a class="headerlink" href="#fully-implemented-2025-11-11" title="Permanent link">&para;</a></h2>
-<h3 id="random-file-io-100-just-completed">Random File I/O (100% - Just Completed!)<a class="headerlink" href="#random-file-io-100-just-completed" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>OPEN mode "R"</strong> - ✅ Opens random file</li>
-<li><strong>FIELD</strong> - ✅ Defines field layout, tracks variable mappings</li>
-<li><strong>GET</strong> - ✅ Reads record, populates field variables</li>
-<li><strong>PUT</strong> - ✅ Writes buffer to file</li>
-<li><strong>LSET</strong> - ✅ Left-justify with space padding</li>
-<li><strong>RSET</strong> - ✅ Right-justify with space padding</li>
-</ul>
-<p><strong>Implementation details:</strong>
-- Fixed-size record buffer per file
-- Field variable mapping (tracks file, offset, width for each string var)
-- GET automatically copies buffer contents to field variables
-- LSET/RSET write directly to buffer with proper padding
-- New string helper: <code>mb25_string_set_from_buf()</code> trims trailing spaces</p>
-<p><strong>Tested</strong>: Compiles successfully, generates correct C code</p>
-<h2 id="newly-implemented-2025-11-11">✅ NEWLY IMPLEMENTED (2025-11-11)<a class="headerlink" href="#newly-implemented-2025-11-11" title="Permanent link">&para;</a></h2>
-<h3 id="system-and-hardware-access">System and Hardware Access<a class="headerlink" href="#system-and-hardware-access" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>PEEK/POKE</strong> - Direct memory read/write ✅</li>
-<li><strong>INP/OUT</strong> - I/O port read/write ✅</li>
-<li><strong>WAIT</strong> - Wait for port condition ✅</li>
-<li><strong>VARPTR</strong> - Get address of variable ✅</li>
-<li><strong>USR</strong> - Call user machine language function ✅</li>
-<li><strong>CALL</strong> - Call machine language routine ✅</li>
-</ul>
-<h3 id="file-management">File Management<a class="headerlink" href="#file-management" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>RESET</strong> - Close all open files ✅</li>
-<li><strong>NAME</strong> - Rename file ✅</li>
-<li><strong>FILES</strong> - Directory listing (warning - requires CP/M BDOS) ⚠️</li>
-<li><strong>CLEAR</strong> - Close files (variable clearing not supported in compiled code) ⚠️</li>
-</ul>
-<h3 id="display-and-printer">Display and Printer<a class="headerlink" href="#display-and-printer" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>WIDTH</strong> - Set line width (warning - display feature) ⚠️</li>
-<li><strong>LPRINT</strong> - Line printer output ✅</li>
-</ul>
-<h3 id="program-chaining">Program Chaining<a class="headerlink" href="#program-chaining" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>CHAIN</strong> - Load another program ✅ <strong>IMPLEMENTED!</strong></li>
-<li>Implemented using CP/M warm boot technique (write to 0x0080, jump to 0x0000)</li>
-<li>Matches Microsoft BASCOM behavior exactly</li>
-<li>Supports basic CHAIN "filename"</li>
-<li>Does NOT support MERGE/ALL/DELETE/line number options (matching Microsoft BASCOM)</li>
-<li><strong>COMMON</strong> - Declare shared variables (not supported, matches Microsoft) ⚠️</li>
-<li>Microsoft BASCOM does NOT support COMMON (interpreter-only in MBASIC 5.21)</li>
-<li>Generates warning in MBASIC-2025 compiler</li>
-<li><strong>ERASE</strong> - Deallocate arrays (not supported, matches Microsoft) ⚠️</li>
-<li>Microsoft BASCOM does NOT support ERASE either</li>
-</ul>
-<h3 id="interpreter-only-features-not-applicable">Interpreter-Only Features (Not Applicable)<a class="headerlink" href="#interpreter-only-features-not-applicable" title="Permanent link">&para;</a></h3>
-<ul>
-<li>LIST, LOAD, SAVE, MERGE, NEW, DELETE, RENUM</li>
-<li>CONT, TRON/TROFF, STEP</li>
-<li>(These are for interactive interpreter, not compiled programs)</li>
-</ul>
-<h2 id="implementation-status-by-category">Implementation Status by Category<a class="headerlink" href="#implementation-status-by-category" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Category</th>
-<th>Status</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Core Language</td>
-<td>100%</td>
-<td>Complete</td>
-</tr>
-<tr>
-<td>Math Functions</td>
-<td>100%</td>
-<td>Complete</td>
-</tr>
-<tr>
-<td>String Functions</td>
-<td>100%</td>
-<td>Complete</td>
-</tr>
-<tr>
-<td>Control Flow</td>
-<td>100%</td>
-<td>IF/THEN/ELSE, all loops</td>
-</tr>
-<tr>
-<td>Sequential Files</td>
-<td>100%</td>
-<td>Complete</td>
-</tr>
-<tr>
-<td>Error Handling</td>
-<td>100%</td>
-<td>All RESUME variants!</td>
-</tr>
-<tr>
-<td>Output Formatting</td>
-<td>100%</td>
-<td>TAB/SPC/PRINT USING</td>
-</tr>
-<tr>
-<td>Random Files</td>
-<td>100%</td>
-<td>Complete! (2025-11-11)</td>
-</tr>
-<tr>
-<td>Binary Data</td>
-<td>100%</td>
-<td>MKI$/CVI etc. done</td>
-</tr>
-<tr>
-<td>Hardware Access</td>
-<td>100%</td>
-<td>PEEK/POKE/INP/OUT/WAIT (2025-11-11)</td>
-</tr>
-<tr>
-<td>Machine Language</td>
-<td>100%</td>
-<td>CALL/USR/VARPTR (2025-11-11)</td>
-</tr>
-<tr>
-<td>File Management</td>
-<td>100%</td>
-<td>RESET/NAME implemented (2025-11-11)</td>
-</tr>
-<tr>
-<td>Program Chaining</td>
-<td>100%</td>
-<td>CHAIN implemented! (2025-11-11)</td>
-</tr>
-</tbody>
-</table>
-<h2 id="whats-actually-left">What's Actually Left?<a class="headerlink" href="#whats-actually-left" title="Permanent link">&para;</a></h2>
-<p><del>1. <strong>Random File I/O</strong> (1-2 days)</del> ✅ COMPLETE (2025-11-11)
-<del>2. <strong>File Management</strong> (0.5 days)</del> ✅ COMPLETE (2025-11-11)
-<del>3. <strong>Hardware Access</strong> (0.5 days)</del> ✅ COMPLETE (2025-11-11)
-<del>4. <strong>Machine Language Interface</strong> (0.5 days)</del> ✅ COMPLETE (2025-11-11)
-<del>5. <strong>CHAIN statement</strong> (0.5 days)</del> ✅ <strong>COMPLETE (2025-11-11)</strong></p>
-<h3 id="nothing-left-100-complete">Nothing Left! 100% Complete!<a class="headerlink" href="#nothing-left-100-complete" title="Permanent link">&para;</a></h3>
-<p><strong>ALL MICROSOFT BASCOM FEATURES ARE NOW IMPLEMENTED!</strong> 🎉🎉🎉</p>
-<p>The MBASIC-2025 compiler now has 100% feature parity with Microsoft BASIC Compiler (BASCOM) from 1980!</p>
-<p>Features correctly NOT supported (matching Microsoft BASCOM):
-- <strong>COMMON</strong> - NOT supported by Microsoft BASCOM either (interpreter-only in MBASIC 5.21)
-- <strong>ERASE</strong> - NOT supported by Microsoft BASCOM either
-- <strong>CHAIN MERGE/ALL/DELETE</strong> - NOT supported by Microsoft BASCOM either
-- <strong>Display/system features</strong> - Generate warnings (WIDTH, FILES, CLEAR parameters)</p>
-<h2 id="surprise-discovery">Surprise Discovery<a class="headerlink" href="#surprise-discovery" title="Permanent link">&para;</a></h2>
-<p>While auditing what's left, I found that many "TODO" features are <strong>already implemented</strong>:
-- ✅ IF/THEN/ELSE (old docs said missing!)
-- ✅ Arrays and DIM (old docs said missing!)
-- ✅ RESUME NEXT (thought it was missing)
-- ✅ RESUME line (thought it was missing)
-- ✅ ERROR statement (thought it was missing)
-- ✅ TAB() function (thought it was missing)
-- ✅ SPC() function (thought it was missing)
-- ✅ Logical operators AND/OR/NOT (old docs said missing!)</p>
-<p>The documentation was way out of date!</p>
-<h2 id="bottom-line">Bottom Line<a class="headerlink" href="#bottom-line" title="Permanent link">&para;</a></h2>
-<p><strong>THE MBASIC 5.21 COMPILER IS 100% COMPLETE!</strong> 🎉🎉🎉</p>
-<p><strong>EVERYTHING</strong> that can be compiled from MBASIC 5.21 is now implemented:
-- ✅ All language features (variables, arrays, control flow)
-- ✅ All functions (math, string, conversion, binary data)
-- ✅ Sequential file I/O (OPEN, PRINT#, INPUT#, etc.)
-- ✅ Random file I/O (FIELD, GET, PUT, LSET, RSET)
-- ✅ Error handling (ON ERROR GOTO, RESUME, ERR, ERL)
-- ✅ Formatted output (PRINT USING, TAB, SPC)
-- ✅ Hardware access (PEEK/POKE, INP/OUT, WAIT) ← <strong>Completed today!</strong>
-- ✅ Machine language interface (CALL, USR, VARPTR) ← <strong>Completed today!</strong>
-- ✅ File management (RESET, NAME, LPRINT) ← <strong>Completed today!</strong></p>
-<p>Features correctly NOT supported (matching Microsoft BASCOM behavior):
-- ⚠️ <strong>COMMON</strong> - NOT supported by Microsoft BASCOM either (interpreter-only in MBASIC 5.21)
-- ⚠️ <strong>ERASE</strong> - NOT supported by Microsoft BASCOM either
-- ⚠️ <strong>CHAIN MERGE/ALL/DELETE</strong> - NOT supported by Microsoft BASCOM either
-- ⚠️ <strong>FILES, WIDTH, CLEAR parameters</strong> - Display/system features (generate warnings)</p>
-<p><strong>Status: 100% complete! Every Microsoft BASCOM feature is now implemented!</strong></p>
-<h2 id="recent-work-2025-11-11">Recent Work (2025-11-11)<a class="headerlink" href="#recent-work-2025-11-11" title="Permanent link">&para;</a></h2>
-<h3 id="random-file-io-implementation-completed">Random File I/O Implementation - COMPLETED! 🎉<a class="headerlink" href="#random-file-io-implementation-completed" title="Permanent link">&para;</a></h3>
-<p><strong>Implemented full random access file support:</strong>
-- Added field mapping infrastructure (tracks file/offset/width per string variable)
-- FIELD statement: Allocates buffer, maps variables to buffer offsets
-- GET statement: Reads record from file, populates field variables from buffer
-- PUT statement: Writes buffer to file at specified record position
-- LSET/RSET: Write strings to buffer with proper padding
-  - LSET: Left-justified (data + spaces)
-  - RSET: Right-justified (spaces + data)
-- New string helper: <code>mb25_string_set_from_buf()</code> for buffer-to-string conversion
-- Full field variable support with automatic buffer synchronization</p>
-<p><strong>Files modified:</strong>
-- src/codegen_backend.py: Field mapping arrays, FIELD/GET/PUT/LSET/RSET generation
-- runtime/strings/mb25_string.h: New mb25_string_set_from_buf() function
-- runtime/strings/mb25_string.c: Implementation with trailing space trimming</p>
-<p><strong>Test program:</strong> test_compile/test_random_file.bas - Creates database with FIELD/LSET/RSET/GET/PUT</p>
-<h3 id="final-feature-batch-completed">Final Feature Batch - COMPLETED! 🎉<a class="headerlink" href="#final-feature-batch-completed" title="Permanent link">&para;</a></h3>
-<p><strong>Implemented ALL remaining MBASIC 5.21 compiler features:</strong></p>
-<h4 id="hardware-access-100">Hardware Access (100%)<a class="headerlink" href="#hardware-access-100" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>PEEK(addr)</strong> - Read byte from memory address</li>
-<li>Generates: <code>(*((unsigned char*)((int)(addr))))</code></li>
-<li><strong>POKE addr, value</strong> - Write byte to memory address</li>
-<li>Generates: <code>*((unsigned char*)((int)(addr))) = (unsigned char)(value);</code></li>
-<li><strong>INP(port)</strong> - Read from I/O port</li>
-<li>Uses z88dk's <code>inp()</code> function</li>
-<li><strong>OUT port, value</strong> - Write to I/O port</li>
-<li>Uses z88dk's <code>outp()</code> function</li>
-<li><strong>WAIT port, mask [, select]</strong> - Wait for port condition</li>
-<li>Implements: <code>(INP(port) XOR select) AND mask ≠ 0</code></li>
-<li>Generates proper polling loop</li>
-</ul>
-<h4 id="machine-language-interface-100">Machine Language Interface (100%)<a class="headerlink" href="#machine-language-interface-100" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>VARPTR(var)</strong> - Get address of variable</li>
-<li>Works with simple variables and array elements</li>
-<li>Returns address as float (BASIC convention)</li>
-<li>Generates: <code>(float)((long)&amp;variable)</code></li>
-<li><strong>USR(addr [, arg])</strong> - Call user machine language function</li>
-<li>With no args: <code>((float (*)(void))(int)(addr))()</code></li>
-<li>With arg: <code>((float (*)(float))(int)(addr))(arg)</code></li>
-<li>Returns float result</li>
-<li><strong>CALL addr</strong> - Call machine language routine</li>
-<li>Standard syntax: <code>CALL address</code></li>
-<li>Generates: <code>((void (*)(void))(int)(addr))();</code></li>
-</ul>
-<h4 id="file-management-100">File Management (100%)<a class="headerlink" href="#file-management-100" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>RESET</strong> - Close all open files</li>
-<li>Equivalent to CLOSE with no arguments</li>
-<li>Only generates code if files are actually used</li>
-<li><strong>NAME old$ AS new$</strong> - Rename file</li>
-<li>Uses C <code>rename()</code> function</li>
-<li>Proper error handling</li>
-<li><strong>FILES [filespec$]</strong> - Directory listing</li>
-<li>Generates warning (requires CP/M BDOS calls)</li>
-<li>Documented as unsupported</li>
-</ul>
-<h4 id="display-and-system-100">Display and System (100%)<a class="headerlink" href="#display-and-system-100" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>WIDTH width [, device]</strong> - Set line width</li>
-<li>Generates warning (display feature, not portable)</li>
-<li><strong>LPRINT ...</strong> - Print to line printer</li>
-<li>Implemented as stdout output (like PRINT)</li>
-<li>In real CP/M would go to LPT1:</li>
-<li><strong>CLEAR [str_space] [, stack_space]</strong> - Clear variables</li>
-<li>Closes all files (like RESET)</li>
-<li>Memory parameters generate warning (can't adjust in compiled code)</li>
-</ul>
-<h4 id="interpreter-only-features-documented">Interpreter-Only Features (Documented)<a class="headerlink" href="#interpreter-only-features-documented" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>CHAIN</strong> - Load another program</li>
-<li>Generates comment (interpreter-only feature)</li>
-<li>Issues compiler warning</li>
-<li><strong>COMMON</strong> - Declare shared variables</li>
-<li>Generates comment (used with CHAIN)</li>
-<li>Issues compiler warning</li>
-<li><strong>ERASE</strong> - Deallocate arrays</li>
-<li>Generates comment (matches Microsoft BASIC Compiler behavior)</li>
-<li>Microsoft's compiler didn't support this either!</li>
-<li>Issues compiler warning</li>
-</ul>
-<p><strong>Files modified:</strong>
-- src/codegen_backend.py: Added 9 functions (_generate_reset, _generate_name, _generate_files, _generate_width, _generate_lprint, _generate_clear, _generate_call, _generate_chain, _generate_common) and 2 function handlers (VARPTR, USR in _generate_expression)
-- src/semantic_analyzer.py: Changed COMMON and ERASE from errors to warnings
-- src/tokens.py: Added VARPTR token
-- src/parser.py: Added VARPTR to function token list</p>
-<p><strong>Test programs:</strong>
-- test_compile/test_port_io.bas - Tests PEEK/POKE/INP/OUT/WAIT
-- test_compile/test_varptr_simple.bas - Tests VARPTR function
-- test_compile/test_all_features.bas - Tests all new features</p>
-<h3 id="memory-optimizations-earlier-today">Memory Optimizations (Earlier today)<a class="headerlink" href="#memory-optimizations-earlier-today" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Eliminated all malloc usage except string pool init</li>
-<li>Removed wasteful GC temp buffer (was doubling memory during GC!)</li>
-<li>Replaced SPACE<span class="arithmatex"><span class="MathJax_Preview">/STRING</span><script type="math/tex">/STRING</script></span> malloc patterns with direct pool allocation</li>
-<li>C string conversions now use temp pool instead of malloc</li>
-<li>Result: Only 1 malloc call in entire system</li>
-</ul>
-<h3 id="printf-investigation-earlier-today">Printf Investigation (Earlier today)<a class="headerlink" href="#printf-investigation-earlier-today" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Documented printf usage (see PRINTF_ELIMINATION_TODO.md)</li>
-<li>Printf already linked via sprintf (STR<span class="arithmatex"><span class="MathJax_Preview">/HEX</span><script type="math/tex">/HEX</script></span>/OCT$)</li>
-<li>Replacing printf with putchar saves little since sprintf stays</li>
-<li>Future: Could write custom ftoa/itoa to eliminate printf family (~1-2KB)</li>
-</ul>
-<h2 id="what-works-now">What Works Now<a class="headerlink" href="#what-works-now" title="Permanent link">&para;</a></h2>
-<p><strong>EVERYTHING!</strong> A MBASIC 5.21 program can use:
-- ✅ All variable types and arrays
-- ✅ All control structures (IF, FOR, WHILE, GOTO, GOSUB, ON...GOTO/GOSUB)
-- ✅ All math and string functions
-- ✅ Sequential file I/O (text files: OPEN, PRINT#, INPUT#, LINE INPUT#, WRITE#)
-- ✅ Random access file I/O (database-style: FIELD, GET, PUT, LSET, RSET)
-- ✅ Error handling (ON ERROR GOTO, RESUME, RESUME NEXT, RESUME line, ERR, ERL)
-- ✅ Formatted output (PRINT USING, TAB, SPC)
-- ✅ Binary data (MKI<span class="arithmatex"><span class="MathJax_Preview">/CVI, MKS</span><script type="math/tex">/CVI, MKS</script></span>/CVS, MKD$/CVD for file formats)
-- ✅ Hardware access (PEEK/POKE, INP/OUT, WAIT) ← <strong>COMPLETED TODAY!</strong>
-- ✅ Machine language (CALL, USR, VARPTR) ← <strong>COMPLETED TODAY!</strong>
-- ✅ File management (RESET, NAME, LPRINT) ← <strong>COMPLETED TODAY!</strong></p>
-<p><strong>100% FEATURE COMPLETE!</strong> The compiler now supports EVERY compilable MBASIC 5.21 feature.</p>
+<hr />
+<p><strong>Last Updated:</strong> 2025-11-12</p>
 
 
 

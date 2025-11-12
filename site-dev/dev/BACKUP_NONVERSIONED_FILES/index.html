@@ -12,7 +12,7 @@
         <meta name="author" content="MBASIC Project Contributors">
       
       
-        <link rel="canonical" href="https://avwohl.github.io/mbasic/dev/COMPILER_STATUS_SUMMARY/">
+        <link rel="canonical" href="https://avwohl.github.io/mbasic/dev/BACKUP_NONVERSIONED_FILES/">
       
       
       
@@ -22,7 +22,7 @@
     
     
       
-        <title>MBASIC Compiler - Actual Status (2025-11-11) - MBASIC 5.21 Documentation (Full)</title>
+        <title>Files to Backup (Not in Git) - MBASIC 5.21 Documentation (Full)</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#mbasic-compiler-actual-status-2025-11-11" class="md-skip">
+        <a href="#files-to-backup-not-in-git" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              MBASIC Compiler - Actual Status (2025-11-11)
+              Files to Backup (Not in Git)
             
           </span>
         </div>
@@ -1192,91 +1192,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#executive-summary" class="md-nav__link">
+  <a href="#deployment-configurations" class="md-nav__link">
     <span class="md-ellipsis">
-      Executive Summary
+      Deployment Configurations
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#implemented-and-working" class="md-nav__link">
-    <span class="md-ellipsis">
-      ✅ IMPLEMENTED AND WORKING
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="✅ IMPLEMENTED AND WORKING">
+    <nav class="md-nav" aria-label="Deployment Configurations">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#core-language-100" class="md-nav__link">
+  <a href="#k8s-kubernetes-filled-in-configs" class="md-nav__link">
     <span class="md-ellipsis">
-      Core Language (100%)
+      k8s/ - Kubernetes Filled-In Configs
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#functions-100" class="md-nav__link">
+  <a href="#configmultiuserjson-runtime-configuration" class="md-nav__link">
     <span class="md-ellipsis">
-      Functions (100%)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#string-operations-100" class="md-nav__link">
-    <span class="md-ellipsis">
-      String Operations (100%)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#io-operations-100" class="md-nav__link">
-    <span class="md-ellipsis">
-      I/O Operations (100%)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#sequential-file-io-100" class="md-nav__link">
-    <span class="md-ellipsis">
-      Sequential File I/O (100%)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#error-handling-100" class="md-nav__link">
-    <span class="md-ellipsis">
-      Error Handling (100%)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#system-operations-100" class="md-nav__link">
-    <span class="md-ellipsis">
-      System Operations (100%)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#memory-optimizations-recent-2025-11-11" class="md-nav__link">
-    <span class="md-ellipsis">
-      Memory Optimizations (Recent: 2025-11-11)
+      config/multiuser.json - Runtime Configuration
     </span>
   </a>
   
@@ -1288,19 +1225,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#fully-implemented-2025-11-11" class="md-nav__link">
+  <a href="#database-files" class="md-nav__link">
     <span class="md-ellipsis">
-      ✅ FULLY IMPLEMENTED (2025-11-11)
+      Database Files
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="✅ FULLY IMPLEMENTED (2025-11-11)">
+    <nav class="md-nav" aria-label="Database Files">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#random-file-io-100-just-completed" class="md-nav__link">
+  <a href="#mysql-error-logs-database" class="md-nav__link">
     <span class="md-ellipsis">
-      Random File I/O (100% - Just Completed!)
+      MySQL Error Logs Database
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#redis-session-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Redis Session Data
     </span>
   </a>
   
@@ -1312,55 +1258,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#newly-implemented-2025-11-11" class="md-nav__link">
+  <a href="#ssltls-certificates" class="md-nav__link">
     <span class="md-ellipsis">
-      ✅ NEWLY IMPLEMENTED (2025-11-11)
+      SSL/TLS Certificates
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="✅ NEWLY IMPLEMENTED (2025-11-11)">
+    <nav class="md-nav" aria-label="SSL/TLS Certificates">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#system-and-hardware-access" class="md-nav__link">
+  <a href="#lets-encrypt-certificates" class="md-nav__link">
     <span class="md-ellipsis">
-      System and Hardware Access
+      Let's Encrypt Certificates
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#file-management" class="md-nav__link">
+  <a href="#digitalocean-mysql-ca-certificate" class="md-nav__link">
     <span class="md-ellipsis">
-      File Management
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#display-and-printer" class="md-nav__link">
-    <span class="md-ellipsis">
-      Display and Printer
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#program-chaining" class="md-nav__link">
-    <span class="md-ellipsis">
-      Program Chaining
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#interpreter-only-features-not-applicable" class="md-nav__link">
-    <span class="md-ellipsis">
-      Interpreter-Only Features (Not Applicable)
+      DigitalOcean MySQL CA Certificate
     </span>
   </a>
   
@@ -1372,28 +1291,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#implementation-status-by-category" class="md-nav__link">
+  <a href="#service-account-credentials" class="md-nav__link">
     <span class="md-ellipsis">
-      Implementation Status by Category
+      Service Account Credentials
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Service Account Credentials">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hcaptcha-api-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      hCaptcha API Keys
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-actually-left" class="md-nav__link">
-    <span class="md-ellipsis">
-      What's Actually Left?
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="What&#39;s Actually Left?">
-      <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#nothing-left-100-complete" class="md-nav__link">
+  <a href="#digitalocean-container-registry" class="md-nav__link">
     <span class="md-ellipsis">
-      Nothing Left! 100% Complete!
+      DigitalOcean Container Registry
     </span>
   </a>
   
@@ -1405,64 +1324,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#surprise-discovery" class="md-nav__link">
+  <a href="#backup-strategy" class="md-nav__link">
     <span class="md-ellipsis">
-      Surprise Discovery
+      Backup Strategy
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#bottom-line" class="md-nav__link">
-    <span class="md-ellipsis">
-      Bottom Line
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#recent-work-2025-11-11" class="md-nav__link">
-    <span class="md-ellipsis">
-      Recent Work (2025-11-11)
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Recent Work (2025-11-11)">
+    <nav class="md-nav" aria-label="Backup Strategy">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#random-file-io-implementation-completed" class="md-nav__link">
+  <a href="#development-machine" class="md-nav__link">
     <span class="md-ellipsis">
-      Random File I/O Implementation - COMPLETED! 🎉
+      Development Machine
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#final-feature-batch-completed" class="md-nav__link">
+  <a href="#production-kubernetes-cluster" class="md-nav__link">
     <span class="md-ellipsis">
-      Final Feature Batch - COMPLETED! 🎉
+      Production Kubernetes Cluster
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#memory-optimizations-earlier-today" class="md-nav__link">
+  <a href="#recommended-backup-locations" class="md-nav__link">
     <span class="md-ellipsis">
-      Memory Optimizations (Earlier today)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#printf-investigation-earlier-today" class="md-nav__link">
-    <span class="md-ellipsis">
-      Printf Investigation (Earlier today)
+      Recommended Backup Locations
     </span>
   </a>
   
@@ -1474,9 +1366,60 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-works-now" class="md-nav__link">
+  <a href="#recovery-process" class="md-nav__link">
     <span class="md-ellipsis">
-      What Works Now
+      Recovery Process
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recovery Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#disaster-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      Disaster Recovery
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#if-secrets-are-lost" class="md-nav__link">
+    <span class="md-ellipsis">
+      If Secrets Are Lost
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Security Notes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Reference
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      See Also
     </span>
   </a>
   
@@ -1498,7 +1441,7 @@
 
 
   
-    <a href="https://github.com/avwohl/mbasic/edit/main/docs/dev/COMPILER_STATUS_SUMMARY.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/avwohl/mbasic/edit/main/docs/dev/BACKUP_NONVERSIONED_FILES.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1506,379 +1449,243 @@
   
 
 
-<h1 id="mbasic-compiler-actual-status-2025-11-11">MBASIC Compiler - Actual Status (2025-11-11)<a class="headerlink" href="#mbasic-compiler-actual-status-2025-11-11" title="Permanent link">&para;</a></h1>
-<h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
-<p><strong>THE COMPILER IS 100% COMPLETE!</strong> 🎉</p>
-<p>All features of Microsoft BASIC Compiler (BASCOM) are now implemented! Final implementations on 2025-11-11:
-- PEEK/POKE, INP/OUT, WAIT (hardware access)
-- CALL, USR, VARPTR (machine language interface)
-- RESET, NAME, FILES, WIDTH, LPRINT, CLEAR (system operations)
-- <strong>CHAIN</strong> - Program chaining using CP/M warm boot (implemented today!)</p>
-<h2 id="implemented-and-working">✅ IMPLEMENTED AND WORKING<a class="headerlink" href="#implemented-and-working" title="Permanent link">&para;</a></h2>
-<h3 id="core-language-100">Core Language (100%)<a class="headerlink" href="#core-language-100" title="Permanent link">&para;</a></h3>
+<h1 id="files-to-backup-not-in-git">Files to Backup (Not in Git)<a class="headerlink" href="#files-to-backup-not-in-git" title="Permanent link">&para;</a></h1>
+<p>This document lists files and directories that should be backed up but are NOT committed to git because they contain secrets, local configurations, or instance-specific data.</p>
+<h2 id="deployment-configurations">Deployment Configurations<a class="headerlink" href="#deployment-configurations" title="Permanent link">&para;</a></h2>
+<h3 id="k8s-kubernetes-filled-in-configs">k8s/ - Kubernetes Filled-In Configs<a class="headerlink" href="#k8s-kubernetes-filled-in-configs" title="Permanent link">&para;</a></h3>
+<p><strong>Location:</strong> <code>/home/wohl/cl/mbasic/k8s/</code>
+<strong>Backup Priority:</strong> HIGH
+<strong>Contains:</strong> Filled-in Kubernetes configurations with real secrets</p>
 <ul>
-<li>Variables, arrays, expressions, control flow</li>
-<li>All data types (INTEGER, SINGLE, DOUBLE, STRING)</li>
-<li>FOR/NEXT, WHILE/WEND, IF/THEN/ELSE</li>
-<li>GOTO/GOSUB/RETURN, ON...GOTO/ON...GOSUB</li>
+<li><code>k8s/mbasic-secrets.yaml</code> - Database passwords, hCaptcha keys, CA certificates</li>
+<li><code>k8s/*.yaml</code> - Any customized deployment configs</li>
 </ul>
-<h3 id="functions-100">Functions (100%)<a class="headerlink" href="#functions-100" title="Permanent link">&para;</a></h3>
+<p><strong>Why not in git:</strong> Contains production secrets and credentials
+<strong>Template location:</strong> <code>deployment/k8s_templates/</code> (committed to git)
+<strong>Restore process:</strong> Copy templates from <code>deployment/k8s_templates/</code> to <code>k8s/</code> and fill in secrets</p>
+<h3 id="configmultiuserjson-runtime-configuration">config/multiuser.json - Runtime Configuration<a class="headerlink" href="#configmultiuserjson-runtime-configuration" title="Permanent link">&para;</a></h3>
+<p><strong>Location:</strong> <code>/home/wohl/cl/mbasic/config/multiuser.json</code>
+<strong>Backup Priority:</strong> MEDIUM
+<strong>Contains:</strong> Local runtime configuration for web UI</p>
 <ul>
-<li><strong>Math</strong>: ABS, SGN, INT, FIX, SIN, COS, TAN, ATN, EXP, LOG, SQR, RND</li>
-<li><strong>String</strong>: LEFT<span class="arithmatex"><span class="MathJax_Preview">, RIGHT</span><script type="math/tex">, RIGHT</script></span>, MID<span class="arithmatex"><span class="MathJax_Preview">, CHR</span><script type="math/tex">, CHR</script></span>, STR<span class="arithmatex"><span class="MathJax_Preview">, SPACE</span><script type="math/tex">, SPACE</script></span>, STRING<span class="arithmatex"><span class="MathJax_Preview">, HEX</span><script type="math/tex">, HEX</script></span>, OCT$</li>
-<li><strong>Analysis</strong>: LEN, ASC, VAL, INSTR</li>
-<li><strong>Conversion</strong>: CINT, CSNG, CDBL, CVI, CVS, CVD, MKI<span class="arithmatex"><span class="MathJax_Preview">, MKS</span><script type="math/tex">, MKS</script></span>, MKD$</li>
-<li><strong>Memory</strong>: FRE() - returns free memory/string pool, VARPTR() - get variable address</li>
-<li><strong>Hardware</strong>: PEEK() - read memory byte, INP() - read I/O port</li>
-<li><strong>Machine Language</strong>: USR() - call user function</li>
-<li><strong>User-defined</strong>: DEF FN</li>
+<li>Database connection details (MySQL socket path, credentials)</li>
+<li>Session storage settings</li>
+<li>Rate limiting configuration</li>
+<li>Feature flags</li>
 </ul>
-<h3 id="string-operations-100">String Operations (100%)<a class="headerlink" href="#string-operations-100" title="Permanent link">&para;</a></h3>
+<p><strong>Why not in git:</strong> Contains local paths and potentially sensitive settings
+<strong>Template location:</strong> <code>config/multiuser.json.example</code> (committed to git)
+<strong>Restore process:</strong> Copy <code>config/multiuser.json.example</code> to <code>config/multiuser.json</code> and customize</p>
+<h2 id="database-files">Database Files<a class="headerlink" href="#database-files" title="Permanent link">&para;</a></h2>
+<h3 id="mysql-error-logs-database">MySQL Error Logs Database<a class="headerlink" href="#mysql-error-logs-database" title="Permanent link">&para;</a></h3>
+<p><strong>Location:</strong> Varies by installation (DigitalOcean managed DB or local MySQL)
+<strong>Backup Priority:</strong> MEDIUM
+<strong>Contains:</strong> Web UI error logs from production</p>
 <ul>
-<li>All string functions</li>
-<li>MID$ statement (substring replacement)</li>
+<li>Database: <code>mbasic_logs</code></li>
+<li>Table: <code>web_errors</code></li>
 </ul>
-<h3 id="io-operations-100">I/O Operations (100%)<a class="headerlink" href="#io-operations-100" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>PRINT</strong> - Console and file output ✅</li>
-<li><strong>PRINT USING</strong> - Formatted output ✅</li>
-<li><strong>INPUT</strong> - Keyboard and file input ✅</li>
-<li><strong>WRITE</strong> - Comma-delimited output ✅</li>
-<li><strong>TAB(n)</strong> - Tab to column ✅</li>
-<li><strong>SPC(n)</strong> - Output spaces ✅</li>
-</ul>
-<h3 id="sequential-file-io-100">Sequential File I/O (100%)<a class="headerlink" href="#sequential-file-io-100" title="Permanent link">&para;</a></h3>
-<ul>
-<li>OPEN (modes: I, O, A, R)</li>
-<li>CLOSE, INPUT #, LINE INPUT #, PRINT #, WRITE #</li>
-<li>KILL, EOF(), LOC(), LOF()</li>
-</ul>
-<h3 id="error-handling-100">Error Handling (100%)<a class="headerlink" href="#error-handling-100" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>ON ERROR GOTO</strong> - Set error trap ✅</li>
-<li><strong>RESUME</strong> - Retry error statement ✅</li>
-<li><strong>RESUME NEXT</strong> - Continue after error ✅</li>
-<li><strong>RESUME line</strong> - Jump to line ✅</li>
-<li><strong>ERROR</strong> - Trigger error ✅</li>
-<li><strong>ERR, ERL</strong> - Error code and line ✅</li>
-</ul>
-<h3 id="system-operations-100">System Operations (100%)<a class="headerlink" href="#system-operations-100" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Control</strong>: RANDOMIZE, SWAP</li>
-<li><strong>Data</strong>: DATA/READ/RESTORE</li>
-<li><strong>Hardware</strong>: POKE, OUT, WAIT</li>
-<li><strong>Machine Language</strong>: CALL</li>
-<li><strong>File Management</strong>: RESET, NAME</li>
-<li><strong>Display</strong>: LPRINT, WIDTH (generates warning)</li>
-<li><strong>Memory</strong>: CLEAR (closes files only)</li>
-</ul>
-<h3 id="memory-optimizations-recent-2025-11-11">Memory Optimizations (Recent: 2025-11-11)<a class="headerlink" href="#memory-optimizations-recent-2025-11-11" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Only 1 malloc (string pool initialization)</li>
-<li>GC uses in-place memmove (no temp buffer)</li>
-<li>C string temps use pool (no malloc)</li>
-<li>putchar loops instead of printf (16% code savings)</li>
-<li>-DAMALLOC for runtime heap detection</li>
-</ul>
-<h2 id="fully-implemented-2025-11-11">✅ FULLY IMPLEMENTED (2025-11-11)<a class="headerlink" href="#fully-implemented-2025-11-11" title="Permanent link">&para;</a></h2>
-<h3 id="random-file-io-100-just-completed">Random File I/O (100% - Just Completed!)<a class="headerlink" href="#random-file-io-100-just-completed" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>OPEN mode "R"</strong> - ✅ Opens random file</li>
-<li><strong>FIELD</strong> - ✅ Defines field layout, tracks variable mappings</li>
-<li><strong>GET</strong> - ✅ Reads record, populates field variables</li>
-<li><strong>PUT</strong> - ✅ Writes buffer to file</li>
-<li><strong>LSET</strong> - ✅ Left-justify with space padding</li>
-<li><strong>RSET</strong> - ✅ Right-justify with space padding</li>
-</ul>
-<p><strong>Implementation details:</strong>
-- Fixed-size record buffer per file
-- Field variable mapping (tracks file, offset, width for each string var)
-- GET automatically copies buffer contents to field variables
-- LSET/RSET write directly to buffer with proper padding
-- New string helper: <code>mb25_string_set_from_buf()</code> trims trailing spaces</p>
-<p><strong>Tested</strong>: Compiles successfully, generates correct C code</p>
-<h2 id="newly-implemented-2025-11-11">✅ NEWLY IMPLEMENTED (2025-11-11)<a class="headerlink" href="#newly-implemented-2025-11-11" title="Permanent link">&para;</a></h2>
-<h3 id="system-and-hardware-access">System and Hardware Access<a class="headerlink" href="#system-and-hardware-access" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>PEEK/POKE</strong> - Direct memory read/write ✅</li>
-<li><strong>INP/OUT</strong> - I/O port read/write ✅</li>
-<li><strong>WAIT</strong> - Wait for port condition ✅</li>
-<li><strong>VARPTR</strong> - Get address of variable ✅</li>
-<li><strong>USR</strong> - Call user machine language function ✅</li>
-<li><strong>CALL</strong> - Call machine language routine ✅</li>
-</ul>
-<h3 id="file-management">File Management<a class="headerlink" href="#file-management" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>RESET</strong> - Close all open files ✅</li>
-<li><strong>NAME</strong> - Rename file ✅</li>
-<li><strong>FILES</strong> - Directory listing (warning - requires CP/M BDOS) ⚠️</li>
-<li><strong>CLEAR</strong> - Close files (variable clearing not supported in compiled code) ⚠️</li>
-</ul>
-<h3 id="display-and-printer">Display and Printer<a class="headerlink" href="#display-and-printer" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>WIDTH</strong> - Set line width (warning - display feature) ⚠️</li>
-<li><strong>LPRINT</strong> - Line printer output ✅</li>
-</ul>
-<h3 id="program-chaining">Program Chaining<a class="headerlink" href="#program-chaining" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>CHAIN</strong> - Load another program ✅ <strong>IMPLEMENTED!</strong></li>
-<li>Implemented using CP/M warm boot technique (write to 0x0080, jump to 0x0000)</li>
-<li>Matches Microsoft BASCOM behavior exactly</li>
-<li>Supports basic CHAIN "filename"</li>
-<li>Does NOT support MERGE/ALL/DELETE/line number options (matching Microsoft BASCOM)</li>
-<li><strong>COMMON</strong> - Declare shared variables (not supported, matches Microsoft) ⚠️</li>
-<li>Microsoft BASCOM does NOT support COMMON (interpreter-only in MBASIC 5.21)</li>
-<li>Generates warning in MBASIC-2025 compiler</li>
-<li><strong>ERASE</strong> - Deallocate arrays (not supported, matches Microsoft) ⚠️</li>
-<li>Microsoft BASCOM does NOT support ERASE either</li>
-</ul>
-<h3 id="interpreter-only-features-not-applicable">Interpreter-Only Features (Not Applicable)<a class="headerlink" href="#interpreter-only-features-not-applicable" title="Permanent link">&para;</a></h3>
-<ul>
-<li>LIST, LOAD, SAVE, MERGE, NEW, DELETE, RENUM</li>
-<li>CONT, TRON/TROFF, STEP</li>
-<li>(These are for interactive interpreter, not compiled programs)</li>
-</ul>
-<h2 id="implementation-status-by-category">Implementation Status by Category<a class="headerlink" href="#implementation-status-by-category" title="Permanent link">&para;</a></h2>
+<p><strong>Why not in git:</strong> Runtime data, not configuration
+<strong>Schema location:</strong> <code>config/setup_mysql_logging.sql</code> (committed to git)
+<strong>Restore process:</strong> Run <code>config/setup_mysql_logging.sql</code> to recreate schema</p>
+<h3 id="redis-session-data">Redis Session Data<a class="headerlink" href="#redis-session-data" title="Permanent link">&para;</a></h3>
+<p><strong>Location:</strong> Varies (DigitalOcean managed Redis or in-cluster)
+<strong>Backup Priority:</strong> LOW
+<strong>Contains:</strong> Active user sessions</p>
+<p><strong>Why not in git:</strong> Ephemeral runtime data, sessions can be recreated
+<strong>Restore process:</strong> No restore needed, sessions will be recreated on access</p>
+<h2 id="ssltls-certificates">SSL/TLS Certificates<a class="headerlink" href="#ssltls-certificates" title="Permanent link">&para;</a></h2>
+<h3 id="lets-encrypt-certificates">Let's Encrypt Certificates<a class="headerlink" href="#lets-encrypt-certificates" title="Permanent link">&para;</a></h3>
+<p><strong>Location:</strong> Managed by cert-manager in Kubernetes
+<strong>Backup Priority:</strong> LOW (auto-renewed)
+<strong>Contains:</strong> SSL certificates for <code>mbasic.awohl.com</code></p>
+<p><strong>Why not in git:</strong> Auto-generated and renewed by cert-manager
+<strong>Restore process:</strong> cert-manager will automatically request new certificates</p>
+<h3 id="digitalocean-mysql-ca-certificate">DigitalOcean MySQL CA Certificate<a class="headerlink" href="#digitalocean-mysql-ca-certificate" title="Permanent link">&para;</a></h3>
+<p><strong>Location:</strong> Downloaded from DigitalOcean dashboard
+<strong>Backup Priority:</strong> MEDIUM
+<strong>Contains:</strong> CA certificate for TLS connection to managed database</p>
+<p><strong>Why not in git:</strong> Provided by DigitalOcean, could be regenerated
+<strong>Stored in:</strong> <code>k8s/mbasic-secrets.yaml</code> (see above)
+<strong>Restore process:</strong> Download from DigitalOcean dashboard → Databases → Your Cluster → Connection Details</p>
+<h2 id="service-account-credentials">Service Account Credentials<a class="headerlink" href="#service-account-credentials" title="Permanent link">&para;</a></h2>
+<h3 id="hcaptcha-api-keys">hCaptcha API Keys<a class="headerlink" href="#hcaptcha-api-keys" title="Permanent link">&para;</a></h3>
+<p><strong>Location:</strong> <code>k8s/mbasic-secrets.yaml</code>
+<strong>Backup Priority:</strong> HIGH
+<strong>Contains:</strong> hCaptcha site key and secret key</p>
+<p><strong>Why not in git:</strong> API secrets
+<strong>Restore process:</strong> Log in to <a href="https://www.hcaptcha.com/">https://www.hcaptcha.com/</a> and retrieve keys</p>
+<h3 id="digitalocean-container-registry">DigitalOcean Container Registry<a class="headerlink" href="#digitalocean-container-registry" title="Permanent link">&para;</a></h3>
+<p><strong>Location:</strong> Local <code>~/.docker/config.json</code> (not in repo)
+<strong>Backup Priority:</strong> LOW
+<strong>Contains:</strong> Docker registry authentication token</p>
+<p><strong>Why not in git:</strong> Auto-generated token
+<strong>Restore process:</strong> Run <code>doctl registry login</code></p>
+<h2 id="backup-strategy">Backup Strategy<a class="headerlink" href="#backup-strategy" title="Permanent link">&para;</a></h2>
+<h3 id="development-machine">Development Machine<a class="headerlink" href="#development-machine" title="Permanent link">&para;</a></h3>
+<p><strong>What to backup:</strong>
+- <code>config/multiuser.json</code> - Local configuration
+- Database dumps: <code>mysqldump mbasic_logs &gt; backup.sql</code></p>
+<p><strong>Backup frequency:</strong> Weekly or before major changes</p>
+<h3 id="production-kubernetes-cluster">Production Kubernetes Cluster<a class="headerlink" href="#production-kubernetes-cluster" title="Permanent link">&para;</a></h3>
+<p><strong>What to backup:</strong>
+- <code>k8s/</code> directory with filled-in configs - CRITICAL!
+- Database dumps from DigitalOcean managed MySQL
+- Kubernetes secrets: <code>kubectl get secret mbasic-secrets -n mbasic -o yaml &gt; backup-secrets.yaml</code></p>
+<p><strong>Backup frequency:</strong>
+- Secrets: After any change (store encrypted)
+- Database: Daily automatic backups via DigitalOcean
+- k8s configs: After any change (before running deployment)</p>
+<h3 id="recommended-backup-locations">Recommended Backup Locations<a class="headerlink" href="#recommended-backup-locations" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Encrypted USB drive</strong> - For k8s/mbasic-secrets.yaml and credentials</li>
+<li><strong>Private password manager</strong> - For individual API keys and passwords</li>
+<li><strong>Encrypted cloud storage</strong> - For database dumps and config backups</li>
+<li><strong>DO NOT use:</strong></li>
+<li>Unencrypted cloud storage</li>
+<li>Email</li>
+<li>Shared drives</li>
+<li>Anything that could leak secrets</li>
+</ol>
+<h2 id="recovery-process">Recovery Process<a class="headerlink" href="#recovery-process" title="Permanent link">&para;</a></h2>
+<h3 id="disaster-recovery">Disaster Recovery<a class="headerlink" href="#disaster-recovery" title="Permanent link">&para;</a></h3>
+<p>If you lose the local repository and need to restore:</p>
+<ol>
+<li>
+<p><strong>Clone repository:</strong>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/avwohl/mbasic.git
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>mbasic
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Restore k8s configs:</strong>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Retrieve from encrypted backup</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>cp<span class="w"> </span>~/backup/k8s/<span class="w"> </span>./k8s/<span class="w"> </span>-r
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Restore local config:</strong>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>cp<span class="w"> </span>~/backup/multiuser.json<span class="w"> </span>config/multiuser.json
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Verify secrets are correct:</strong>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>grep<span class="w"> </span>-E<span class="w"> </span><span class="s2">&quot;MYSQL_PASSWORD|HCAPTCHA&quot;</span><span class="w"> </span>k8s/mbasic-secrets.yaml
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># Ensure no placeholder values remain</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Redeploy:</strong>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>./deployment/deploy.sh
+</code></pre></div></p>
+</li>
+</ol>
+<h3 id="if-secrets-are-lost">If Secrets Are Lost<a class="headerlink" href="#if-secrets-are-lost" title="Permanent link">&para;</a></h3>
+<p>If you lose the secrets backup:</p>
+<ol>
+<li><strong>Regenerate hCaptcha keys:</strong></li>
+<li>Log in to <a href="https://www.hcaptcha.com/">https://www.hcaptcha.com/</a></li>
+<li>
+<p>Create new site or retrieve existing keys</p>
+</li>
+<li>
+<p><strong>Get database credentials:</strong></p>
+</li>
+<li>Log in to DigitalOcean</li>
+<li>Navigate to Databases → Your Cluster</li>
+<li>
+<p>View connection details and CA certificate</p>
+</li>
+<li>
+<p><strong>Update k8s/mbasic-secrets.yaml:</strong>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>cp<span class="w"> </span>deployment/k8s_templates/mbasic-secrets.yaml.example<span class="w"> </span>k8s/mbasic-secrets.yaml
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="c1"># Edit with new values</span>
+</code></pre></div></p>
+</li>
+</ol>
+<h2 id="security-notes">Security Notes<a class="headerlink" href="#security-notes" title="Permanent link">&para;</a></h2>
+<p>⚠️ <strong>NEVER:</strong>
+- Commit <code>k8s/mbasic-secrets.yaml</code> to git
+- Commit <code>config/multiuser.json</code> with real credentials
+- Share secrets via unencrypted channels
+- Store secrets in plain text on cloud storage
+- Include secrets in screenshots or documentation</p>
+<p>✅ <strong>ALWAYS:</strong>
+- Encrypt backups of secret files
+- Use different passwords for each service
+- Rotate secrets quarterly
+- Audit git commits before pushing (check for accidentally committed secrets)
+- Use .gitignore to prevent accidental commits</p>
+<h2 id="quick-reference">Quick Reference<a class="headerlink" href="#quick-reference" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Category</th>
-<th>Status</th>
-<th>Notes</th>
+<th>File/Directory</th>
+<th>In Git?</th>
+<th>Backup?</th>
+<th>Priority</th>
+<th>Contains</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Core Language</td>
-<td>100%</td>
-<td>Complete</td>
+<td><code>k8s/mbasic-secrets.yaml</code></td>
+<td>❌</td>
+<td>✅</td>
+<td>HIGH</td>
+<td>Secrets</td>
 </tr>
 <tr>
-<td>Math Functions</td>
-<td>100%</td>
-<td>Complete</td>
+<td><code>k8s/*.yaml</code></td>
+<td>❌</td>
+<td>✅</td>
+<td>MEDIUM</td>
+<td>Custom configs</td>
 </tr>
 <tr>
-<td>String Functions</td>
-<td>100%</td>
-<td>Complete</td>
+<td><code>config/multiuser.json</code></td>
+<td>❌</td>
+<td>✅</td>
+<td>MEDIUM</td>
+<td>Local config</td>
 </tr>
 <tr>
-<td>Control Flow</td>
-<td>100%</td>
-<td>IF/THEN/ELSE, all loops</td>
+<td><code>deployment/k8s_templates/</code></td>
+<td>✅</td>
+<td>❌</td>
+<td>N/A</td>
+<td>Templates</td>
 </tr>
 <tr>
-<td>Sequential Files</td>
-<td>100%</td>
-<td>Complete</td>
+<td><code>config/*.example</code></td>
+<td>✅</td>
+<td>❌</td>
+<td>N/A</td>
+<td>Templates</td>
 </tr>
 <tr>
-<td>Error Handling</td>
-<td>100%</td>
-<td>All RESUME variants!</td>
+<td>MySQL <code>mbasic_logs</code></td>
+<td>❌</td>
+<td>✅</td>
+<td>MEDIUM</td>
+<td>Error logs</td>
 </tr>
 <tr>
-<td>Output Formatting</td>
-<td>100%</td>
-<td>TAB/SPC/PRINT USING</td>
-</tr>
-<tr>
-<td>Random Files</td>
-<td>100%</td>
-<td>Complete! (2025-11-11)</td>
-</tr>
-<tr>
-<td>Binary Data</td>
-<td>100%</td>
-<td>MKI$/CVI etc. done</td>
-</tr>
-<tr>
-<td>Hardware Access</td>
-<td>100%</td>
-<td>PEEK/POKE/INP/OUT/WAIT (2025-11-11)</td>
-</tr>
-<tr>
-<td>Machine Language</td>
-<td>100%</td>
-<td>CALL/USR/VARPTR (2025-11-11)</td>
-</tr>
-<tr>
-<td>File Management</td>
-<td>100%</td>
-<td>RESET/NAME implemented (2025-11-11)</td>
-</tr>
-<tr>
-<td>Program Chaining</td>
-<td>100%</td>
-<td>CHAIN implemented! (2025-11-11)</td>
+<td>Redis sessions</td>
+<td>❌</td>
+<td>❌</td>
+<td>LOW</td>
+<td>Ephemeral</td>
 </tr>
 </tbody>
 </table>
-<h2 id="whats-actually-left">What's Actually Left?<a class="headerlink" href="#whats-actually-left" title="Permanent link">&para;</a></h2>
-<p><del>1. <strong>Random File I/O</strong> (1-2 days)</del> ✅ COMPLETE (2025-11-11)
-<del>2. <strong>File Management</strong> (0.5 days)</del> ✅ COMPLETE (2025-11-11)
-<del>3. <strong>Hardware Access</strong> (0.5 days)</del> ✅ COMPLETE (2025-11-11)
-<del>4. <strong>Machine Language Interface</strong> (0.5 days)</del> ✅ COMPLETE (2025-11-11)
-<del>5. <strong>CHAIN statement</strong> (0.5 days)</del> ✅ <strong>COMPLETE (2025-11-11)</strong></p>
-<h3 id="nothing-left-100-complete">Nothing Left! 100% Complete!<a class="headerlink" href="#nothing-left-100-complete" title="Permanent link">&para;</a></h3>
-<p><strong>ALL MICROSOFT BASCOM FEATURES ARE NOW IMPLEMENTED!</strong> 🎉🎉🎉</p>
-<p>The MBASIC-2025 compiler now has 100% feature parity with Microsoft BASIC Compiler (BASCOM) from 1980!</p>
-<p>Features correctly NOT supported (matching Microsoft BASCOM):
-- <strong>COMMON</strong> - NOT supported by Microsoft BASCOM either (interpreter-only in MBASIC 5.21)
-- <strong>ERASE</strong> - NOT supported by Microsoft BASCOM either
-- <strong>CHAIN MERGE/ALL/DELETE</strong> - NOT supported by Microsoft BASCOM either
-- <strong>Display/system features</strong> - Generate warnings (WIDTH, FILES, CLEAR parameters)</p>
-<h2 id="surprise-discovery">Surprise Discovery<a class="headerlink" href="#surprise-discovery" title="Permanent link">&para;</a></h2>
-<p>While auditing what's left, I found that many "TODO" features are <strong>already implemented</strong>:
-- ✅ IF/THEN/ELSE (old docs said missing!)
-- ✅ Arrays and DIM (old docs said missing!)
-- ✅ RESUME NEXT (thought it was missing)
-- ✅ RESUME line (thought it was missing)
-- ✅ ERROR statement (thought it was missing)
-- ✅ TAB() function (thought it was missing)
-- ✅ SPC() function (thought it was missing)
-- ✅ Logical operators AND/OR/NOT (old docs said missing!)</p>
-<p>The documentation was way out of date!</p>
-<h2 id="bottom-line">Bottom Line<a class="headerlink" href="#bottom-line" title="Permanent link">&para;</a></h2>
-<p><strong>THE MBASIC 5.21 COMPILER IS 100% COMPLETE!</strong> 🎉🎉🎉</p>
-<p><strong>EVERYTHING</strong> that can be compiled from MBASIC 5.21 is now implemented:
-- ✅ All language features (variables, arrays, control flow)
-- ✅ All functions (math, string, conversion, binary data)
-- ✅ Sequential file I/O (OPEN, PRINT#, INPUT#, etc.)
-- ✅ Random file I/O (FIELD, GET, PUT, LSET, RSET)
-- ✅ Error handling (ON ERROR GOTO, RESUME, ERR, ERL)
-- ✅ Formatted output (PRINT USING, TAB, SPC)
-- ✅ Hardware access (PEEK/POKE, INP/OUT, WAIT) ← <strong>Completed today!</strong>
-- ✅ Machine language interface (CALL, USR, VARPTR) ← <strong>Completed today!</strong>
-- ✅ File management (RESET, NAME, LPRINT) ← <strong>Completed today!</strong></p>
-<p>Features correctly NOT supported (matching Microsoft BASCOM behavior):
-- ⚠️ <strong>COMMON</strong> - NOT supported by Microsoft BASCOM either (interpreter-only in MBASIC 5.21)
-- ⚠️ <strong>ERASE</strong> - NOT supported by Microsoft BASCOM either
-- ⚠️ <strong>CHAIN MERGE/ALL/DELETE</strong> - NOT supported by Microsoft BASCOM either
-- ⚠️ <strong>FILES, WIDTH, CLEAR parameters</strong> - Display/system features (generate warnings)</p>
-<p><strong>Status: 100% complete! Every Microsoft BASCOM feature is now implemented!</strong></p>
-<h2 id="recent-work-2025-11-11">Recent Work (2025-11-11)<a class="headerlink" href="#recent-work-2025-11-11" title="Permanent link">&para;</a></h2>
-<h3 id="random-file-io-implementation-completed">Random File I/O Implementation - COMPLETED! 🎉<a class="headerlink" href="#random-file-io-implementation-completed" title="Permanent link">&para;</a></h3>
-<p><strong>Implemented full random access file support:</strong>
-- Added field mapping infrastructure (tracks file/offset/width per string variable)
-- FIELD statement: Allocates buffer, maps variables to buffer offsets
-- GET statement: Reads record from file, populates field variables from buffer
-- PUT statement: Writes buffer to file at specified record position
-- LSET/RSET: Write strings to buffer with proper padding
-  - LSET: Left-justified (data + spaces)
-  - RSET: Right-justified (spaces + data)
-- New string helper: <code>mb25_string_set_from_buf()</code> for buffer-to-string conversion
-- Full field variable support with automatic buffer synchronization</p>
-<p><strong>Files modified:</strong>
-- src/codegen_backend.py: Field mapping arrays, FIELD/GET/PUT/LSET/RSET generation
-- runtime/strings/mb25_string.h: New mb25_string_set_from_buf() function
-- runtime/strings/mb25_string.c: Implementation with trailing space trimming</p>
-<p><strong>Test program:</strong> test_compile/test_random_file.bas - Creates database with FIELD/LSET/RSET/GET/PUT</p>
-<h3 id="final-feature-batch-completed">Final Feature Batch - COMPLETED! 🎉<a class="headerlink" href="#final-feature-batch-completed" title="Permanent link">&para;</a></h3>
-<p><strong>Implemented ALL remaining MBASIC 5.21 compiler features:</strong></p>
-<h4 id="hardware-access-100">Hardware Access (100%)<a class="headerlink" href="#hardware-access-100" title="Permanent link">&para;</a></h4>
+<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>PEEK(addr)</strong> - Read byte from memory address</li>
-<li>Generates: <code>(*((unsigned char*)((int)(addr))))</code></li>
-<li><strong>POKE addr, value</strong> - Write byte to memory address</li>
-<li>Generates: <code>*((unsigned char*)((int)(addr))) = (unsigned char)(value);</code></li>
-<li><strong>INP(port)</strong> - Read from I/O port</li>
-<li>Uses z88dk's <code>inp()</code> function</li>
-<li><strong>OUT port, value</strong> - Write to I/O port</li>
-<li>Uses z88dk's <code>outp()</code> function</li>
-<li><strong>WAIT port, mask [, select]</strong> - Wait for port condition</li>
-<li>Implements: <code>(INP(port) XOR select) AND mask ≠ 0</code></li>
-<li>Generates proper polling loop</li>
+<li><code>deployment/README.md</code> - Deployment instructions</li>
+<li><code>config/README.md</code> - Configuration documentation</li>
+<li><code>deployment/k8s_templates/mbasic-secrets.yaml.example</code> - Secrets template</li>
+<li><code>.gitignore</code> - Files excluded from git</li>
 </ul>
-<h4 id="machine-language-interface-100">Machine Language Interface (100%)<a class="headerlink" href="#machine-language-interface-100" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>VARPTR(var)</strong> - Get address of variable</li>
-<li>Works with simple variables and array elements</li>
-<li>Returns address as float (BASIC convention)</li>
-<li>Generates: <code>(float)((long)&amp;variable)</code></li>
-<li><strong>USR(addr [, arg])</strong> - Call user machine language function</li>
-<li>With no args: <code>((float (*)(void))(int)(addr))()</code></li>
-<li>With arg: <code>((float (*)(float))(int)(addr))(arg)</code></li>
-<li>Returns float result</li>
-<li><strong>CALL addr</strong> - Call machine language routine</li>
-<li>Standard syntax: <code>CALL address</code></li>
-<li>Generates: <code>((void (*)(void))(int)(addr))();</code></li>
-</ul>
-<h4 id="file-management-100">File Management (100%)<a class="headerlink" href="#file-management-100" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>RESET</strong> - Close all open files</li>
-<li>Equivalent to CLOSE with no arguments</li>
-<li>Only generates code if files are actually used</li>
-<li><strong>NAME old$ AS new$</strong> - Rename file</li>
-<li>Uses C <code>rename()</code> function</li>
-<li>Proper error handling</li>
-<li><strong>FILES [filespec$]</strong> - Directory listing</li>
-<li>Generates warning (requires CP/M BDOS calls)</li>
-<li>Documented as unsupported</li>
-</ul>
-<h4 id="display-and-system-100">Display and System (100%)<a class="headerlink" href="#display-and-system-100" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>WIDTH width [, device]</strong> - Set line width</li>
-<li>Generates warning (display feature, not portable)</li>
-<li><strong>LPRINT ...</strong> - Print to line printer</li>
-<li>Implemented as stdout output (like PRINT)</li>
-<li>In real CP/M would go to LPT1:</li>
-<li><strong>CLEAR [str_space] [, stack_space]</strong> - Clear variables</li>
-<li>Closes all files (like RESET)</li>
-<li>Memory parameters generate warning (can't adjust in compiled code)</li>
-</ul>
-<h4 id="interpreter-only-features-documented">Interpreter-Only Features (Documented)<a class="headerlink" href="#interpreter-only-features-documented" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>CHAIN</strong> - Load another program</li>
-<li>Generates comment (interpreter-only feature)</li>
-<li>Issues compiler warning</li>
-<li><strong>COMMON</strong> - Declare shared variables</li>
-<li>Generates comment (used with CHAIN)</li>
-<li>Issues compiler warning</li>
-<li><strong>ERASE</strong> - Deallocate arrays</li>
-<li>Generates comment (matches Microsoft BASIC Compiler behavior)</li>
-<li>Microsoft's compiler didn't support this either!</li>
-<li>Issues compiler warning</li>
-</ul>
-<p><strong>Files modified:</strong>
-- src/codegen_backend.py: Added 9 functions (_generate_reset, _generate_name, _generate_files, _generate_width, _generate_lprint, _generate_clear, _generate_call, _generate_chain, _generate_common) and 2 function handlers (VARPTR, USR in _generate_expression)
-- src/semantic_analyzer.py: Changed COMMON and ERASE from errors to warnings
-- src/tokens.py: Added VARPTR token
-- src/parser.py: Added VARPTR to function token list</p>
-<p><strong>Test programs:</strong>
-- test_compile/test_port_io.bas - Tests PEEK/POKE/INP/OUT/WAIT
-- test_compile/test_varptr_simple.bas - Tests VARPTR function
-- test_compile/test_all_features.bas - Tests all new features</p>
-<h3 id="memory-optimizations-earlier-today">Memory Optimizations (Earlier today)<a class="headerlink" href="#memory-optimizations-earlier-today" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Eliminated all malloc usage except string pool init</li>
-<li>Removed wasteful GC temp buffer (was doubling memory during GC!)</li>
-<li>Replaced SPACE<span class="arithmatex"><span class="MathJax_Preview">/STRING</span><script type="math/tex">/STRING</script></span> malloc patterns with direct pool allocation</li>
-<li>C string conversions now use temp pool instead of malloc</li>
-<li>Result: Only 1 malloc call in entire system</li>
-</ul>
-<h3 id="printf-investigation-earlier-today">Printf Investigation (Earlier today)<a class="headerlink" href="#printf-investigation-earlier-today" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Documented printf usage (see PRINTF_ELIMINATION_TODO.md)</li>
-<li>Printf already linked via sprintf (STR<span class="arithmatex"><span class="MathJax_Preview">/HEX</span><script type="math/tex">/HEX</script></span>/OCT$)</li>
-<li>Replacing printf with putchar saves little since sprintf stays</li>
-<li>Future: Could write custom ftoa/itoa to eliminate printf family (~1-2KB)</li>
-</ul>
-<h2 id="what-works-now">What Works Now<a class="headerlink" href="#what-works-now" title="Permanent link">&para;</a></h2>
-<p><strong>EVERYTHING!</strong> A MBASIC 5.21 program can use:
-- ✅ All variable types and arrays
-- ✅ All control structures (IF, FOR, WHILE, GOTO, GOSUB, ON...GOTO/GOSUB)
-- ✅ All math and string functions
-- ✅ Sequential file I/O (text files: OPEN, PRINT#, INPUT#, LINE INPUT#, WRITE#)
-- ✅ Random access file I/O (database-style: FIELD, GET, PUT, LSET, RSET)
-- ✅ Error handling (ON ERROR GOTO, RESUME, RESUME NEXT, RESUME line, ERR, ERL)
-- ✅ Formatted output (PRINT USING, TAB, SPC)
-- ✅ Binary data (MKI<span class="arithmatex"><span class="MathJax_Preview">/CVI, MKS</span><script type="math/tex">/CVI, MKS</script></span>/CVS, MKD$/CVD for file formats)
-- ✅ Hardware access (PEEK/POKE, INP/OUT, WAIT) ← <strong>COMPLETED TODAY!</strong>
-- ✅ Machine language (CALL, USR, VARPTR) ← <strong>COMPLETED TODAY!</strong>
-- ✅ File management (RESET, NAME, LPRINT) ← <strong>COMPLETED TODAY!</strong></p>
-<p><strong>100% FEATURE COMPLETE!</strong> The compiler now supports EVERY compilable MBASIC 5.21 feature.</p>
 
 
 
