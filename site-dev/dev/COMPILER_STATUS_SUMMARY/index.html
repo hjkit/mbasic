@@ -22,7 +22,7 @@
     
     
       
-        <title>MBASIC Compiler - Actual Status (2025-11-11) - MBASIC 5.21 Documentation (Full)</title>
+        <title>MBASIC Compilers - Status Summary (2025-11-13) - MBASIC 5.21 Documentation (Full)</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#mbasic-compiler-actual-status-2025-11-11" class="md-skip">
+        <a href="#mbasic-compilers-status-summary-2025-11-13" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              MBASIC Compiler - Actual Status (2025-11-11)
+              MBASIC Compilers - Status Summary (2025-11-13)
             
           </span>
         </div>
@@ -1506,14 +1506,19 @@
   
 
 
-<h1 id="mbasic-compiler-actual-status-2025-11-11">MBASIC Compiler - Actual Status (2025-11-11)<a class="headerlink" href="#mbasic-compiler-actual-status-2025-11-11" title="Permanent link">&para;</a></h1>
+<h1 id="mbasic-compilers-status-summary-2025-11-13">MBASIC Compilers - Status Summary (2025-11-13)<a class="headerlink" href="#mbasic-compilers-status-summary-2025-11-13" title="Permanent link">&para;</a></h1>
 <h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
-<p><strong>THE COMPILER IS 100% COMPLETE!</strong> 🎉</p>
+<p><strong>BOTH COMPILERS ARE 100% COMPLETE!</strong> 🎉</p>
+<p>MBASIC-2025 now has TWO production-ready compiler backends:
+1. <strong>Z80/8080 Compiler</strong> - Generates native CP/M executables (documented in this file)
+2. <strong>JavaScript Compiler</strong> - Generates JavaScript for browsers and Node.js (see JS_BACKEND_REMAINING.md)</p>
+<p>This file documents the <strong>Z80/8080 Compiler Backend</strong> which generates native CP/M executables.</p>
 <p>All features of Microsoft BASIC Compiler (BASCOM) are now implemented! Final implementations on 2025-11-11:
 - PEEK/POKE, INP/OUT, WAIT (hardware access)
 - CALL, USR, VARPTR (machine language interface)
 - RESET, NAME, FILES, WIDTH, LPRINT, CLEAR (system operations)
-- <strong>CHAIN</strong> - Program chaining using CP/M warm boot (implemented today!)</p>
+- <strong>CHAIN</strong> - Program chaining using CP/M warm boot</p>
+<p>JavaScript compiler also implements CHAIN (2025-11-13) using browser navigation and process spawn!</p>
 <h2 id="implemented-and-working">✅ IMPLEMENTED AND WORKING<a class="headerlink" href="#implemented-and-working" title="Permanent link">&para;</a></h2>
 <h3 id="core-language-100">Core Language (100%)<a class="headerlink" href="#core-language-100" title="Permanent link">&para;</a></h3>
 <ul>

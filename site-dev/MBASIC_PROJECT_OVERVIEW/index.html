@@ -1211,9 +1211,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#two-complete-implementations-in-one-project" class="md-nav__link">
+  <a href="#three-complete-implementations-in-one-project" class="md-nav__link">
     <span class="md-ellipsis">
-      Two Complete Implementations in One Project
+      THREE Complete Implementations in One Project
     </span>
   </a>
   
@@ -1229,9 +1229,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#what-makes-the-compiler-special" class="md-nav__link">
+  <a href="#what-makes-the-compilers-special" class="md-nav__link">
     <span class="md-ellipsis">
-      What Makes the Compiler Special
+      What Makes the Compilers Special
     </span>
   </a>
   
@@ -1592,23 +1592,29 @@
 
 <h1 id="mbasic-2025-the-complete-basic-80-revival">MBASIC-2025: The Complete BASIC-80 Revival<a class="headerlink" href="#mbasic-2025-the-complete-basic-80-revival" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>Two complete implementations. Zero compromises. 100% compatible.</strong></p>
+<p><strong>THREE complete implementations. Zero compromises. 100% compatible.</strong></p>
 </blockquote>
 <h2 id="what-is-mbasic-2025">What Is MBASIC-2025?<a class="headerlink" href="#what-is-mbasic-2025" title="Permanent link">&para;</a></h2>
-<p>MBASIC-2025 is the <strong>only</strong> modern implementation that gives you both a feature-complete interactive BASIC interpreter AND a native code compiler for the classic Microsoft BASIC-80 5.21 language. Whether you're preserving historical software, teaching programming fundamentals, or building retro computing projects, MBASIC-2025 delivers unprecedented compatibility and power.</p>
+<p>MBASIC-2025 is the <strong>only</strong> modern implementation that gives you a feature-complete interactive BASIC interpreter AND two complete compiler backends for the classic Microsoft BASIC-80 5.21 language. Whether you're preserving historical software, teaching programming fundamentals, building retro computing projects, or deploying web applications, MBASIC-2025 delivers unprecedented compatibility and power.</p>
 <h2 id="why-mbasic-2025-stands-out">🎉 Why MBASIC-2025 Stands Out<a class="headerlink" href="#why-mbasic-2025-stands-out" title="Permanent link">&para;</a></h2>
-<h3 id="two-complete-implementations-in-one-project">Two Complete Implementations in One Project<a class="headerlink" href="#two-complete-implementations-in-one-project" title="Permanent link">&para;</a></h3>
+<h3 id="three-complete-implementations-in-one-project">THREE Complete Implementations in One Project<a class="headerlink" href="#three-complete-implementations-in-one-project" title="Permanent link">&para;</a></h3>
 <p><strong>Interactive Interpreter (100% Complete)</strong>
 - Run classic MBASIC programs exactly as written - no modifications needed
 - Interactive REPL with all classic commands (LIST, RUN, SAVE, LOAD, RENUM)
 - Modern debugging features (BREAK, STEP, WATCH, STACK)
 - Four UI options: CLI (classic), Curses (full-screen), Tk (GUI), Web (browser-based)</p>
-<p><strong>Native Code Compiler (100% Complete)</strong>
+<p><strong>Z80/8080 Compiler (100% Complete)</strong>
 - Generates real CP/M executables for 8080 or Z80 processors
 - <strong>Every</strong> compilable MBASIC 5.21 feature implemented
 - Hardware access features that work: PEEK/POKE/INP/OUT/WAIT
 - Machine language integration: CALL/USR/VARPTR
 - Optimized runtime with O(n log n) garbage collection</p>
+<p><strong>JavaScript Compiler (100% Complete)</strong>
+- Generates portable JavaScript for browsers and Node.js
+- All MBASIC 5.21 features except hardware access
+- Standalone HTML applications (no server required)
+- Full file I/O (localStorage in browser, fs module in Node.js)
+- Cross-platform deployment anywhere JavaScript runs</p>
 <h3 id="100-language-compatibility">100% Language Compatibility<a class="headerlink" href="#100-language-compatibility" title="Permanent link">&para;</a></h3>
 <p><strong>We didn't cut corners.</strong> Every MBASIC 5.21 feature is implemented:</p>
 <p>✅ All data types: INTEGER (%), SINGLE (!), DOUBLE (#), STRING (<span class="arithmatex"><span class="MathJax_Preview">)
@@ -1624,9 +1630,9 @@
 ✅ Error handling: ON ERROR GOTO, RESUME (all variants), ERR, ERL
 ✅ Formatted output: PRINT USING, TAB(), SPC()
 ✅ Advanced features: DEF FN, DATA/READ/RESTORE, MID</script></span> assignment</p>
-<h3 id="what-makes-the-compiler-special">What Makes the Compiler Special<a class="headerlink" href="#what-makes-the-compiler-special" title="Permanent link">&para;</a></h3>
-<p>Most BASIC compilers skip the "hard parts." Not MBASIC-2025:</p>
-<p><strong>Hardware Integration That Actually Works</strong>
+<h3 id="what-makes-the-compilers-special">What Makes the Compilers Special<a class="headerlink" href="#what-makes-the-compilers-special" title="Permanent link">&para;</a></h3>
+<p>Most BASIC compilers skip the "hard parts." Not MBASIC-2025 - we have TWO production-ready compilers!</p>
+<p><strong>Z80/8080 Compiler - Hardware Integration That Actually Works</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nl">10</span><span class="w"> </span><span class="vg">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">PEEK</span><span class="p">(</span><span class="il">100</span><span class="p">)</span><span class="w">        </span><span class="c1">&#39; Direct memory access</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nl">20</span><span class="w"> </span><span class="kr">POKE</span><span class="w"> </span><span class="il">100</span><span class="p">,</span><span class="w"> </span><span class="il">42</span><span class="w">         </span><span class="c1">&#39; Memory writes</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nl">30</span><span class="w"> </span><span class="vg">B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">INP</span><span class="p">(</span><span class="il">255</span><span class="p">)</span><span class="w">         </span><span class="c1">&#39; Read I/O port</span>
@@ -1637,11 +1643,26 @@
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nl">80</span><span class="w"> </span><span class="vg">RESULT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="vg">USR</span><span class="p">(</span><span class="il">16384</span><span class="p">)</span><span class="w">  </span><span class="c1">&#39; Call ML function</span>
 </code></pre></div></p>
 <p>These don't just parse - they generate <strong>real 8080/Z80 machine code</strong> that works on actual hardware or emulators!</p>
-<p><strong>Efficient Runtime Library</strong>
+<p><strong>JavaScript Compiler - Modern Cross-Platform Deployment</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nl">10</span><span class="w"> </span><span class="c1">REM All MBASIC features work in JavaScript!</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nl">20</span><span class="w"> </span><span class="kd">DIM</span><span class="w"> </span><span class="vg">A</span><span class="p">(</span><span class="il">100</span><span class="p">),</span><span class="w"> </span><span class="vg">B$</span><span class="p">(</span><span class="il">50</span><span class="p">)</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nl">30</span><span class="w"> </span><span class="kr">OPEN</span><span class="w"> </span><span class="s2">&quot;DATA.TXT&quot;</span><span class="w"> </span><span class="kr">FOR</span><span class="w"> </span><span class="k">OUTPUT</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">#</span><span class="il">1</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nl">40</span><span class="w"> </span><span class="kr">PRINT</span><span class="w"> </span><span class="err">#</span><span class="il">1</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Hello from JavaScript!&quot;</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="nl">50</span><span class="w"> </span><span class="kr">CLOSE</span><span class="w"> </span><span class="err">#</span><span class="il">1</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="nl">60</span><span class="w"> </span><span class="kr">CHAIN</span><span class="w"> </span><span class="s2">&quot;NEXTPROG&quot;</span><span class="w">  </span><span class="c1">&#39; Chain to another program</span>
+</code></pre></div></p>
+<p>Compiles to clean JavaScript that runs in browsers AND Node.js - same code, both platforms!</p>
+<p><strong>Efficient Runtime Libraries</strong></p>
+<p>Z80/8080 Backend:
 - Custom string system with smart garbage collection
 - Only 1 malloc in the entire system (pool initialization)
 - In-place GC - no temporary buffers wasting precious CP/M RAM
 - Fits comfortably in 64K TPA (Transient Program Area)</p>
+<p>JavaScript Backend:
+- Leverages JavaScript's built-in garbage collection
+- Clean, readable output code
+- Dual runtime for Node.js and browser environments
+- Virtual filesystem (localStorage) and real filesystem (fs module)</p>
 <p><strong>Complete File I/O</strong>
 - Sequential files: OPEN, PRINT#, INPUT#, LINE INPUT#, WRITE#
 - Random access: FIELD, GET, PUT, LSET, RSET (real database-style records)
@@ -1837,15 +1858,15 @@
 </ul>
 <h2 id="getting-started">🚢 Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
 <h3 id="for-users-interpreter-only">For Users (Interpreter Only)<a class="headerlink" href="#for-users-interpreter-only" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Install via pip (when published)</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span>mbasic
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Or from source (zero dependencies for CLI)</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/avwohl/mbasic.git
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="nb">cd</span><span class="w"> </span>mbasic
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>python3<span class="w"> </span>mbasic
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1"># That&#39;s it! Start typing BASIC code.</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Install via pip (when published)</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>pip<span class="w"> </span>install<span class="w"> </span>mbasic
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Or from source (zero dependencies for CLI)</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/avwohl/mbasic.git
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nb">cd</span><span class="w"> </span>mbasic
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>python3<span class="w"> </span>mbasic
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="c1"># That&#39;s it! Start typing BASIC code.</span>
 </code></pre></div>
 <h3 id="for-developers-full-stack">For Developers (Full Stack)<a class="headerlink" href="#for-developers-full-stack" title="Permanent link">&para;</a></h3>
 <p>Complete setup guide for Linux Mint/Ubuntu/Debian includes:
@@ -1856,15 +1877,25 @@
 - Development tools</p>
 <p>See <a href="../dev/LINUX_MINT_DEVELOPER_SETUP/">docs/dev/LINUX_MINT_DEVELOPER_SETUP.md</a></p>
 <h3 id="for-compiler-users">For Compiler Users<a class="headerlink" href="#for-compiler-users" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Install z88dk (8080/Z80 C compiler)</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sudo<span class="w"> </span>snap<span class="w"> </span>install<span class="w"> </span>z88dk<span class="w"> </span>--beta
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Compile BASIC to CP/M</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nb">cd</span><span class="w"> </span>test_compile
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>python3<span class="w"> </span>test_compile.py<span class="w"> </span>yourprogram.bas
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="c1"># Creates: yourprogram.com (runs on CP/M!)</span>
-</code></pre></div>
+<p><strong>Z80/8080 Backend (CP/M Targets):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Install z88dk (8080/Z80 C compiler)</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>sudo<span class="w"> </span>snap<span class="w"> </span>install<span class="w"> </span>z88dk<span class="w"> </span>--beta
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Compile BASIC to CP/M</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="nb">cd</span><span class="w"> </span>test_compile
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>python3<span class="w"> </span>test_compile.py<span class="w"> </span>yourprogram.bas
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1"># Creates: yourprogram.com (runs on CP/M!)</span>
+</code></pre></div></p>
+<p><strong>JavaScript Backend (Modern Platforms):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Compile to JavaScript for Node.js</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>mbasic<span class="w"> </span>--compile-js<span class="w"> </span>yourprogram.js<span class="w"> </span>yourprogram.bas
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>node<span class="w"> </span>yourprogram.js
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="c1"># Or compile to standalone HTML</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>mbasic<span class="w"> </span>--compile-js<span class="w"> </span>yourprogram.js<span class="w"> </span>--html<span class="w"> </span>yourprogram.bas
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Open yourprogram.html in any browser!</span>
+</code></pre></div></p>
 <h2 id="learn-more">🎓 Learn More<a class="headerlink" href="#learn-more" title="Permanent link">&para;</a></h2>
 <h3 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1890,10 +1921,11 @@
 <p><strong>MBASIC-2025 is the ONLY implementation that gives you:</strong></p>
 <ol>
 <li>✅ <strong>100% MBASIC 5.21 compatibility</strong> - Every feature, no exceptions</li>
-<li>✅ <strong>Two complete implementations</strong> - Interpreter AND compiler</li>
-<li>✅ <strong>Hardware access that works</strong> - Real PEEK/POKE/INP/OUT</li>
+<li>✅ <strong>THREE complete implementations</strong> - Interpreter AND two compilers (Z80 + JavaScript)</li>
+<li>✅ <strong>Hardware access that works</strong> - Real PEEK/POKE/INP/OUT in Z80 compiled code</li>
+<li>✅ <strong>Modern cross-platform deployment</strong> - Compile to JavaScript for browsers/Node.js</li>
 <li>✅ <strong>Modern development experience</strong> - Multiple UIs, debugging tools</li>
-<li>✅ <strong>Production-ready compiler</strong> - Generates real CP/M executables</li>
+<li>✅ <strong>Production-ready compilers</strong> - Generates real CP/M executables AND JavaScript</li>
 <li>✅ <strong>Educational excellence</strong> - Perfect for teaching fundamentals</li>
 <li>✅ <strong>Open source freedom</strong> - GPLv3, no restrictions</li>
 <li>✅ <strong>Active development</strong> - Maintained and improved</li>
