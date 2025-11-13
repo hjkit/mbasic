@@ -1238,6 +1238,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#file-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#variables-arrays" class="md-nav__link">
     <span class="md-ellipsis">
       Variables &amp; Arrays
@@ -1537,7 +1546,11 @@ Phase 5-6: Enhanced features ✓
 - File I/O support (OPEN, CLOSE, RESET, PRINT#, INPUT#, LINE INPUT#, WRITE#)
   - Node.js: Uses fs module for real file operations
   - Browser: Uses localStorage as virtual filesystem
-- File position functions (EOF, LOF, LOC)</p>
+- File position functions (EOF, LOF, LOC)
+- File management (KILL, NAME, FILES)
+  - KILL: Delete file
+  - NAME: Rename file
+  - FILES: List directory (supports wildcards * and ?)</p>
 <p>This document tracks what's <strong>not yet implemented</strong> in the JavaScript backend.</p>
 <hr />
 <h2 id="implemented-core-features">✅ IMPLEMENTED (Core Features)<a class="headerlink" href="#implemented-core-features" title="Permanent link">&para;</a></h2>
@@ -1569,6 +1582,12 @@ Phase 5-6: Enhanced features ✓
 <li>✓ EOF() - Test for end of file</li>
 <li>✓ LOF() - Length of file in bytes</li>
 <li>✓ LOC() - Current position in file</li>
+</ul>
+<h3 id="file-management">File Management<a class="headerlink" href="#file-management" title="Permanent link">&para;</a></h3>
+<ul>
+<li>✓ KILL - Delete file (Node.js: fs.unlinkSync, Browser: localStorage.removeItem)</li>
+<li>✓ NAME - Rename file (Node.js: fs.renameSync, Browser: copy + remove in localStorage)</li>
+<li>✓ FILES - List directory (Node.js: fs.readdirSync with wildcards, Browser: list localStorage keys)</li>
 </ul>
 <h3 id="variables-arrays">Variables &amp; Arrays<a class="headerlink" href="#variables-arrays" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1605,9 +1624,6 @@ Phase 5-6: Enhanced features ✓
 <h2 id="not-implemented">❌ NOT IMPLEMENTED<a class="headerlink" href="#not-implemented" title="Permanent link">&para;</a></h2>
 <h3 id="file-operations-advanced">File Operations (Advanced)<a class="headerlink" href="#file-operations-advanced" title="Permanent link">&para;</a></h3>
 <ul>
-<li>KILL - Delete file</li>
-<li>NAME - Rename file</li>
-<li>FILES - List directory</li>
 <li>FIELD - Define random file buffer</li>
 <li>GET - Read random file record</li>
 <li>PUT - Write random file record</li>

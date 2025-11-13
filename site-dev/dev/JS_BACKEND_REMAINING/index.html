@@ -1343,16 +1343,14 @@
 <p>These features are rarely used or not applicable to JavaScript:</p>
 <h4 id="file-io-advanced-features-low-priority">File I/O - Advanced Features (Low Priority)<a class="headerlink" href="#file-io-advanced-features-low-priority" title="Permanent link">&para;</a></h4>
 <ul>
-<li><strong>KILL</strong> - Delete file</li>
-<li><strong>NAME</strong> - Rename file</li>
-<li><strong>FILES</strong> - List directory</li>
 <li><strong>FIELD / GET / PUT / LSET / RSET</strong> - Random file access</li>
 </ul>
 <p><strong>Notes</strong>:
 - All basic file I/O is implemented (OPEN, CLOSE, PRINT#, INPUT#, LINE INPUT#, WRITE#)
 - All file position functions implemented (EOF, LOF, LOC)
+- All file management implemented (KILL, NAME, FILES)
 - Node.js uses fs module, Browser uses localStorage
-- Advanced features rarely needed</p>
+- Random file access rarely needed</p>
 <h4 id="program-control-low-priority">Program Control (Low Priority)<a class="headerlink" href="#program-control-low-priority" title="Permanent link">&para;</a></h4>
 <ul>
 <li><strong>CHAIN</strong> - Load and run another program</li>
@@ -1390,6 +1388,9 @@
 - Node.js: Real filesystem using fs module
 - Browser: Virtual filesystem using localStorage</p>
 <p><strong>File Functions</strong>: EOF(), LOF(), LOC()</p>
+<p><strong>File Management</strong>: KILL (delete), NAME (rename), FILES (list directory)
+- Node.js: fs.unlinkSync, fs.renameSync, fs.readdirSync
+- Browser: localStorage operations</p>
 <p><strong>Variables &amp; Arrays</strong>: LET, DIM, array access, SWAP, ERASE, MID$ assignment</p>
 <p><strong>Functions</strong>: DEF FN, all math functions (ABS, INT, SQR, SIN, COS, TAN, ATN, LOG, EXP, RND, FIX, SGN, CINT, CSNG, CDBL), all string functions (LEFT<span class="arithmatex"><span class="MathJax_Preview">, RIGHT</span><script type="math/tex">, RIGHT</script></span>, MID<span class="arithmatex"><span class="MathJax_Preview">, LEN, CHR</span><script type="math/tex">, LEN, CHR</script></span>, ASC, STR<span class="arithmatex"><span class="MathJax_Preview">, VAL, INSTR, SPACE</span><script type="math/tex">, VAL, INSTR, SPACE</script></span>, STRING<span class="arithmatex"><span class="MathJax_Preview">, HEX</span><script type="math/tex">, HEX</script></span>, OCT$, POS), print formatting (TAB, SPC)</p>
 <p><strong>Error Handling</strong>: ON ERROR GOTO/GOSUB, RESUME/RESUME NEXT/RESUME line, ERROR, ERL(), ERR()</p>
@@ -1398,7 +1399,7 @@
 <li><strong>Test in browser</strong> - Generate HTML wrapper and test compiled programs</li>
 <li><strong>Test in Node.js</strong> - Run compiled programs with Node.js and real file I/O</li>
 <li><strong>Optimize code generation</strong> - Reduce redundant runtime code</li>
-<li><strong>Consider advanced file features</strong> - WRITE#, KILL, NAME, EOF, LOF if needed</li>
+<li><strong>Consider random file access</strong> - FIELD/GET/PUT/LSET/RSET if needed (rarely used)</li>
 </ol>
 <h3 id="feature-coverage">📊 Feature Coverage<a class="headerlink" href="#feature-coverage" title="Permanent link">&para;</a></h3>
 <p><strong>Core MBASIC 5.21 Compiler Features</strong>: ~99% complete
@@ -1407,8 +1408,8 @@
 - String operations: ✅ (including MID$ assignment)
 - Error handling: ✅
 - Formatted output: ✅
-- Basic file I/O: ✅ (OPEN, CLOSE, PRINT#, INPUT#, LINE INPUT#)</p>
-<p><strong>Advanced File I/O</strong>: Not implemented (rarely needed - WRITE#, KILL, NAME, EOF, LOF, LOC)
+- File I/O: ✅ (OPEN, CLOSE, PRINT#, INPUT#, LINE INPUT#, WRITE#, EOF, LOF, LOC, KILL, NAME, FILES)</p>
+<p><strong>Random File Access</strong>: Not implemented (rarely needed - FIELD/GET/PUT/LSET/RSET)
 <strong>Hardware access</strong>: Not applicable (JavaScript limitation)</p>
 <hr />
 <p><strong>Conclusion</strong>: The JavaScript backend is ready for production use with virtually all MBASIC 5.21 programs, including those with file I/O!</p>
