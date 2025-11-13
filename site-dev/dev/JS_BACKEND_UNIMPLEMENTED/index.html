@@ -1247,6 +1247,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#random-file-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      Random File Access
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#variables-arrays" class="md-nav__link">
     <span class="md-ellipsis">
       Variables &amp; Arrays
@@ -1305,15 +1314,6 @@
   
     <nav class="md-nav" aria-label="❌ NOT IMPLEMENTED">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#file-operations-advanced" class="md-nav__link">
-    <span class="md-ellipsis">
-      File Operations (Advanced)
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#program-control" class="md-nav__link">
@@ -1550,7 +1550,12 @@ Phase 5-6: Enhanced features ✓
 - File management (KILL, NAME, FILES)
   - KILL: Delete file
   - NAME: Rename file
-  - FILES: List directory (supports wildcards * and ?)</p>
+  - FILES: List directory (supports wildcards * and ?)
+- Random file access (FIELD, LSET, RSET, GET, PUT)
+  - OPEN "R" with record length support
+  - FIELD: Define buffer layout
+  - LSET/RSET: Left/right-justify strings in buffer
+  - GET/PUT: Read/write records by number</p>
 <p>This document tracks what's <strong>not yet implemented</strong> in the JavaScript backend.</p>
 <hr />
 <h2 id="implemented-core-features">✅ IMPLEMENTED (Core Features)<a class="headerlink" href="#implemented-core-features" title="Permanent link">&para;</a></h2>
@@ -1589,6 +1594,15 @@ Phase 5-6: Enhanced features ✓
 <li>✓ NAME - Rename file (Node.js: fs.renameSync, Browser: copy + remove in localStorage)</li>
 <li>✓ FILES - List directory (Node.js: fs.readdirSync with wildcards, Browser: list localStorage keys)</li>
 </ul>
+<h3 id="random-file-access">Random File Access<a class="headerlink" href="#random-file-access" title="Permanent link">&para;</a></h3>
+<ul>
+<li>✓ OPEN "R" - Open file for random access with record length</li>
+<li>✓ FIELD - Define buffer layout for random file (map variables to buffer positions)</li>
+<li>✓ LSET - Left-justify string in field variable</li>
+<li>✓ RSET - Right-justify string in field variable</li>
+<li>✓ GET - Read record from random file into buffer</li>
+<li>✓ PUT - Write buffer to record in random file</li>
+</ul>
 <h3 id="variables-arrays">Variables &amp; Arrays<a class="headerlink" href="#variables-arrays" title="Permanent link">&para;</a></h3>
 <ul>
 <li>✓ LET (assignment)</li>
@@ -1622,13 +1636,6 @@ Phase 5-6: Enhanced features ✓
 <p><em>None currently - all previously stubbed features have been implemented</em></p>
 <hr />
 <h2 id="not-implemented">❌ NOT IMPLEMENTED<a class="headerlink" href="#not-implemented" title="Permanent link">&para;</a></h2>
-<h3 id="file-operations-advanced">File Operations (Advanced)<a class="headerlink" href="#file-operations-advanced" title="Permanent link">&para;</a></h3>
-<ul>
-<li>FIELD - Define random file buffer</li>
-<li>GET - Read random file record</li>
-<li>PUT - Write random file record</li>
-<li>LSET / RSET - Format string for random files</li>
-</ul>
 <h3 id="program-control">Program Control<a class="headerlink" href="#program-control" title="Permanent link">&para;</a></h3>
 <ul>
 <li>CHAIN - Load and run another program</li>

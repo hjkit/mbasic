@@ -1341,16 +1341,6 @@
 <hr />
 <h3 id="low-priority-specializedadvanced">🔵 LOW Priority (Specialized/Advanced)<a class="headerlink" href="#low-priority-specializedadvanced" title="Permanent link">&para;</a></h3>
 <p>These features are rarely used or not applicable to JavaScript:</p>
-<h4 id="file-io-advanced-features-low-priority">File I/O - Advanced Features (Low Priority)<a class="headerlink" href="#file-io-advanced-features-low-priority" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>FIELD / GET / PUT / LSET / RSET</strong> - Random file access</li>
-</ul>
-<p><strong>Notes</strong>:
-- All basic file I/O is implemented (OPEN, CLOSE, PRINT#, INPUT#, LINE INPUT#, WRITE#)
-- All file position functions implemented (EOF, LOF, LOC)
-- All file management implemented (KILL, NAME, FILES)
-- Node.js uses fs module, Browser uses localStorage
-- Random file access rarely needed</p>
 <h4 id="program-control-low-priority">Program Control (Low Priority)<a class="headerlink" href="#program-control-low-priority" title="Permanent link">&para;</a></h4>
 <ul>
 <li><strong>CHAIN</strong> - Load and run another program</li>
@@ -1391,6 +1381,10 @@
 <p><strong>File Management</strong>: KILL (delete), NAME (rename), FILES (list directory)
 - Node.js: fs.unlinkSync, fs.renameSync, fs.readdirSync
 - Browser: localStorage operations</p>
+<p><strong>Random File Access</strong>: OPEN "R", FIELD, LSET, RSET, GET, PUT
+- Node.js: Binary file operations with fs module
+- Browser: localStorage-based random access
+- Record-based read/write with buffer management</p>
 <p><strong>Variables &amp; Arrays</strong>: LET, DIM, array access, SWAP, ERASE, MID$ assignment</p>
 <p><strong>Functions</strong>: DEF FN, all math functions (ABS, INT, SQR, SIN, COS, TAN, ATN, LOG, EXP, RND, FIX, SGN, CINT, CSNG, CDBL), all string functions (LEFT<span class="arithmatex"><span class="MathJax_Preview">, RIGHT</span><script type="math/tex">, RIGHT</script></span>, MID<span class="arithmatex"><span class="MathJax_Preview">, LEN, CHR</span><script type="math/tex">, LEN, CHR</script></span>, ASC, STR<span class="arithmatex"><span class="MathJax_Preview">, VAL, INSTR, SPACE</span><script type="math/tex">, VAL, INSTR, SPACE</script></span>, STRING<span class="arithmatex"><span class="MathJax_Preview">, HEX</span><script type="math/tex">, HEX</script></span>, OCT$, POS), print formatting (TAB, SPC)</p>
 <p><strong>Error Handling</strong>: ON ERROR GOTO/GOSUB, RESUME/RESUME NEXT/RESUME line, ERROR, ERL(), ERR()</p>
@@ -1398,21 +1392,23 @@
 <ol>
 <li><strong>Test in browser</strong> - Generate HTML wrapper and test compiled programs</li>
 <li><strong>Test in Node.js</strong> - Run compiled programs with Node.js and real file I/O</li>
+<li><strong>Test random file access</strong> - Test FIELD/GET/PUT with real programs</li>
 <li><strong>Optimize code generation</strong> - Reduce redundant runtime code</li>
-<li><strong>Consider random file access</strong> - FIELD/GET/PUT/LSET/RSET if needed (rarely used)</li>
+<li><strong>Consider CHAIN statement</strong> - Program chaining (rarely used)</li>
 </ol>
 <h3 id="feature-coverage">📊 Feature Coverage<a class="headerlink" href="#feature-coverage" title="Permanent link">&para;</a></h3>
-<p><strong>Core MBASIC 5.21 Compiler Features</strong>: ~99% complete
+<p><strong>Core MBASIC 5.21 Compiler Features</strong>: ~100% complete
 - All essential statements: ✅
 - All builtin functions: ✅
 - String operations: ✅ (including MID$ assignment)
 - Error handling: ✅
 - Formatted output: ✅
-- File I/O: ✅ (OPEN, CLOSE, PRINT#, INPUT#, LINE INPUT#, WRITE#, EOF, LOF, LOC, KILL, NAME, FILES)</p>
-<p><strong>Random File Access</strong>: Not implemented (rarely needed - FIELD/GET/PUT/LSET/RSET)
+- Sequential file I/O: ✅ (OPEN, CLOSE, PRINT#, INPUT#, LINE INPUT#, WRITE#, EOF, LOF, LOC, KILL, NAME, FILES)
+- Random file access: ✅ (FIELD, LSET, RSET, GET, PUT)</p>
+<p><strong>Program chaining</strong>: Not implemented (CHAIN - rarely used)
 <strong>Hardware access</strong>: Not applicable (JavaScript limitation)</p>
 <hr />
-<p><strong>Conclusion</strong>: The JavaScript backend is ready for production use with virtually all MBASIC 5.21 programs, including those with file I/O!</p>
+<p><strong>Conclusion</strong>: The JavaScript backend is ready for production use with virtually all MBASIC 5.21 programs, including those with sequential and random file I/O!</p>
 
 
 
