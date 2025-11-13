@@ -1192,9 +1192,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status-phase-7-error-handling-complete" class="md-nav__link">
+  <a href="#status-phase-8-formatted-output-complete" class="md-nav__link">
     <span class="md-ellipsis">
-      Status: Phase 7 (Error Handling) Complete
+      Status: Phase 8 (Formatted Output) Complete
     </span>
   </a>
   
@@ -1418,9 +1418,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#completed-phase-2-7" class="md-nav__link">
+  <a href="#completed-phase-2-8" class="md-nav__link">
     <span class="md-ellipsis">
-      ✅ COMPLETED (Phase 2-7)
+      ✅ COMPLETED (Phase 2-8)
     </span>
   </a>
   
@@ -1492,7 +1492,7 @@
 
 
 <h1 id="javascript-backend-unimplemented-features">JavaScript Backend - Unimplemented Features<a class="headerlink" href="#javascript-backend-unimplemented-features" title="Permanent link">&para;</a></h1>
-<h2 id="status-phase-7-error-handling-complete">Status: Phase 7 (Error Handling) Complete<a class="headerlink" href="#status-phase-7-error-handling-complete" title="Permanent link">&para;</a></h2>
+<h2 id="status-phase-8-formatted-output-complete">Status: Phase 8 (Formatted Output) Complete<a class="headerlink" href="#status-phase-8-formatted-output-complete" title="Permanent link">&para;</a></h2>
 <p>Phase 1-4: Core implementation ✓
 Phase 5-6: Enhanced features ✓
 - INPUT statement (browser &amp; Node.js)
@@ -1513,6 +1513,9 @@ Phase 5-6: Enhanced features ✓
 - RESUME / RESUME NEXT / RESUME line
 - ERROR statement
 - ERL() and ERR() functions</p>
+<p>Phase 8: Formatted output ✓
+- PRINT USING (simplified implementation)
+- Format specifiers: #, !, &amp;, \</p>
 <p>This document tracks what's <strong>not yet implemented</strong> in the JavaScript backend.</p>
 <hr />
 <h2 id="implemented-core-features">✅ IMPLEMENTED (Core Features)<a class="headerlink" href="#implemented-core-features" title="Permanent link">&para;</a></h2>
@@ -1527,6 +1530,7 @@ Phase 5-6: Enhanced features ✓
 <h3 id="io">I/O<a class="headerlink" href="#io" title="Permanent link">&para;</a></h3>
 <ul>
 <li>✓ PRINT (with separators)</li>
+<li>✓ PRINT USING (formatted output - simplified, basic format specifiers)</li>
 <li>✓ READ / DATA / RESTORE</li>
 <li>✓ INPUT (browser: prompt, Node.js: readline - note: async in Node.js)</li>
 </ul>
@@ -1568,7 +1572,6 @@ Phase 5-6: Enhanced features ✓
 <li>LINE INPUT - Read entire line including commas/quotes</li>
 <li>INPUT # - Read from file</li>
 <li>PRINT # - Write to file</li>
-<li>PRINT USING - Formatted output</li>
 <li>LPRINT - Print to line printer (could map to console)</li>
 <li>WRITE - CSV-formatted output</li>
 <li>WRITE # - Write to file</li>
@@ -1674,7 +1677,7 @@ Phase 5-6: Enhanced features ✓
 </ul>
 <hr />
 <h2 id="implementation-priority">📊 Implementation Priority<a class="headerlink" href="#implementation-priority" title="Permanent link">&para;</a></h2>
-<h3 id="completed-phase-2-7">✅ COMPLETED (Phase 2-7)<a class="headerlink" href="#completed-phase-2-7" title="Permanent link">&para;</a></h3>
+<h3 id="completed-phase-2-8">✅ COMPLETED (Phase 2-8)<a class="headerlink" href="#completed-phase-2-8" title="Permanent link">&para;</a></h3>
 <ol>
 <li>✓ INPUT - User input (browser: prompt, Node.js: readline)</li>
 <li>✓ RANDOMIZE - Proper random seeding</li>
@@ -1688,11 +1691,11 @@ Phase 5-6: Enhanced features ✓
 <li>✓ ON GOSUB - Computed subroutine calls</li>
 <li>✓ ERASE - Reset arrays</li>
 <li>✓ Error handling (ON ERROR, RESUME, ERROR, ERL, ERR)</li>
+<li>✓ PRINT USING - Formatted output (simplified)</li>
 </ol>
 <h3 id="medium-nice-to-have">MEDIUM (Nice to have)<a class="headerlink" href="#medium-nice-to-have" title="Permanent link">&para;</a></h3>
 <ol>
 <li>MID$ assignment - String modification</li>
-<li>PRINT USING - Formatted output</li>
 </ol>
 <h3 id="low-specializedadvanced">LOW (Specialized/Advanced)<a class="headerlink" href="#low-specializedadvanced" title="Permanent link">&para;</a></h3>
 <ol>
