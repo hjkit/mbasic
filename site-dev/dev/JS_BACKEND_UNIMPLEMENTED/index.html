@@ -1289,18 +1289,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#io-statements" class="md-nav__link">
+  <a href="#file-operations-advanced" class="md-nav__link">
     <span class="md-ellipsis">
-      I/O Statements
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#file-operations" class="md-nav__link">
-    <span class="md-ellipsis">
-      File Operations
+      File Operations (Advanced)
     </span>
   </a>
   
@@ -1514,7 +1505,10 @@ Phase 5-6: Enhanced features ✓
 - LINE INPUT statement (reads entire line without parsing, browser &amp; Node.js support)
 - WRITE statement (CSV-formatted output with automatic quoting)
 - LPRINT statement (print to line printer / console.log)
-- MID$ assignment (modify substring in place)</p>
+- MID$ assignment (modify substring in place)
+- File I/O support (OPEN, CLOSE, RESET, PRINT#, INPUT#, LINE INPUT#)
+  - Node.js: Uses fs module for real file operations
+  - Browser: Uses localStorage as virtual filesystem</p>
 <p>This document tracks what's <strong>not yet implemented</strong> in the JavaScript backend.</p>
 <hr />
 <h2 id="implemented-core-features">✅ IMPLEMENTED (Core Features)<a class="headerlink" href="#implemented-core-features" title="Permanent link">&para;</a></h2>
@@ -1530,11 +1524,15 @@ Phase 5-6: Enhanced features ✓
 <ul>
 <li>✓ PRINT (with separators)</li>
 <li>✓ PRINT USING (formatted output - simplified, basic format specifiers)</li>
+<li>✓ PRINT# (write to file)</li>
 <li>✓ WRITE (CSV-formatted output with automatic quoting)</li>
 <li>✓ LPRINT (print to line printer / console.log)</li>
 <li>✓ READ / DATA / RESTORE</li>
 <li>✓ INPUT (browser: prompt, Node.js: readline - note: async in Node.js)</li>
+<li>✓ INPUT# (read from file)</li>
 <li>✓ LINE INPUT (reads entire line without parsing, browser &amp; Node.js)</li>
+<li>✓ LINE INPUT# (read line from file)</li>
+<li>✓ OPEN / CLOSE / RESET (file operations - Node.js: fs, Browser: localStorage)</li>
 </ul>
 <h3 id="variables-arrays">Variables &amp; Arrays<a class="headerlink" href="#variables-arrays" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1569,17 +1567,9 @@ Phase 5-6: Enhanced features ✓
 <p><em>None currently - all previously stubbed features have been implemented</em></p>
 <hr />
 <h2 id="not-implemented">❌ NOT IMPLEMENTED<a class="headerlink" href="#not-implemented" title="Permanent link">&para;</a></h2>
-<h3 id="io-statements">I/O Statements<a class="headerlink" href="#io-statements" title="Permanent link">&para;</a></h3>
+<h3 id="file-operations-advanced">File Operations (Advanced)<a class="headerlink" href="#file-operations-advanced" title="Permanent link">&para;</a></h3>
 <ul>
-<li>INPUT # - Read from file</li>
-<li>PRINT # - Write to file</li>
-<li>WRITE # - Write to file</li>
-</ul>
-<h3 id="file-operations">File Operations<a class="headerlink" href="#file-operations" title="Permanent link">&para;</a></h3>
-<ul>
-<li>OPEN - Open file for I/O</li>
-<li>CLOSE - Close file</li>
-<li>RESET - Close all files</li>
+<li>WRITE # - Write to file (CSV format)</li>
 <li>KILL - Delete file</li>
 <li>NAME - Rename file</li>
 <li>FILES - List directory</li>

@@ -1323,14 +1323,9 @@
 <hr />
 <h3 id="low-priority-specializedadvanced">🔵 LOW Priority (Specialized/Advanced)<a class="headerlink" href="#low-priority-specializedadvanced" title="Permanent link">&para;</a></h3>
 <p>These features are rarely used or not applicable to JavaScript:</p>
-<h4 id="file-io-low-priority-requires-filesystem-api">File I/O (Low Priority - requires filesystem API)<a class="headerlink" href="#file-io-low-priority-requires-filesystem-api" title="Permanent link">&para;</a></h4>
+<h4 id="file-io-advanced-features-low-priority">File I/O - Advanced Features (Low Priority)<a class="headerlink" href="#file-io-advanced-features-low-priority" title="Permanent link">&para;</a></h4>
 <ul>
-<li><strong>OPEN</strong> - Open file for I/O</li>
-<li><strong>CLOSE</strong> - Close file</li>
-<li><strong>PRINT #</strong> - Write to file</li>
-<li><strong>INPUT #</strong> - Read from file</li>
-<li><strong>WRITE #</strong> - Write to file</li>
-<li><strong>RESET</strong> - Close all files</li>
+<li><strong>WRITE #</strong> - Write to file (CSV format)</li>
 <li><strong>KILL</strong> - Delete file</li>
 <li><strong>NAME</strong> - Rename file</li>
 <li><strong>FILES</strong> - List directory</li>
@@ -1338,9 +1333,9 @@
 <li><strong>LOF / EOF / LOC</strong> - File position functions</li>
 </ul>
 <p><strong>Notes</strong>:
-- Could implement using localStorage (browser) or fs module (Node.js)
-- Not in original MBASIC compiler scope for many programs
-- Complexity: High</p>
+- Basic file I/O is implemented (OPEN, CLOSE, PRINT#, INPUT#, LINE INPUT#)
+- Node.js uses fs module, Browser uses localStorage
+- Advanced features rarely needed</p>
 <h4 id="program-control-low-priority-mostly-interactive">Program Control (Low Priority - mostly interactive)<a class="headerlink" href="#program-control-low-priority-mostly-interactive" title="Permanent link">&para;</a></h4>
 <ul>
 <li><strong>CHAIN</strong> - Load and run another program</li>
@@ -1371,28 +1366,32 @@
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
 <h3 id="whats-implemented-complete-feature-set">✅ What's IMPLEMENTED (Complete Feature Set)<a class="headerlink" href="#whats-implemented-complete-feature-set" title="Permanent link">&para;</a></h3>
 <p><strong>Control Flow</strong>: GOTO, ON GOTO, GOSUB, ON GOSUB, RETURN, FOR/NEXT, WHILE/WEND, IF/THEN/ELSE, END, STOP</p>
-<p><strong>I/O</strong>: PRINT, PRINT USING, INPUT, LINE INPUT, WRITE, LPRINT, READ/DATA/RESTORE</p>
-<p><strong>Variables &amp; Arrays</strong>: LET, DIM, array access, SWAP, ERASE</p>
+<p><strong>I/O</strong>: PRINT, PRINT#, PRINT USING, INPUT, INPUT#, LINE INPUT, LINE INPUT#, WRITE, LPRINT, READ/DATA/RESTORE</p>
+<p><strong>File Operations</strong>: OPEN (modes: I, O, A), CLOSE, RESET
+- Node.js: Real filesystem using fs module
+- Browser: Virtual filesystem using localStorage</p>
+<p><strong>Variables &amp; Arrays</strong>: LET, DIM, array access, SWAP, ERASE, MID$ assignment</p>
 <p><strong>Functions</strong>: DEF FN, all math functions (ABS, INT, SQR, SIN, COS, TAN, ATN, LOG, EXP, RND, FIX, SGN, CINT, CSNG, CDBL), all string functions (LEFT<span class="arithmatex"><span class="MathJax_Preview">, RIGHT</span><script type="math/tex">, RIGHT</script></span>, MID<span class="arithmatex"><span class="MathJax_Preview">, LEN, CHR</span><script type="math/tex">, LEN, CHR</script></span>, ASC, STR<span class="arithmatex"><span class="MathJax_Preview">, VAL, INSTR, SPACE</span><script type="math/tex">, VAL, INSTR, SPACE</script></span>, STRING<span class="arithmatex"><span class="MathJax_Preview">, HEX</span><script type="math/tex">, HEX</script></span>, OCT$, POS), print formatting (TAB, SPC)</p>
 <p><strong>Error Handling</strong>: ON ERROR GOTO/GOSUB, RESUME/RESUME NEXT/RESUME line, ERROR, ERL(), ERR()</p>
 <h3 id="recommended-next-steps">🎯 Recommended Next Steps<a class="headerlink" href="#recommended-next-steps" title="Permanent link">&para;</a></h3>
 <ol>
 <li><strong>Test in browser</strong> - Generate HTML wrapper and test compiled programs</li>
-<li><strong>Test in Node.js</strong> - Run compiled programs with Node.js</li>
+<li><strong>Test in Node.js</strong> - Run compiled programs with Node.js and real file I/O</li>
 <li><strong>Optimize code generation</strong> - Reduce redundant runtime code</li>
-<li><strong>Consider file I/O</strong> - If needed by specific programs (OPEN, CLOSE, PRINT#, INPUT#)</li>
+<li><strong>Consider advanced file features</strong> - WRITE#, KILL, NAME, EOF, LOF if needed</li>
 </ol>
 <h3 id="feature-coverage">📊 Feature Coverage<a class="headerlink" href="#feature-coverage" title="Permanent link">&para;</a></h3>
-<p><strong>Core MBASIC 5.21 Compiler Features</strong>: ~98% complete
+<p><strong>Core MBASIC 5.21 Compiler Features</strong>: ~99% complete
 - All essential statements: ✅
 - All builtin functions: ✅
 - String operations: ✅ (including MID$ assignment)
 - Error handling: ✅
-- Formatted output: ✅</p>
-<p><strong>File I/O</strong>: Not implemented (rarely needed)
+- Formatted output: ✅
+- Basic file I/O: ✅ (OPEN, CLOSE, PRINT#, INPUT#, LINE INPUT#)</p>
+<p><strong>Advanced File I/O</strong>: Not implemented (rarely needed - WRITE#, KILL, NAME, EOF, LOF, LOC)
 <strong>Hardware access</strong>: Not applicable (JavaScript limitation)</p>
 <hr />
-<p><strong>Conclusion</strong>: The JavaScript backend is ready for production use with MBASIC 5.21 programs that don't require file I/O!</p>
+<p><strong>Conclusion</strong>: The JavaScript backend is ready for production use with virtually all MBASIC 5.21 programs, including those with file I/O!</p>
 
 
 
