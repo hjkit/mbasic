@@ -1516,6 +1516,7 @@ Generated code should run in:
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented LINE INPUT statement (reads entire line without parsing, browser &amp; Node.js)</li>
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented WRITE statement (CSV-formatted output with automatic quoting)</li>
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented LPRINT statement (print to line printer / console.log)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented MID$ assignment (modify substring in place)</li>
 </ul>
 <h3 id="testing-results">Testing Results<a class="headerlink" href="#testing-results" title="Permanent link">&para;</a></h3>
 <ul class="task-list">
@@ -1536,10 +1537,10 @@ Generated code should run in:
 - Comprehensive error handling</p>
 <h3 id="next-steps-optional-enhancements">Next Steps (Optional Enhancements)<a class="headerlink" href="#next-steps-optional-enhancements" title="Permanent link">&para;</a></h3>
 <ol>
-<li>Implement medium-priority MBASIC 5.21 features (MID$ assignment)</li>
-<li>Add file I/O support (OPEN, CLOSE, PRINT #, INPUT #)</li>
+<li>Add file I/O support (OPEN, CLOSE, PRINT #, INPUT #) - Low priority</li>
 <li>Optimize generated code (reduce redundant runtime functions)</li>
 <li>Test in real browsers with complex programs</li>
+<li>Consider CHAIN statement for program chaining - Low priority</li>
 </ol>
 <p><strong>Note:</strong> Only implementing features from MBASIC 5.21 manual. CLS/LOCATE/COLOR are NOT in MBASIC 5.21 (those are GW-BASIC/QuickBASIC features).</p>
 <h2 id="key-design-decisions">Key Design Decisions<a class="headerlink" href="#key-design-decisions" title="Permanent link">&para;</a></h2>
