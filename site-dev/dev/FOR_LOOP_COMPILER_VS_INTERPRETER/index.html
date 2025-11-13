@@ -12,7 +12,7 @@
         <meta name="author" content="MBASIC Project Contributors">
       
       
-        <link rel="canonical" href="https://avwohl.github.io/mbasic/dev/WORK_IN_PROGRESS/">
+        <link rel="canonical" href="https://avwohl.github.io/mbasic/dev/FOR_LOOP_COMPILER_VS_INTERPRETER/">
       
       
       
@@ -22,7 +22,7 @@
     
     
       
-        <title>WORK IN PROGRESS - MBASIC 5.21 Documentation (Full)</title>
+        <title>FOR Loop Handling: Compiler vs Interpreter - MBASIC 5.21 Documentation (Full)</title>
       
     
     
@@ -75,6 +75,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#for-loop-handling-compiler-vs-interpreter" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -107,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              WORK IN PROGRESS
+              FOR Loop Handling: Compiler vs Interpreter
             
           </span>
         </div>
@@ -1177,6 +1182,178 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#date" class="md-nav__link">
+    <span class="md-ellipsis">
+      Date
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compiler-backend-z88dk-c-code-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compiler Backend (z88dk C code generation)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Compiler Backend (z88dk C code generation)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      How It Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generated-code-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Generated Code Example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Results
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interpreter-runtime-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interpreter (Runtime execution)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Interpreter (Runtime execution)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-implementation-has-bug" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current Implementation (Has Bug)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proposed-fix-option-1-separate-for-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      Proposed Fix (Option 1: Separate FOR Stack)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#after-fix" class="md-nav__link">
+    <span class="md-ellipsis">
+      After Fix
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparison-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      Comparison Table
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-they-differ" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why They Differ
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes-for-future" class="md-nav__link">
+    <span class="md-ellipsis">
+      Notes for Future
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Notes for Future">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#potential-circular-buffer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Potential Circular Buffer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#whilewend-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      WHILE/WEND Behavior
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      Related Files
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -1192,7 +1369,7 @@
 
 
   
-    <a href="https://github.com/avwohl/mbasic/edit/main/docs/dev/WORK_IN_PROGRESS.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/avwohl/mbasic/edit/main/docs/dev/FOR_LOOP_COMPILER_VS_INTERPRETER.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1200,9 +1377,189 @@
   
 
 
-  <h1>WORK IN PROGRESS</h1>
-
-
+<h1 id="for-loop-handling-compiler-vs-interpreter">FOR Loop Handling: Compiler vs Interpreter<a class="headerlink" href="#for-loop-handling-compiler-vs-interpreter" title="Permanent link">&para;</a></h1>
+<h2 id="date">Date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
+<p>2025-11-13</p>
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p>The <strong>compiler</strong> and <strong>interpreter</strong> handle FOR loops fundamentally differently when jumping out of loops and reusing variables.</p>
+<h2 id="compiler-backend-z88dk-c-code-generation">Compiler Backend (z88dk C code generation)<a class="headerlink" href="#compiler-backend-z88dk-c-code-generation" title="Permanent link">&para;</a></h2>
+<h3 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h3>
+<p>The compiler generates <strong>lexically-scoped C for loops</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nl">line_30</span><span class="p">:</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="c1">// loop body</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">condition</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">line_100</span><span class="p">;</span><span class="w">  </span><span class="c1">// Jump out</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nl">line_100</span><span class="p">:</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="c1">// Can reuse &#39;i&#39; here</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">        </span><span class="c1">// new loop body</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+<p><strong>Key characteristics</strong>:
+- No runtime "loop stack" tracking
+- Variables are just C variables (lexically scoped)
+- Jumping out of a loop is just a C <code>goto</code>
+- Reusing a variable in a new FOR loop is just reusing the C variable
+- <strong>Already works correctly</strong> for Super Star Trek pattern</p>
+<h3 id="generated-code-example">Generated Code Example<a class="headerlink" href="#generated-code-example" title="Permanent link">&para;</a></h3>
+<p>From <code>tests/for_test3_jump_reuse.bas</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nl">line_30</span><span class="p">:</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nl">line_40</span><span class="p">:</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;I=%g</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="nl">line_50</span><span class="p">:</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">i</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">3</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">line_100</span><span class="p">;</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="nl">line_60</span><span class="p">:</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="nl">line_100</span><span class="p">:</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Jumped out at I=%g</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="nl">line_110</span><span class="p">:</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Starting new FOR I loop...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="nl">line_120</span><span class="p">:</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">// Reuses same &#39;i&#39; variable</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="nl">line_130</span><span class="p">:</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;New I=%g</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="nl">line_140</span><span class="p">:</span>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+<h3 id="test-results">Test Results<a class="headerlink" href="#test-results" title="Permanent link">&para;</a></h3>
+<p>✅ <strong>Test 3</strong> (jump-reuse): Compiles and runs correctly
+✅ <strong>Test 6</strong> (Super Trek): Compiles and runs correctly</p>
+<p><strong>Conclusion</strong>: Compiler backend has <strong>no issue</strong> with this pattern. It's purely lexical scoping.</p>
+<h2 id="interpreter-runtime-execution">Interpreter (Runtime execution)<a class="headerlink" href="#interpreter-runtime-execution" title="Permanent link">&para;</a></h2>
+<h3 id="current-implementation-has-bug">Current Implementation (Has Bug)<a class="headerlink" href="#current-implementation-has-bug" title="Permanent link">&para;</a></h3>
+<p>The interpreter uses a <strong>runtime execution stack</strong> that tracks active FOR loops:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># src/runtime.py lines 83-88</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="bp">self</span><span class="o">.</span><span class="n">execution_stack</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Mixed: GOSUB, FOR, WHILE entries</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="bp">self</span><span class="o">.</span><span class="n">for_loop_vars</span> <span class="o">=</span> <span class="p">{}</span>    <span class="c1"># Quick lookup: var_name -&gt; stack index</span>
+</code></pre></div>
+<p><strong>Problem</strong>: When pushing a new FOR loop with a variable that's already on the stack:
+1. Checks if <code>var_name in self.for_loop_vars</code> (line 996)
+2. Raises error: "FOR loop variable already active"
+3. This prevents Super Star Trek pattern from working</p>
+<p><strong>Issue</strong>: Old FOR might be deep in stack (not on top):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Stack: [FOR I (index 0), GOSUB (index 1), WHILE (index 2)]
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>         ↑ Can&#39;t pop this without breaking structure
+</code></pre></div></p>
+<h3 id="proposed-fix-option-1-separate-for-stack">Proposed Fix (Option 1: Separate FOR Stack)<a class="headerlink" href="#proposed-fix-option-1-separate-for-stack" title="Permanent link">&para;</a></h3>
+<p>Split FOR loops into a <strong>separate stack</strong> from GOSUB/WHILE:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Separate stacks</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="bp">self</span><span class="o">.</span><span class="n">for_loop_stack</span> <span class="o">=</span> <span class="p">[]</span>      <span class="c1"># Only FOR loops (can be circular)</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="bp">self</span><span class="o">.</span><span class="n">execution_stack</span> <span class="o">=</span> <span class="p">[]</span>     <span class="c1"># Only GOSUB and WHILE</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="bp">self</span><span class="o">.</span><span class="n">for_loop_vars</span> <span class="o">=</span> <span class="p">{}</span>       <span class="c1"># var_name -&gt; index in for_loop_stack</span>
+</code></pre></div>
+<p><strong>Implementation</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">push_for_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="c1"># If variable already active, replace it (implicit cleanup)</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="k">if</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">for_loop_vars</span><span class="p">:</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>        <span class="n">old_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">for_loop_vars</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">for_loop_stack</span><span class="p">[</span><span class="n">old_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_entry</span>  <span class="c1"># Replace in place</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">for_loop_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_entry</span><span class="p">)</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">for_loop_vars</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">for_loop_stack</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+</code></pre></div></p>
+<p><strong>Benefit</strong>: When starting new FOR I, it just replaces the old FOR I in the separate stack.</p>
+<h3 id="after-fix">After Fix<a class="headerlink" href="#after-fix" title="Permanent link">&para;</a></h3>
+<p>Post-fix behavior will match real MBASIC 5.21:</p>
+<p>✅ Test 3: Jump out of FOR I, start new FOR I → Works
+✅ Test 5: Do this 9 times consecutively → Works
+✅ Test 6: Super Star Trek pattern → Works
+❌ Nested FOR with same var (both active) → Still errors (correct)</p>
+<h2 id="comparison-table">Comparison Table<a class="headerlink" href="#comparison-table" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Compiler</th>
+<th>Interpreter (Current)</th>
+<th>Interpreter (After Fix)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FOR loop tracking</td>
+<td>Lexical (C scope)</td>
+<td>Runtime stack</td>
+<td>Runtime stack (separate)</td>
+</tr>
+<tr>
+<td>Variable reuse</td>
+<td>Automatic (C var)</td>
+<td>❌ Error</td>
+<td>✅ Replaces old entry</td>
+</tr>
+<tr>
+<td>Jump out behavior</td>
+<td>C goto</td>
+<td>Stack stays</td>
+<td>Stack stays</td>
+</tr>
+<tr>
+<td>Super Trek pattern</td>
+<td>✅ Works</td>
+<td>❌ Error</td>
+<td>✅ Works</td>
+</tr>
+<tr>
+<td>Implementation</td>
+<td>None needed</td>
+<td>Unified stack</td>
+<td>Separate FOR stack</td>
+</tr>
+<tr>
+<td>Nested same var</td>
+<td>C compiler error</td>
+<td>✅ Runtime error</td>
+<td>✅ Runtime error</td>
+</tr>
+</tbody>
+</table>
+<h2 id="why-they-differ">Why They Differ<a class="headerlink" href="#why-they-differ" title="Permanent link">&para;</a></h2>
+<p><strong>Compiler</strong>:
+- Generates static C code
+- Relies on C's lexical scoping rules
+- No runtime loop tracking needed
+- Variables are just C variables</p>
+<p><strong>Interpreter</strong>:
+- Executes dynamically at runtime
+- Must track active control flow for:
+  - NEXT statement matching
+  - GOSUB/RETURN pairing
+  - Error detection (improper nesting)
+- Variables exist in runtime variable storage
+- Needs explicit loop stack management</p>
+<h2 id="notes-for-future">Notes for Future<a class="headerlink" href="#notes-for-future" title="Permanent link">&para;</a></h2>
+<h3 id="potential-circular-buffer">Potential Circular Buffer<a class="headerlink" href="#potential-circular-buffer" title="Permanent link">&para;</a></h3>
+<p>Real MBASIC may have used an 8-entry circular FOR loop buffer. If desired, we could implement this:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">MAX_FOR_LOOPS</span> <span class="o">=</span> <span class="mi">8</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="bp">self</span><span class="o">.</span><span class="n">for_loop_stack</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">MAX_FOR_LOOPS</span>  <span class="c1"># Fixed size</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="bp">self</span><span class="o">.</span><span class="n">for_loop_head</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Circular index</span>
+</code></pre></div>
+<p>However, tests show real MBASIC 5.21 supports at least 10 nested loops, so a fixed 8-entry limit doesn't match behavior. More likely real MBASIC just had a generous limit.</p>
+<h3 id="whilewend-behavior">WHILE/WEND Behavior<a class="headerlink" href="#whilewend-behavior" title="Permanent link">&para;</a></h3>
+<p>Needs separate testing to determine if WHILE/WEND has the same "jump out and reuse" behavior as FOR loops.</p>
+<p>If yes, may need <code>self.while_loop_stack</code> as well.</p>
+<h2 id="related-files">Related Files<a class="headerlink" href="#related-files" title="Permanent link">&para;</a></h2>
+<p><strong>Compiler</strong>:
+- <code>src/codegen_backend.py</code> - Lines 1094-1123 (FOR/NEXT generation)
+- <code>test_compile/test_compile.py</code> - Compilation test harness</p>
+<p><strong>Interpreter</strong>:
+- <code>src/runtime.py</code> - Lines 83-1045 (execution stack management)
+- <code>src/interpreter.py</code> - Line 1021 (GOTO implementation)</p>
+<p><strong>Tests</strong>:
+- <code>tests/for_test3_jump_reuse.bas</code> - Critical test (jump and reuse)
+- <code>tests/for_test6_super_trek.bas</code> - Super Star Trek pattern</p>
+<p><strong>Documentation</strong>:
+- <code>docs/dev/FOR_LOOP_STACK_FINDINGS.md</code> - Test results from real MBASIC
+- <code>docs/dev/FOR_LOOP_STACK_IMPLEMENTATION_OPTIONS.md</code> - Analysis of 4 fix options
+- <code>docs/dev/FOR_LOOP_JUMP_TODO.md</code> - Original issue description</p>
 
 
 
