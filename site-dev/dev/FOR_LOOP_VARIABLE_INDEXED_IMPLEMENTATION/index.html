@@ -12,7 +12,7 @@
         <meta name="author" content="MBASIC Project Contributors">
       
       
-        <link rel="canonical" href="https://avwohl.github.io/mbasic/dev/WORK_IN_PROGRESS/">
+        <link rel="canonical" href="https://avwohl.github.io/mbasic/dev/FOR_LOOP_VARIABLE_INDEXED_IMPLEMENTATION/">
       
       
       
@@ -22,7 +22,7 @@
     
     
       
-        <title>Work in Progress: JavaScript Backend - MBASIC 5.21 Documentation (Full)</title>
+        <title>FOR Loop Variable-Indexed Implementation - MBASIC 5.21 Documentation (Full)</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#work-in-progress-javascript-backend" class="md-skip">
+        <a href="#for-loop-variable-indexed-implementation" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Work in Progress: JavaScript Backend
+              FOR Loop Variable-Indexed Implementation
             
           </span>
         </div>
@@ -1192,82 +1192,64 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#date-started" class="md-nav__link">
+  <a href="#date" class="md-nav__link">
     <span class="md-ellipsis">
-      Date Started
+      Date
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#task" class="md-nav__link">
+  <a href="#summary" class="md-nav__link">
     <span class="md-ellipsis">
-      Task
+      Summary
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#the-approach" class="md-nav__link">
     <span class="md-ellipsis">
-      Status
+      The Approach
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#branch" class="md-nav__link">
+  <a href="#changes-made" class="md-nav__link">
     <span class="md-ellipsis">
-      Branch
+      Changes Made
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#goals" class="md-nav__link">
-    <span class="md-ellipsis">
-      Goals
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#completed" class="md-nav__link">
-    <span class="md-ellipsis">
-      Completed
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Completed">
+    <nav class="md-nav" aria-label="Changes Made">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#phase-0-design" class="md-nav__link">
+  <a href="#runtime-srcruntimepy" class="md-nav__link">
     <span class="md-ellipsis">
-      Phase 0: Design
+      Runtime (src/runtime.py)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#phase-1-4-implementation" class="md-nav__link">
+  <a href="#interpreter-srcinterpreterpy" class="md-nav__link">
     <span class="md-ellipsis">
-      Phase 1-4: Implementation
+      Interpreter (src/interpreter.py)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
+  <a href="#web-ui-srcuiwebnicegui_backendpy" class="md-nav__link">
     <span class="md-ellipsis">
-      Next Steps
+      Web UI (src/ui/web/nicegui_backend.py)
     </span>
   </a>
   
@@ -1279,18 +1261,27 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-design-decisions" class="md-nav__link">
+  <a href="#benefits" class="md-nav__link">
     <span class="md-ellipsis">
-      Key Design Decisions
+      Benefits
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#files-to-create" class="md-nav__link">
+  <a href="#test-results" class="md-nav__link">
     <span class="md-ellipsis">
-      Files to Create
+      Test Results
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#files-modified" class="md-nav__link">
+    <span class="md-ellipsis">
+      Files Modified
     </span>
   </a>
   
@@ -1300,24 +1291,6 @@
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing-strategy" class="md-nav__link">
-    <span class="md-ellipsis">
-      Testing Strategy
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#notes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Notes
     </span>
   </a>
   
@@ -1339,7 +1312,7 @@
 
 
   
-    <a href="https://github.com/avwohl/mbasic/edit/main/docs/dev/WORK_IN_PROGRESS.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/avwohl/mbasic/edit/main/docs/dev/FOR_LOOP_VARIABLE_INDEXED_IMPLEMENTATION.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1347,115 +1320,110 @@
   
 
 
-<h1 id="work-in-progress-javascript-backend">Work in Progress: JavaScript Backend<a class="headerlink" href="#work-in-progress-javascript-backend" title="Permanent link">&para;</a></h1>
-<h2 id="date-started">Date Started<a class="headerlink" href="#date-started" title="Permanent link">&para;</a></h2>
+<h1 id="for-loop-variable-indexed-implementation">FOR Loop Variable-Indexed Implementation<a class="headerlink" href="#for-loop-variable-indexed-implementation" title="Permanent link">&para;</a></h1>
+<h2 id="date">Date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
 <p>2025-11-13</p>
-<h2 id="task">Task<a class="headerlink" href="#task" title="Permanent link">&para;</a></h2>
-<p>Design and implement JavaScript compiler backend</p>
-<h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
-<p>Phase 1-4: Implementation - Complete</p>
-<h2 id="branch">Branch<a class="headerlink" href="#branch" title="Permanent link">&para;</a></h2>
-<p>js-backend</p>
-<h2 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h2>
-<p>Create a new compiler backend that generates JavaScript code from BASIC programs.
-Generated code should run in:
-- Browser (standalone HTML + JS)
-- Node.js (command-line via npm/node)</p>
-<h2 id="completed">Completed<a class="headerlink" href="#completed" title="Permanent link">&para;</a></h2>
-<h3 id="phase-0-design">Phase 0: Design<a class="headerlink" href="#phase-0-design" title="Permanent link">&para;</a></h3>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Created design specification document (docs/design/JAVASCRIPT_BACKEND_SPEC.md)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Defined code generation strategy</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Planned control flow handling (switch-based PC)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Designed runtime library structure</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Specified I/O handling for browser vs Node.js</li>
-</ul>
-<h3 id="phase-1-4-implementation">Phase 1-4: Implementation<a class="headerlink" href="#phase-1-4-implementation" title="Permanent link">&para;</a></h3>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Created <code>src/codegen_js_backend.py</code> (800+ lines)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented variable declarations and array initialization</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented expression generation (arithmetic, logic, strings, arrays)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented all statement types:</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> PRINT (with separators)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> LET (including array assignment)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> FOR/NEXT (variable-indexed with state tracking)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> GOTO/ON GOTO</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> GOSUB/RETURN</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> IF/THEN/ELSE</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> WHILE/WEND</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> READ/DATA/RESTORE</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> END</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented runtime library:</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Print functions (browser and Node.js)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Math functions (ABS, INT, SQR, SIN, COS, TAN, ATN, LOG, EXP)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> String functions (LEFT<span class="arithmatex"><span class="MathJax_Preview">, RIGHT</span><script type="math/tex">, RIGHT</script></span>, MID<span class="arithmatex"><span class="MathJax_Preview">, LEN, CHR</span><script type="math/tex">, LEN, CHR</script></span>, ASC, STR$, VAL)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> RND function with seeding</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> GOSUB/RETURN stack</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> FOR/NEXT state tracking</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> DATA/READ/RESTORE support</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Added CLI integration (<code>--compile-js</code> and <code>--html</code> flags)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented HTML wrapper generation</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Tested with hello world program - successful compilation!</li>
-</ul>
-<h3 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h3>
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p>Implemented variable-indexed FOR loop tracking instead of stack-based tracking. This allows jumping out of FOR loops and reusing the same variable (Super Star Trek pattern).</p>
+<h2 id="the-approach">The Approach<a class="headerlink" href="#the-approach" title="Permanent link">&para;</a></h2>
+<p><strong>Variable-Indexed FOR Loops:</strong>
+- Each variable is bound to at most one FOR loop at a time
+- FOR loop state stored in <code>Runtime.for_loop_states</code> dict: <code>var_name -&gt; {'pc': PC, 'end': value, 'step': value}</code>
+- NEXT looks up the loop state by variable name (O(1) operation)
+- Jumping out of a loop and starting a new FOR with the same variable just overwrites the binding</p>
+<p><strong>Nested Loop Detection:</strong>
+When nested FOR loops use the same variable:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kr">FOR</span><span class="w"> </span><span class="vg">I</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="il">1</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="il">10</span><span class="w">   </span><span class="c1">&#39; Binds I to loop 1</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="kr">FOR</span><span class="w"> </span><span class="vg">I</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="il">1</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="il">5</span><span class="w">  </span><span class="c1">&#39; Overwrites, binds I to loop 2</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="kr">NEXT</span><span class="w"> </span><span class="vg">I</span><span class="w">          </span><span class="c1">&#39; Completes loop 2, unbinds I</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kr">NEXT</span><span class="w"> </span><span class="vg">I</span><span class="w">            </span><span class="c1">&#39; Error: I not bound to any loop</span>
+</code></pre></div></p>
+<p>The first NEXT clears the variable's binding. The second NEXT finds no binding and errors - exactly as desired.</p>
+<h2 id="changes-made">Changes Made<a class="headerlink" href="#changes-made" title="Permanent link">&para;</a></h2>
+<h3 id="runtime-srcruntimepy">Runtime (src/runtime.py)<a class="headerlink" href="#runtime-srcruntimepy" title="Permanent link">&para;</a></h3>
 <ol>
-<li>Test with more complex programs (loops, arrays, strings)</li>
-<li>Test Super Star Trek (ultimate test!)</li>
-<li>Fix any bugs discovered during testing</li>
-<li>Add INPUT support (currently stubbed out)</li>
-<li>Optimize generated code</li>
+<li>
+<p><strong>Added <code>for_loop_states</code> dict</strong> (line 90):
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># FOR loop state storage - maps variable name to loop state</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># var_name -&gt; {&#39;pc&#39;: PC object, &#39;end&#39;: end_value, &#39;step&#39;: step_value}</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="bp">self</span><span class="o">.</span><span class="n">for_loop_states</span> <span class="o">=</span> <span class="p">{}</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Removed <code>for_loop_vars</code> dict</strong> - no longer needed</p>
+</li>
+<li>
+<p><strong>Added helper methods</strong>:</p>
+</li>
+<li><code>bind_for_loop(var_name, pc, end_value, step_value)</code> - Bind variable to FOR loop</li>
+<li><code>get_for_loop_state(var_name)</code> - Get loop state</li>
+<li>
+<p><code>unbind_for_loop(var_name)</code> - Unbind variable from loop</p>
+</li>
+<li>
+<p><strong>Updated <code>push_for_loop()</code></strong> - Now binds variable to loop state (overwrites if already bound)</p>
+</li>
+<li>
+<p><strong>Simplified <code>pop_for_loop()</code></strong> - Just unbinds variable</p>
+</li>
+<li>
+<p><strong>Updated <code>get_for_loop()</code></strong> - Returns loop info from for_loop_states</p>
+</li>
+<li>
+<p><strong>Updated <code>validate_stack()</code></strong> - Validates FOR loop states separately from execution stack</p>
+</li>
+<li>
+<p><strong>Updated <code>has_active_loop()</code></strong> - Checks for_loop_states instead of for_loop_vars</p>
+</li>
+<li>
+<p><strong>Updated clear method</strong> - Clears for_loop_states</p>
+</li>
 </ol>
-<h2 id="key-design-decisions">Key Design Decisions<a class="headerlink" href="#key-design-decisions" title="Permanent link">&para;</a></h2>
+<h3 id="interpreter-srcinterpreterpy">Interpreter (src/interpreter.py)<a class="headerlink" href="#interpreter-srcinterpreterpy" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Control Flow</strong>: Use switch statement with PC variable (like VM)</li>
 <li>
-<p>Reason: JavaScript has no goto, switch provides clean jumping</p>
+<p><strong>Simplified <code>_execute_next_single()</code></strong> - Removed stack validation logic (no longer needed)</p>
 </li>
 <li>
-<p><strong>FOR Loops</strong>: Variable-indexed approach (matching new interpreter)</p>
+<p><strong>Added <code>_find_most_recent_for_variable()</code></strong> - Lexically scans backward to find FOR statement for NEXT without variable</p>
 </li>
 <li>
-<p>Reason: Consistency with interpreter, handles Super Star Trek pattern</p>
+<p><strong>Updated <code>execute_next()</code></strong> - Handles NEXT without variable using lexical scoping</p>
 </li>
-<li>
-<p><strong>Runtime Detection</strong>: Check for <code>window</code> vs <code>process</code></p>
-</li>
-<li>
-<p>Reason: Single JS file works in both environments</p>
-</li>
-<li>
-<p><strong>GOSUB/RETURN</strong>: Call stack array</p>
-</li>
-<li>Reason: Simple, matches BASIC semantics</li>
 </ol>
-<h2 id="files-to-create">Files to Create<a class="headerlink" href="#files-to-create" title="Permanent link">&para;</a></h2>
+<h3 id="web-ui-srcuiwebnicegui_backendpy">Web UI (src/ui/web/nicegui_backend.py)<a class="headerlink" href="#web-ui-srcuiwebnicegui_backendpy" title="Permanent link">&para;</a></h3>
+<ol>
+<li>
+<p><strong>Updated serialization</strong> - Saves for_loop_states (pickled) instead of for_loop_vars</p>
+</li>
+<li>
+<p><strong>Backwards compatibility</strong> - Old saves without for_loop_states start with empty dict</p>
+</li>
+</ol>
+<h2 id="benefits">Benefits<a class="headerlink" href="#benefits" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Super Star Trek Pattern Works</strong>: Can jump out of FOR I and start new FOR I</li>
+<li><strong>Simple Logic</strong>: No stack searching, just dict lookup</li>
+<li><strong>Correct Nesting Detection</strong>: Automatically catches nested same-variable loops</li>
+<li><strong>O(1) NEXT Operation</strong>: Direct dict lookup instead of stack search</li>
+<li><strong>Matches Real MBASIC</strong>: Tested behavior matches MBASIC 5.21</li>
+</ol>
+<h2 id="test-results">Test Results<a class="headerlink" href="#test-results" title="Permanent link">&para;</a></h2>
+<p>✅ <strong>test3 (Jump and Reuse)</strong>: Works - jumps out of FOR I, starts new FOR I
+✅ <strong>test6 (Super Trek Pattern)</strong>: Works - ON I GOTO handlers with FOR I loops
+✅ <strong>test1 (Deep Nesting)</strong>: Works - 10 nested loops with different variables
+✅ <strong>Nested Same Variable</strong>: Correctly errors on second NEXT</p>
+<h2 id="files-modified">Files Modified<a class="headerlink" href="#files-modified" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>src/codegen_js_backend.py</code> - Main backend</li>
-<li><code>src/js_runtime.js</code> - Runtime library template</li>
-<li><code>test_compile_js/</code> - Test directory</li>
-<li><code>docs/user/JAVASCRIPT_BACKEND_GUIDE.md</code> - User docs</li>
+<li><code>src/runtime.py</code> - FOR loop state tracking</li>
+<li><code>src/interpreter.py</code> - NEXT execution and lexical scanning</li>
+<li><code>src/ui/web/nicegui_backend.py</code> - Session serialization</li>
 </ul>
 <h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Design spec: <code>docs/design/JAVASCRIPT_BACKEND_SPEC.md</code></li>
-<li>Existing C backend: <code>src/codegen_backend.py</code></li>
-<li>Runtime: <code>src/runtime.py</code></li>
-<li>Interpreter: <code>src/interpreter.py</code></li>
-</ul>
-<h2 id="testing-strategy">Testing Strategy<a class="headerlink" href="#testing-strategy" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Start with hello world</li>
-<li>Test control flow (FOR, GOTO, GOSUB)</li>
-<li>Test built-in functions</li>
-<li>Test I/O (PRINT, INPUT, DATA/READ)</li>
-<li>Ultimate test: Super Star Trek</li>
-</ol>
-<h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Following same pattern as Z88dk backend for consistency</li>
-<li>JavaScript backend will be easier to use (no C compiler needed)</li>
-<li>Can embed in web pages for interactive BASIC</li>
-<li>Good for teaching/learning BASIC in browser</li>
+<li><code>docs/dev/FOR_LOOP_IMPLEMENTATION_SUMMARY.md</code> - Original plan (used separate stack approach)</li>
+<li><code>docs/dev/FOR_LOOP_STACK_FINDINGS.md</code> - Real MBASIC test results</li>
+<li>User insight: "no stack, just tag variable with FOR loop PC"</li>
 </ul>
 
 

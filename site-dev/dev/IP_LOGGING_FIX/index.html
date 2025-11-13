@@ -12,7 +12,7 @@
         <meta name="author" content="MBASIC Project Contributors">
       
       
-        <link rel="canonical" href="https://avwohl.github.io/mbasic/dev/WORK_IN_PROGRESS/">
+        <link rel="canonical" href="https://avwohl.github.io/mbasic/dev/IP_LOGGING_FIX/">
       
       
       
@@ -22,7 +22,7 @@
     
     
       
-        <title>Work in Progress: JavaScript Backend - MBASIC 5.21 Documentation (Full)</title>
+        <title>IP Address Logging Fix for Kubernetes - MBASIC 5.21 Documentation (Full)</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#work-in-progress-javascript-backend" class="md-skip">
+        <a href="#ip-address-logging-fix-for-kubernetes" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Work in Progress: JavaScript Backend
+              IP Address Logging Fix for Kubernetes
             
           </span>
         </div>
@@ -1192,82 +1192,46 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#date-started" class="md-nav__link">
+  <a href="#problem" class="md-nav__link">
     <span class="md-ellipsis">
-      Date Started
+      Problem
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#task" class="md-nav__link">
+  <a href="#solution" class="md-nav__link">
     <span class="md-ellipsis">
-      Task
+      Solution
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
+  <a href="#implementation" class="md-nav__link">
     <span class="md-ellipsis">
-      Status
+      Implementation
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#branch" class="md-nav__link">
-    <span class="md-ellipsis">
-      Branch
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#goals" class="md-nav__link">
-    <span class="md-ellipsis">
-      Goals
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#completed" class="md-nav__link">
-    <span class="md-ellipsis">
-      Completed
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Completed">
+    <nav class="md-nav" aria-label="Implementation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#phase-0-design" class="md-nav__link">
+  <a href="#files-changed" class="md-nav__link">
     <span class="md-ellipsis">
-      Phase 0: Design
+      Files Changed
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#phase-1-4-implementation" class="md-nav__link">
+  <a href="#code-changes" class="md-nav__link">
     <span class="md-ellipsis">
-      Phase 1-4: Implementation
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Next Steps
+      Code Changes
     </span>
   </a>
   
@@ -1279,38 +1243,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-design-decisions" class="md-nav__link">
+  <a href="#testing" class="md-nav__link">
     <span class="md-ellipsis">
-      Key Design Decisions
+      Testing
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#files-to-create" class="md-nav__link">
+  <a href="#deployment" class="md-nav__link">
     <span class="md-ellipsis">
-      Files to Create
+      Deployment
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Deployment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current State
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#merge-strategy" class="md-nav__link">
     <span class="md-ellipsis">
-      References
+      Merge Strategy
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#testing-strategy" class="md-nav__link">
-    <span class="md-ellipsis">
-      Testing Strategy
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1318,6 +1288,15 @@
   <a href="#notes" class="md-nav__link">
     <span class="md-ellipsis">
       Notes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      Related Files
     </span>
   </a>
   
@@ -1339,7 +1318,7 @@
 
 
   
-    <a href="https://github.com/avwohl/mbasic/edit/main/docs/dev/WORK_IN_PROGRESS.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/avwohl/mbasic/edit/main/docs/dev/IP_LOGGING_FIX.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1347,115 +1326,127 @@
   
 
 
-<h1 id="work-in-progress-javascript-backend">Work in Progress: JavaScript Backend<a class="headerlink" href="#work-in-progress-javascript-backend" title="Permanent link">&para;</a></h1>
-<h2 id="date-started">Date Started<a class="headerlink" href="#date-started" title="Permanent link">&para;</a></h2>
-<p>2025-11-13</p>
-<h2 id="task">Task<a class="headerlink" href="#task" title="Permanent link">&para;</a></h2>
-<p>Design and implement JavaScript compiler backend</p>
-<h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
-<p>Phase 1-4: Implementation - Complete</p>
-<h2 id="branch">Branch<a class="headerlink" href="#branch" title="Permanent link">&para;</a></h2>
-<p>js-backend</p>
-<h2 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h2>
-<p>Create a new compiler backend that generates JavaScript code from BASIC programs.
-Generated code should run in:
-- Browser (standalone HTML + JS)
-- Node.js (command-line via npm/node)</p>
-<h2 id="completed">Completed<a class="headerlink" href="#completed" title="Permanent link">&para;</a></h2>
-<h3 id="phase-0-design">Phase 0: Design<a class="headerlink" href="#phase-0-design" title="Permanent link">&para;</a></h3>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Created design specification document (docs/design/JAVASCRIPT_BACKEND_SPEC.md)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Defined code generation strategy</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Planned control flow handling (switch-based PC)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Designed runtime library structure</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Specified I/O handling for browser vs Node.js</li>
-</ul>
-<h3 id="phase-1-4-implementation">Phase 1-4: Implementation<a class="headerlink" href="#phase-1-4-implementation" title="Permanent link">&para;</a></h3>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Created <code>src/codegen_js_backend.py</code> (800+ lines)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented variable declarations and array initialization</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented expression generation (arithmetic, logic, strings, arrays)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented all statement types:</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> PRINT (with separators)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> LET (including array assignment)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> FOR/NEXT (variable-indexed with state tracking)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> GOTO/ON GOTO</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> GOSUB/RETURN</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> IF/THEN/ELSE</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> WHILE/WEND</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> READ/DATA/RESTORE</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> END</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented runtime library:</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Print functions (browser and Node.js)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Math functions (ABS, INT, SQR, SIN, COS, TAN, ATN, LOG, EXP)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> String functions (LEFT<span class="arithmatex"><span class="MathJax_Preview">, RIGHT</span><script type="math/tex">, RIGHT</script></span>, MID<span class="arithmatex"><span class="MathJax_Preview">, LEN, CHR</span><script type="math/tex">, LEN, CHR</script></span>, ASC, STR$, VAL)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> RND function with seeding</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> GOSUB/RETURN stack</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> FOR/NEXT state tracking</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> DATA/READ/RESTORE support</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Added CLI integration (<code>--compile-js</code> and <code>--html</code> flags)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented HTML wrapper generation</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Tested with hello world program - successful compilation!</li>
-</ul>
-<h3 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h3>
+<h1 id="ip-address-logging-fix-for-kubernetes">IP Address Logging Fix for Kubernetes<a class="headerlink" href="#ip-address-logging-fix-for-kubernetes" title="Permanent link">&para;</a></h1>
+<h2 id="problem">Problem<a class="headerlink" href="#problem" title="Permanent link">&para;</a></h2>
+<p>When running MBASIC web UI in a Kubernetes cluster behind an ingress controller:
+- IP addresses logged to MySQL were always the ingress controller's IP (e.g., <code>10.244.0.5</code>)
+- This happened because the code was using <code>request.client.host</code> which gives the TCP connection IP
+- In Kubernetes, all traffic comes through the ingress controller, so all IPs were the same</p>
+<h2 id="solution">Solution<a class="headerlink" href="#solution" title="Permanent link">&para;</a></h2>
+<p>Extract the real client IP from the <code>X-Forwarded-For</code> HTTP header:
+- Ingress controllers and reverse proxies add this header containing the original client IP
+- Format: <code>X-Forwarded-For: client_ip, proxy1_ip, proxy2_ip</code>
+- The first IP in the list is the original client</p>
+<h2 id="implementation">Implementation<a class="headerlink" href="#implementation" title="Permanent link">&para;</a></h2>
+<h3 id="files-changed">Files Changed<a class="headerlink" href="#files-changed" title="Permanent link">&para;</a></h3>
 <ol>
-<li>Test with more complex programs (loops, arrays, strings)</li>
-<li>Test Super Star Trek (ultimate test!)</li>
-<li>Fix any bugs discovered during testing</li>
-<li>Add INPUT support (currently stubbed out)</li>
-<li>Optimize generated code</li>
-</ol>
-<h2 id="key-design-decisions">Key Design Decisions<a class="headerlink" href="#key-design-decisions" title="Permanent link">&para;</a></h2>
-<ol>
-<li><strong>Control Flow</strong>: Use switch statement with PC variable (like VM)</li>
+<li><strong>src/bot_protection.py</strong> (already existed)</li>
+<li>Contains <code>get_client_ip()</code> method that properly extracts IP from X-Forwarded-For header</li>
 <li>
-<p>Reason: JavaScript has no goto, switch provides clean jumping</p>
+<p>Falls back to <code>request.client.host</code> if header is not present</p>
 </li>
 <li>
-<p><strong>FOR Loops</strong>: Variable-indexed approach (matching new interpreter)</p>
+<p><strong>src/ui/web/nicegui_backend.py</strong> (fixed)</p>
+</li>
+<li>Added import: <code>from src.bot_protection import get_bot_protection</code></li>
+<li>Fixed <code>start_ide_session()</code> (line ~3878):<ul>
+<li>Before: <code>ip = context.client.request.client.host</code></li>
+<li>After: Uses <code>bot_protection.get_client_ip(context.client.request)</code></li>
+</ul>
 </li>
 <li>
-<p>Reason: Consistency with interpreter, handles Super Star Trek pattern</p>
-</li>
-<li>
-<p><strong>Runtime Detection</strong>: Check for <code>window</code> vs <code>process</code></p>
-</li>
-<li>
-<p>Reason: Single JS file works in both environments</p>
-</li>
-<li>
-<p><strong>GOSUB/RETURN</strong>: Call stack array</p>
-</li>
-<li>Reason: Simple, matches BASIC semantics</li>
-</ol>
-<h2 id="files-to-create">Files to Create<a class="headerlink" href="#files-to-create" title="Permanent link">&para;</a></h2>
+<p>Fixed <code>track_visit()</code> endpoint (line ~4009):</p>
 <ul>
-<li><code>src/codegen_js_backend.py</code> - Main backend</li>
-<li><code>src/js_runtime.js</code> - Runtime library template</li>
-<li><code>test_compile_js/</code> - Test directory</li>
-<li><code>docs/user/JAVASCRIPT_BACKEND_GUIDE.md</code> - User docs</li>
+<li>Before: Passed <code>None</code> for IP address</li>
+<li>After: Uses <code>bot_protection.get_client_ip(context.client.request)</code></li>
 </ul>
-<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+</li>
+<li>
+<p><strong>tests/test_ip_logging.py</strong> (new)</p>
+</li>
+<li>Comprehensive test suite for IP extraction</li>
+<li>Tests single IP, multiple IPs, IPv6, empty header, fallback behavior</li>
+<li>Tests Kubernetes ingress scenario specifically</li>
+</ol>
+<h3 id="code-changes">Code Changes<a class="headerlink" href="#code-changes" title="Permanent link">&para;</a></h3>
+<h4 id="before-line-3875">Before (line 3875)<a class="headerlink" href="#before-line-3875" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ip</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">host</span> <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">client</span> <span class="ow">and</span> <span class="n">context</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">request</span> <span class="ow">and</span> <span class="n">context</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">client</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">tracker</span><span class="o">.</span><span class="n">start_ide_session</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="after-line-3877-3879">After (line 3877-3879)<a class="headerlink" href="#after-line-3877-3879" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Get real client IP from X-Forwarded-For header (for Kubernetes ingress)</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">bot_protection</span> <span class="o">=</span> <span class="n">get_bot_protection</span><span class="p">()</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">ip</span> <span class="o">=</span> <span class="n">bot_protection</span><span class="o">.</span><span class="n">get_client_ip</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">)</span> <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">client</span> <span class="ow">and</span> <span class="n">context</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">request</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">tracker</span><span class="o">.</span><span class="n">start_ide_session</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="before-line-4007">Before (line 4007)<a class="headerlink" href="#before-line-4007" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Note: IP extraction handled in tracker, pass None for now</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">tracker</span><span class="o">.</span><span class="n">track_page_visit</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="n">referrer</span><span class="p">,</span> <span class="n">userAgent</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sessionId</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="after-line-4007-4010">After (line 4007-4010)<a class="headerlink" href="#after-line-4007-4010" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Get real client IP from X-Forwarded-For header (for Kubernetes ingress)</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">nicegui</span><span class="w"> </span><span class="kn">import</span> <span class="n">context</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">bot_protection</span> <span class="o">=</span> <span class="n">get_bot_protection</span><span class="p">()</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">ip</span> <span class="o">=</span> <span class="n">bot_protection</span><span class="o">.</span><span class="n">get_client_ip</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">)</span> <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">client</span> <span class="ow">and</span> <span class="n">context</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">request</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">tracker</span><span class="o">.</span><span class="n">track_page_visit</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="n">referrer</span><span class="p">,</span> <span class="n">userAgent</span><span class="p">,</span> <span class="n">ip</span><span class="p">,</span> <span class="n">sessionId</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
+<p>Run the test suite:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>tests.test_ip_logging<span class="w"> </span>-v
+</code></pre></div></p>
+<p>All tests pass:
+- ✓ Single IP extraction
+- ✓ Multiple IPs (takes first)
+- ✓ IPv6 support
+- ✓ Empty header fallback
+- ✓ Kubernetes ingress scenario</p>
+<h2 id="deployment">Deployment<a class="headerlink" href="#deployment" title="Permanent link">&para;</a></h2>
+<h3 id="current-state">Current State<a class="headerlink" href="#current-state" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Design spec: <code>docs/design/JAVASCRIPT_BACKEND_SPEC.md</code></li>
-<li>Existing C backend: <code>src/codegen_backend.py</code></li>
-<li>Runtime: <code>src/runtime.py</code></li>
-<li>Interpreter: <code>src/interpreter.py</code></li>
+<li><strong>dev branch</strong>: Contains the fix (this commit)</li>
+<li><strong>main branch</strong>: Deployed to Kubernetes, does NOT have the fix yet</li>
 </ul>
-<h2 id="testing-strategy">Testing Strategy<a class="headerlink" href="#testing-strategy" title="Permanent link">&para;</a></h2>
+<h3 id="merge-strategy">Merge Strategy<a class="headerlink" href="#merge-strategy" title="Permanent link">&para;</a></h3>
 <ol>
-<li>Start with hello world</li>
-<li>Test control flow (FOR, GOTO, GOSUB)</li>
-<li>Test built-in functions</li>
-<li>Test I/O (PRINT, INPUT, DATA/READ)</li>
-<li>Ultimate test: Super Star Trek</li>
+<li>
+<p><strong>Merge to main</strong>:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>git<span class="w"> </span>merge<span class="w"> </span>dev
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Deploy to Kubernetes</strong>:</p>
+</li>
+<li>Push to main branch</li>
+<li>Kubernetes deployment will automatically pick up the changes</li>
+<li>
+<p>No configuration changes needed (X-Forwarded-For is already set by ingress)</p>
+</li>
+<li>
+<p><strong>Verify in production</strong>:</p>
+</li>
+<li>Check MySQL logs to ensure IP addresses are diverse (not all the same)</li>
+<li>Example query:
+     <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">DISTINCT</span><span class="w"> </span><span class="n">ip_address</span><span class="p">,</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="k">count</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">page_visits</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="k">timestamp</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">INTERVAL</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">HOUR</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">ip_address</span><span class="p">;</span>
+</code></pre></div></li>
 </ol>
 <h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Following same pattern as Z88dk backend for consistency</li>
-<li>JavaScript backend will be easier to use (no C compiler needed)</li>
-<li>Can embed in web pages for interactive BASIC</li>
-<li>Good for teaching/learning BASIC in browser</li>
+<li>No configuration changes required</li>
+<li>X-Forwarded-For header is automatically added by ingress controllers</li>
+<li>Falls back gracefully to direct IP if header is missing (e.g., local development)</li>
+<li>Handles IPv4, IPv6, and multiple proxy chains correctly</li>
+<li>The <code>bot_protection.py</code> module was already properly implemented; we just needed to use it</li>
+</ul>
+<h2 id="related-files">Related Files<a class="headerlink" href="#related-files" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>src/bot_protection.py:181-197</code> - IP extraction implementation</li>
+<li><code>src/usage_tracker.py</code> - Usage tracking database operations</li>
+<li><code>deployment/k8s_templates/mbasic-configmap.yaml</code> - Kubernetes configuration</li>
+<li><code>docs/dev/KUBERNETES_DEPLOYMENT_SETUP.md</code> - Deployment documentation</li>
 </ul>
 
 

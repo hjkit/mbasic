@@ -1336,8 +1336,11 @@
 
 
 <h1 id="usage-tracking-integration">Usage Tracking Integration<a class="headerlink" href="#usage-tracking-integration" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Note</strong>: The <code>page_visits</code> table and <code>/api/track-visit</code> endpoint mentioned in this document have been removed as dead code (2025-11-13). See <code>docs/dev/PAGE_VISITS_CLEANUP.md</code> for details. Only IDE session tracking is currently active.</p>
+</blockquote>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>Custom usage tracking has been added to log website and IDE usage to MySQL database.</p>
+<p>Custom usage tracking has been added to log IDE usage to MySQL database.</p>
 <h2 id="database-schema">Database Schema<a class="headerlink" href="#database-schema" title="Permanent link">&para;</a></h2>
 <p>Location: <code>deployment/sql/usage_tracking_schema.sql</code></p>
 <p>Tables created:

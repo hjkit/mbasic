@@ -12,7 +12,7 @@
         <meta name="author" content="MBASIC Project Contributors">
       
       
-        <link rel="canonical" href="https://avwohl.github.io/mbasic/dev/WORK_IN_PROGRESS/">
+        <link rel="canonical" href="https://avwohl.github.io/mbasic/dev/PAGE_VISITS_CLEANUP/">
       
       
       
@@ -22,7 +22,7 @@
     
     
       
-        <title>Work in Progress: JavaScript Backend - MBASIC 5.21 Documentation (Full)</title>
+        <title>Dead Code Cleanup: page_visits and feature_usage Tables - MBASIC 5.21 Documentation (Full)</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#work-in-progress-javascript-backend" class="md-skip">
+        <a href="#dead-code-cleanup-page_visits-and-feature_usage-tables" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Work in Progress: JavaScript Backend
+              Dead Code Cleanup: page_visits and feature_usage Tables
             
           </span>
         </div>
@@ -1192,82 +1192,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#date-started" class="md-nav__link">
+  <a href="#summary" class="md-nav__link">
     <span class="md-ellipsis">
-      Date Started
+      Summary
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#task" class="md-nav__link">
+  <a href="#problems" class="md-nav__link">
     <span class="md-ellipsis">
-      Task
+      Problems
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#status" class="md-nav__link">
-    <span class="md-ellipsis">
-      Status
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#branch" class="md-nav__link">
-    <span class="md-ellipsis">
-      Branch
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#goals" class="md-nav__link">
-    <span class="md-ellipsis">
-      Goals
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#completed" class="md-nav__link">
-    <span class="md-ellipsis">
-      Completed
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Completed">
+    <nav class="md-nav" aria-label="Problems">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#phase-0-design" class="md-nav__link">
+  <a href="#1-page_visits-table" class="md-nav__link">
     <span class="md-ellipsis">
-      Phase 0: Design
+      1. page_visits Table
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#phase-1-4-implementation" class="md-nav__link">
+  <a href="#2-feature_usage-table" class="md-nav__link">
     <span class="md-ellipsis">
-      Phase 1-4: Implementation
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Next Steps
+      2. feature_usage Table
     </span>
   </a>
   
@@ -1279,45 +1234,87 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-design-decisions" class="md-nav__link">
+  <a href="#what-actually-gets-used" class="md-nav__link">
     <span class="md-ellipsis">
-      Key Design Decisions
+      What Actually Gets Used
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#files-to-create" class="md-nav__link">
+  <a href="#changes-made" class="md-nav__link">
     <span class="md-ellipsis">
-      Files to Create
+      Changes Made
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Changes Made">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#removed-from-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removed from Code
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-from-sql-schemas" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removed from SQL Schemas
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#files-not-touched-methods-remain-but-unused" class="md-nav__link">
+    <span class="md-ellipsis">
+      Files Not Touched (Methods Remain but Unused)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database-cleanup-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      Database Cleanup (Optional)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
+  <a href="#what-remains-active" class="md-nav__link">
     <span class="md-ellipsis">
-      References
+      What Remains Active
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#testing-strategy" class="md-nav__link">
+  <a href="#related-documents" class="md-nav__link">
     <span class="md-ellipsis">
-      Testing Strategy
+      Related Documents
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#notes" class="md-nav__link">
+  <a href="#date" class="md-nav__link">
     <span class="md-ellipsis">
-      Notes
+      Date
     </span>
   </a>
   
@@ -1339,7 +1336,7 @@
 
 
   
-    <a href="https://github.com/avwohl/mbasic/edit/main/docs/dev/WORK_IN_PROGRESS.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/avwohl/mbasic/edit/main/docs/dev/PAGE_VISITS_CLEANUP.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1347,116 +1344,67 @@
   
 
 
-<h1 id="work-in-progress-javascript-backend">Work in Progress: JavaScript Backend<a class="headerlink" href="#work-in-progress-javascript-backend" title="Permanent link">&para;</a></h1>
-<h2 id="date-started">Date Started<a class="headerlink" href="#date-started" title="Permanent link">&para;</a></h2>
+<h1 id="dead-code-cleanup-page_visits-and-feature_usage-tables">Dead Code Cleanup: page_visits and feature_usage Tables<a class="headerlink" href="#dead-code-cleanup-page_visits-and-feature_usage-tables" title="Permanent link">&para;</a></h1>
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p>Removed dead code related to <code>page_visits</code> and <code>feature_usage</code> tables that were never being used.</p>
+<h2 id="problems">Problems<a class="headerlink" href="#problems" title="Permanent link">&para;</a></h2>
+<h3 id="1-page_visits-table">1. page_visits Table<a class="headerlink" href="#1-page_visits-table" title="Permanent link">&para;</a></h3>
+<p>The root URL (<code>/</code>) immediately redirects to <code>/ide</code>, so the landing page HTML that calls <code>/api/track-visit</code> was never served. This resulted in:
+- <code>/api/track-visit</code> endpoint never being called
+- <code>page_visits</code> MySQL table always empty
+- Dead code in the codebase</p>
+<h3 id="2-feature_usage-table">2. feature_usage Table<a class="headerlink" href="#2-feature_usage-table" title="Permanent link">&para;</a></h3>
+<p>The <code>track_feature_usage()</code> method exists in <code>usage_tracker.py</code> but is <strong>never called anywhere</strong> in the codebase. This resulted in:
+- <code>feature_usage</code> MySQL table always empty
+- Dead code in usage_tracker.py</p>
+<h2 id="what-actually-gets-used">What Actually Gets Used<a class="headerlink" href="#what-actually-gets-used" title="Permanent link">&para;</a></h2>
+<ul>
+<li>✅ <strong><code>ide_sessions</code> table</strong> - Tracks IDE sessions with real client IPs (X-Forwarded-For fix applied)</li>
+<li>✅ <strong><code>program_executions</code> table</strong> - Tracks program runs (called from nicegui_backend.py)</li>
+<li>❌ <strong><code>page_visits</code> table</strong> - Never populated (dead code)</li>
+<li>❌ <strong><code>feature_usage</code> table</strong> - Never populated (dead code)</li>
+</ul>
+<h2 id="changes-made">Changes Made<a class="headerlink" href="#changes-made" title="Permanent link">&para;</a></h2>
+<h3 id="removed-from-code">Removed from Code<a class="headerlink" href="#removed-from-code" title="Permanent link">&para;</a></h3>
+<ol>
+<li><code>src/ui/web/nicegui_backend.py</code> - Deleted the <code>/api/track-visit</code> endpoint</li>
+</ol>
+<h3 id="removed-from-sql-schemas">Removed from SQL Schemas<a class="headerlink" href="#removed-from-sql-schemas" title="Permanent link">&para;</a></h3>
+<ol>
+<li><code>deployment/sql/usage_tracking_schema.sql</code> - Removed <code>page_visits</code> and <code>feature_usage</code> table definitions</li>
+<li><code>deployment/sql/recreate_usage_tables.sql</code> - Removed <code>page_visits</code> and <code>feature_usage</code> table definitions</li>
+<li><code>deployment/sql/setup_usage_tracking.sh</code> - Removed from output listing</li>
+</ol>
+<h3 id="files-not-touched-methods-remain-but-unused">Files Not Touched (Methods Remain but Unused)<a class="headerlink" href="#files-not-touched-methods-remain-but-unused" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>src/usage_tracker.py</code> - <code>track_page_visit()</code> and <code>track_feature_usage()</code> methods remain (unused but harmless)</li>
+<li><code>deployment/landing-page/index.html</code> - Landing page HTML remains (not served)</li>
+</ul>
+<h2 id="database-cleanup-optional">Database Cleanup (Optional)<a class="headerlink" href="#database-cleanup-optional" title="Permanent link">&para;</a></h2>
+<p>If you want to remove the unused tables from MySQL:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">-- Check if tables have any data (should be empty)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">page_visits</span><span class="p">;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">feature_usage</span><span class="p">;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1">-- Drop the tables (drop feature_usage first due to foreign key constraint)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">DROP</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">feature_usage</span><span class="p">;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="k">DROP</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">page_visits</span><span class="p">;</span>
+</code></pre></div>
+<p><strong>Note</strong>: This is optional. The empty tables don't hurt anything, but removing them cleans up the schema.</p>
+<h2 id="what-remains-active">What Remains Active<a class="headerlink" href="#what-remains-active" title="Permanent link">&para;</a></h2>
+<p>The following usage tracking is still active and working:
+- ✅ <code>ide_sessions</code> - Tracks IDE session starts/ends with real client IPs (X-Forwarded-For fix applied)
+- ✅ <code>program_executions</code> - Tracks program runs (called from <code>_track_program_execution()</code>)
+- ✅ <code>daily_usage_summary</code> - Aggregated daily statistics</p>
+<p>Both active tables use the fixed IP extraction that gets real client IPs from X-Forwarded-For header.</p>
+<h2 id="related-documents">Related Documents<a class="headerlink" href="#related-documents" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>docs/dev/IP_LOGGING_FIX.md</code> - IP address logging fix for Kubernetes</li>
+<li><code>docs/dev/USAGE_TRACKING_INTEGRATION.md</code> - Original usage tracking setup (now outdated regarding page_visits)</li>
+<li><code>DEPLOY_NOTE_IP_LOGGING_FIX.md</code> - Deployment note for IP fix</li>
+</ul>
+<h2 id="date">Date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
 <p>2025-11-13</p>
-<h2 id="task">Task<a class="headerlink" href="#task" title="Permanent link">&para;</a></h2>
-<p>Design and implement JavaScript compiler backend</p>
-<h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
-<p>Phase 1-4: Implementation - Complete</p>
-<h2 id="branch">Branch<a class="headerlink" href="#branch" title="Permanent link">&para;</a></h2>
-<p>js-backend</p>
-<h2 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h2>
-<p>Create a new compiler backend that generates JavaScript code from BASIC programs.
-Generated code should run in:
-- Browser (standalone HTML + JS)
-- Node.js (command-line via npm/node)</p>
-<h2 id="completed">Completed<a class="headerlink" href="#completed" title="Permanent link">&para;</a></h2>
-<h3 id="phase-0-design">Phase 0: Design<a class="headerlink" href="#phase-0-design" title="Permanent link">&para;</a></h3>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Created design specification document (docs/design/JAVASCRIPT_BACKEND_SPEC.md)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Defined code generation strategy</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Planned control flow handling (switch-based PC)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Designed runtime library structure</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Specified I/O handling for browser vs Node.js</li>
-</ul>
-<h3 id="phase-1-4-implementation">Phase 1-4: Implementation<a class="headerlink" href="#phase-1-4-implementation" title="Permanent link">&para;</a></h3>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Created <code>src/codegen_js_backend.py</code> (800+ lines)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented variable declarations and array initialization</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented expression generation (arithmetic, logic, strings, arrays)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented all statement types:</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> PRINT (with separators)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> LET (including array assignment)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> FOR/NEXT (variable-indexed with state tracking)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> GOTO/ON GOTO</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> GOSUB/RETURN</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> IF/THEN/ELSE</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> WHILE/WEND</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> READ/DATA/RESTORE</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> END</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented runtime library:</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Print functions (browser and Node.js)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Math functions (ABS, INT, SQR, SIN, COS, TAN, ATN, LOG, EXP)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> String functions (LEFT<span class="arithmatex"><span class="MathJax_Preview">, RIGHT</span><script type="math/tex">, RIGHT</script></span>, MID<span class="arithmatex"><span class="MathJax_Preview">, LEN, CHR</span><script type="math/tex">, LEN, CHR</script></span>, ASC, STR$, VAL)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> RND function with seeding</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> GOSUB/RETURN stack</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> FOR/NEXT state tracking</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> DATA/READ/RESTORE support</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Added CLI integration (<code>--compile-js</code> and <code>--html</code> flags)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Implemented HTML wrapper generation</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Tested with hello world program - successful compilation!</li>
-</ul>
-<h3 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h3>
-<ol>
-<li>Test with more complex programs (loops, arrays, strings)</li>
-<li>Test Super Star Trek (ultimate test!)</li>
-<li>Fix any bugs discovered during testing</li>
-<li>Add INPUT support (currently stubbed out)</li>
-<li>Optimize generated code</li>
-</ol>
-<h2 id="key-design-decisions">Key Design Decisions<a class="headerlink" href="#key-design-decisions" title="Permanent link">&para;</a></h2>
-<ol>
-<li><strong>Control Flow</strong>: Use switch statement with PC variable (like VM)</li>
-<li>
-<p>Reason: JavaScript has no goto, switch provides clean jumping</p>
-</li>
-<li>
-<p><strong>FOR Loops</strong>: Variable-indexed approach (matching new interpreter)</p>
-</li>
-<li>
-<p>Reason: Consistency with interpreter, handles Super Star Trek pattern</p>
-</li>
-<li>
-<p><strong>Runtime Detection</strong>: Check for <code>window</code> vs <code>process</code></p>
-</li>
-<li>
-<p>Reason: Single JS file works in both environments</p>
-</li>
-<li>
-<p><strong>GOSUB/RETURN</strong>: Call stack array</p>
-</li>
-<li>Reason: Simple, matches BASIC semantics</li>
-</ol>
-<h2 id="files-to-create">Files to Create<a class="headerlink" href="#files-to-create" title="Permanent link">&para;</a></h2>
-<ul>
-<li><code>src/codegen_js_backend.py</code> - Main backend</li>
-<li><code>src/js_runtime.js</code> - Runtime library template</li>
-<li><code>test_compile_js/</code> - Test directory</li>
-<li><code>docs/user/JAVASCRIPT_BACKEND_GUIDE.md</code> - User docs</li>
-</ul>
-<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Design spec: <code>docs/design/JAVASCRIPT_BACKEND_SPEC.md</code></li>
-<li>Existing C backend: <code>src/codegen_backend.py</code></li>
-<li>Runtime: <code>src/runtime.py</code></li>
-<li>Interpreter: <code>src/interpreter.py</code></li>
-</ul>
-<h2 id="testing-strategy">Testing Strategy<a class="headerlink" href="#testing-strategy" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Start with hello world</li>
-<li>Test control flow (FOR, GOTO, GOSUB)</li>
-<li>Test built-in functions</li>
-<li>Test I/O (PRINT, INPUT, DATA/READ)</li>
-<li>Ultimate test: Super Star Trek</li>
-</ol>
-<h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Following same pattern as Z88dk backend for consistency</li>
-<li>JavaScript backend will be easier to use (no C compiler needed)</li>
-<li>Can embed in web pages for interactive BASIC</li>
-<li>Good for teaching/learning BASIC in browser</li>
-</ul>
 
 
 
