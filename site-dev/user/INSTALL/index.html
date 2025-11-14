@@ -862,9 +862,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quick-install-from-pypi-beta" class="md-nav__link">
+  <a href="#quick-install-from-pypi" class="md-nav__link">
     <span class="md-ellipsis">
-      Quick Install from PyPI (Beta)
+      Quick Install from PyPI
     </span>
   </a>
   
@@ -1561,9 +1561,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quick-install-from-pypi-beta" class="md-nav__link">
+  <a href="#quick-install-from-pypi" class="md-nav__link">
     <span class="md-ellipsis">
-      Quick Install from PyPI (Beta)
+      Quick Install from PyPI
     </span>
   </a>
   
@@ -1813,20 +1813,17 @@ This is <strong>required</strong> to use virtual environments (recommended). Wit
 </code></pre></div>
 Only needed if you want to use the Tkinter GUI backend. Skip this if you only need CLI/Curses/Web UIs.</p>
 <p><strong>On other systems</strong> (Fedora, macOS, Windows), virtual environment support and tkinter are usually included with Python.</p>
-<h2 id="quick-install-from-pypi-beta">Quick Install from PyPI (Beta)<a class="headerlink" href="#quick-install-from-pypi-beta" title="Permanent link">&para;</a></h2>
+<h2 id="quick-install-from-pypi">Quick Install from PyPI<a class="headerlink" href="#quick-install-from-pypi" title="Permanent link">&para;</a></h2>
 <p><strong>If you just want to install and use MBASIC</strong>, the easiest method is via PyPI:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Install the beta version (requires --pre flag)</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>pip<span class="w"> </span>install<span class="w"> </span>--pre<span class="w"> </span>mbasic
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Install MBASIC</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>pip<span class="w"> </span>install<span class="w"> </span>mbasic
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Or with full-screen terminal UI support</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>pip<span class="w"> </span>install<span class="w"> </span>--pre<span class="w"> </span>mbasic<span class="o">[</span>curses<span class="o">]</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>pip<span class="w"> </span>install<span class="w"> </span>mbasic<span class="o">[</span>curses<span class="o">]</span>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Or with all UI backends</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>pip<span class="w"> </span>install<span class="w"> </span>--pre<span class="w"> </span>mbasic<span class="o">[</span>all<span class="o">]</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>pip<span class="w"> </span>install<span class="w"> </span>mbasic<span class="o">[</span>all<span class="o">]</span>
 </code></pre></div>
-<blockquote>
-<p><strong>Beta Note</strong>: We're currently in BETA (version 1.0.0b1) and gathering feedback. The <code>--pre</code> flag is required to install beta releases. Once we release stable 1.0.0, the <code>--pre</code> flag will no longer be necessary.</p>
-</blockquote>
 <p>After installation, run:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mbasic
 </code></pre></div></p>
